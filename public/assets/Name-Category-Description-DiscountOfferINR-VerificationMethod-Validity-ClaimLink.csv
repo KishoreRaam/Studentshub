@@ -1,0 +1,38 @@
+title,category,description,DiscountOffer,VerificationMethod,validity,claimlink,isActive
+StudentGithub Pack,Learning,"Github offers wide range of benfits , from coding to learning to deploying ",See details,Studentemail,4 years (renewable),https://education.github.com/pack,True
+Apple Music,Entertainment,"Ad-free music, downloads",See details,Studentemail ,While enrolled,https://www.apple.com/in/apple-music/,True
+Amazon Prime Student,Entertainment,"Prime Video, Music, Delivery",See details,Studentemail,4 years (renewable),https://www.amazon.in/prime/student,True
+Disney+ Hotstar,Entertainment,"Movies, TV, sports streaming",See details,SheerID ,While enrolled,https://www.hotstar.com/in/,True
+Hulu,Entertainment,U.S. TV & movies,See details,SheerID,While enrolled,https://www.hulu.com/,True
+Notion,Productivity,"Project notes, databases",See details,Studentemail,While enrolled,https://www.notion.so/students,True
+Evernote,Productivity,"Note-taking, search",See details,Studentemail,1 year (renewable),https://evernote.com/students,True
+Todoist,Productivity,Task/project manager,See details,Studentemail,While enrolled,https://todoist.com/education,True
+Dropbox,Cloud,File storage/share,See details,Studentemail,1 year (renewable),https://www.dropbox.com/edu,True
+Google Workspace for Education,Cloud,"Docs, Drive, AI",See details,Studentemail,While enrolled,https://workspace.google.com/edu/signup,True
+Autodesk,Design/Engineering,"AutoCAD, Fusion 360, Maya",See details,Studentemail,While enrolled,https://www.autodesk.com/education/edu-software,True
+MATLAB,Engineering,Technical computing/Coding,See details,Studentemail,While enrolled,https://in.mathworks.com/academia/student_version.html,True
+Figma,Design,"UI/UX design, collaboration",See details,Studentemail,"2 years, renewable",https://www.figma.com/education/,True
+JetBrains Student Pack,Productivity,"IDEs for devs, all languages",See details,Studentemail,"1 year, renewable",https://www.jetbrains.com/community/education/#students,True
+SolidWorks,Design/Engineering,3D CAD design,See details,Studentemail,"1 year, renewable",https://www.solidworks.com/solution/education-products,True
+Dell Student Store,Hardware,"Laptops, monitors, accessories",See details,UNiDAYS ,While enrolled,https://www.dell.com/en-in/lp/students,True
+Apple Education Store,Hardware,"Macs, iPads, accessories",See details,UNiDAYS ,While enrolled/semester,https://www.apple.com/in-edu/store,True
+Lenovo Student Store,Hardware,Laptops & tablets,See details,ID.me ,While enrolled,https://www.lenovo.com/in/en/education-store,True
+HP Student Store,Hardware,Laptops & printers,See details,Studentemail ,While enrolled,https://www.hp.com/in-en/shop/offer.aspx?p=student-discount,True
+Samsung Student Offers,Hardware,"Laptops, mobiles, accessories",See details,UNiDAYS ,While enrolled,https://www.samsung.com/in/offer/education/,True
+1Password,Security,Password manager,See details,Studentemail,1 year + renewable,https://1password.com/college/,True
+LastPass,Security,Password manager,See details,Studentemail,1 year (renewable),https://www.lastpass.com/education,True
+RoboForm,Security,Password manager,See details,Studentemail,While enrolled,https://www.roboform.com/for-students,True
+Alibaba Cloud Academy,Cloud,"Cloud courses & certs, cloud credits",See details,Studentemail,1 year,https://www.alibabacloud.com/en/developer/students?_p_lc=1,True
+Coursera,Learning,Online university courses,See details,Studentemail ,While enrolled,https://www.coursera.org,True
+Udemy,Learning,Online courses,See details,Studentemail,While enrolled,https://www.udemy.com/,True
+LinkedIn Learning,Learning,Professional courses,See details,Studentemail,While enrolled,https://www.linkedin.com/learning/,True
+Air India,Travel,Domestic/Int’l flights,See details,Studentemail,Under 26 or enrolled,https://www.airindia.com,True
+IndiGo,Travel,Domestic flights,See details,Studentemail,While enrolled,https://www.goindigo.in/,True
+British Airways,Travel,Int’l flights,See details,Studentemail ,While enrolled,https://www.britishairways.com/travel/student-fares/public/en_gb,True
+Emirates,Travel,Int’l flights,See details,Studentemail ,While enrolled,https://www.emirates.com/in/english/plan-book/fare-types/student-fares/,True
+Pizza Hut,Food/Dining,"Pizza, combos",See details,Studentemail,While enrolled,https://www.pizzahut.co.in/,True
+Domino’s Pizza,Food/Dining,"Pizza, combos, meals",See details,Studentemail,While enrolled,https://www.dominos.co.in/,True
+McDonald’s,Food/Dining,Meals/snacks,See details,Studentemail,While enrolled,https://www.mcdonaldsindia.com/,True
+Croma,Hardware,Electronics/Accessories,See details,Studentemail,While enrolled,https://www.croma.com/,True
+Nykaa,Wellbeign,Beauty & personal care,See details,Studentemail,While enrolled,https://www.nykaa.com/,True
+BookMyShow,Entertainment,Movie/event tickets,See details,Studentemail,While enrolled,https://in.bookmyshow.com/,True
