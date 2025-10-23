@@ -1,4 +1,4 @@
-import { Calendar, Check, X } from "lucide-react";
+import { Calendar, Check, X, Gift, Bookmark } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,8 +54,8 @@ export function CourseDetailModal({ course, isOpen, onClose, onClaim, onSave }: 
               </button>
             </div>
 
-            <div className="w-32 h-32 bg-white dark:bg-slate-900/80 rounded-3xl shadow-2xl dark:shadow-[0_18px_45px_-30px_rgba(37,99,235,0.75)] flex items-center justify-center mb-6 border border-white/40 dark:border-[rgba(148,163,184,0.25)]">
-              <span className="text-6xl">{course.logo}</span>
+            <div className="w-48 h-48 bg-white dark:bg-slate-900/80 rounded-3xl shadow-2xl dark:shadow-[0_18px_45px_-30px_rgba(37,99,235,0.75)] flex items-center justify-center mb-6 border border-white/40 dark:border-[rgba(148,163,184,0.25)]">
+              <span className="text-8xl">{course.logo}</span>
             </div>
 
             <h2 className="text-white text-center mb-2">{course.provider}</h2>
@@ -128,15 +128,19 @@ export function CourseDetailModal({ course, isOpen, onClose, onClaim, onSave }: 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button
                   onClick={onClaim}
-                  className="flex-1 bg-gradient-to-r from-[#2563eb] to-[#16a34a] dark:from-[#2563eb] dark:to-[#16a34a] text-white shadow-md hover:shadow-xl hover:shadow-[#2563eb]/30 dark:hover:shadow-[0_18px_35px_-18px_rgba(37,99,235,0.55)] transition-all duration-300 rounded-xl py-6"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/40 dark:hover:shadow-blue-500/30 transition-all duration-300 rounded-xl py-7 h-14 font-bold text-lg hover:scale-[1.02]"
+                  type="button"
                 >
-                  Claim Now
+                  <Gift className="mr-2 h-6 w-6" />
+                  Claim Resources
                 </Button>
                 <Button
                   onClick={onSave}
                   variant="outline"
-                  className="flex-1 border-2 border-[#2563eb] dark:border-[#3b82f6] text-[#2563eb] dark:text-[#3b82f6] hover:bg-[#2563eb] dark:hover:bg-[#1e40af] hover:text-white dark:hover:text-white transition-all duration-300 rounded-xl py-6"
+                  className="flex-1 bg-white dark:bg-slate-800/50 border-2 border-blue-400 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-600 dark:hover:border-blue-400 transition-all duration-300 rounded-xl py-7 h-14 font-semibold text-lg hover:scale-[1.02]"
+                  type="button"
                 >
+                  <Bookmark className="mr-2 h-5 w-5" />
                   Save for Later
                 </Button>
               </div>
