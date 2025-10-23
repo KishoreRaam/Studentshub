@@ -1,4 +1,4 @@
-import { Gift, Check, Calendar, Clock, ArrowLeft, Bookmark, Users, Shield, Star } from "lucide-react";
+import { Gift, Check, Calendar, Clock, ArrowLeft, Bookmark, Users, Shield, Star, ExternalLink } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -46,6 +46,26 @@ const renderBenefits = (perk: Perk) => {
             <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
             <span className="text-card-foreground leading-relaxed">{benefit}</span>
           </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const renderRequirements = (perk: Perk) => {
+  if (!perk.requirements || perk.requirements.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="px-6 py-6">
+      <h3 className="text-lg font-semibold text-foreground mb-4">Requirements</h3>
+      <div className="space-y-2">
+        {perk.requirements.map((requirement, index) => (
+          <div key={index} className="flex items-start space-x-3">
+            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+            <span className="text-card-foreground leading-relaxed">{requirement}</span>
+          </div>
         ))}
       </div>
     </div>
@@ -197,6 +217,9 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
                 {/* Benefits */}
                 {renderBenefits(perk)}
 
+                {/* Requirements */}
+                {renderRequirements(perk)}
+
                 {/* Verification Steps */}
                 {renderVerification(perk)}
               </div>
@@ -206,31 +229,39 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
             <div className="p-6 border-t border-border bg-muted/30">
               <div className="flex flex-col sm:flex-row gap-3">
                 {perk.claimLink ? (
-                  <Button
-                    asChild
-                    size="lg"
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white border-0 h-12"
+                  <a
+                    href={perk.claimLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1"
                   >
-                    <a href={perk.claimLink} target="_blank" rel="noopener noreferrer">
-                      Apply Now
-                    </a>
-                  </Button>
+                    <Button
+                      size="lg"
+                      className="w-full bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white border-0 h-14 font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                      type="button"
+                    >
+                      <Gift className="w-6 h-6 mr-2" />
+                      Claim Perk
+                      <ExternalLink className="w-5 h-5 ml-2" />
+                    </Button>
+                  </a>
                 ) : (
                   <Button
                     disabled
                     size="lg"
-                    className="flex-1 bg-gradient-to-r from-blue-600/60 to-green-600/60 text-white border-0 h-12"
+                    className="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 text-white border-0 h-14 font-bold text-lg opacity-60"
                   >
-                    Apply Now
+                    <Gift className="w-6 h-6 mr-2" />
+                    Claim Perk
                   </Button>
                 )}
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="lg"
-                  className="flex-1 h-12 border-2 border-border hover:bg-accent" 
+                  className="flex-1 h-14 border-2 border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-500 transition-all duration-200"
                   type="button"
                 >
-                  <Bookmark className="w-4 h-4 mr-2" />
+                  <Bookmark className="w-5 h-5 mr-2" />
                   Save for Later
                 </Button>
               </div>
