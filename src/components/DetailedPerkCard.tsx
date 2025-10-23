@@ -1,4 +1,4 @@
-import { Gift, Check, Calendar, Clock, ArrowLeft, Bookmark, Users, Shield, Star, X } from "lucide-react";
+import { Gift, Check, Calendar, Clock, ArrowLeft, Bookmark, Users, Shield, Star } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -144,7 +144,7 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
           {/* Content with backdrop blur */}
           <div className="relative bg-card/95 backdrop-blur-sm">
             {/* Header */}
-            <div className="flex items-start justify-between p-6 border-b border-border">
+            <div className="p-6 border-b border-border">
               <div className="flex items-start space-x-4">
                 <div className="w-20 h-20 rounded-xl overflow-hidden shadow-lg bg-muted flex-shrink-0">
                   <ImageWithFallback
@@ -178,15 +178,6 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
                   )}
                 </div>
               </div>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="rounded-full w-10 h-10 p-0"
-              >
-                <X className="w-5 h-5" />
-              </Button>
             </div>
 
             {/* Scrollable Content */}
