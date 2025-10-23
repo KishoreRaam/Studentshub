@@ -9,7 +9,7 @@ import Login from "./pages/Login/index";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import Resources from "./pages/Resources";
-import Tools from "./pages/Tools";
+import AITools from "./pages/AITools";
 
 export default function App() {
   return (
@@ -25,7 +25,7 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/resources" element={<Resources />} />
-          <Route path="/tools" element={<Tools />} />
+          <Route path="/tools" element={<AITools />} />
         </Routes>
 
         <Footer />

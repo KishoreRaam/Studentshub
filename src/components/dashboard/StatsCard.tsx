@@ -21,7 +21,7 @@ export default function StatsCard({ stat }: StatsCardProps) {
             {stat.subtitle}
           </p>
         </div>
-        <div className="ml-4 p-3 bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-600 dark:to-blue-700 rounded-lg shadow-lg">
+        <div className="ml-4 p-3 bg-blue-600 dark:bg-gradient-to-br dark:from-cyan-600 dark:to-blue-700 rounded-lg shadow-lg">
           <Icon className="w-6 h-6 text-white" />
         </div>
       </div>

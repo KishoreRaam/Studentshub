@@ -61,7 +61,7 @@ export default function PerkCard({ perk, onViewDetails, onToggleSave }: PerkCard
       {/* Action Button */}
       <Button
         onClick={() => onViewDetails(perk)}
-        className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 dark:from-cyan-600 dark:to-blue-700 dark:hover:from-cyan-700 dark:hover:to-blue-800 text-white shadow-sm hover:shadow-md transition-all"
+        className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-700 dark:hover:from-cyan-700 dark:hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all font-semibold"
       >
         View Details
       </Button>

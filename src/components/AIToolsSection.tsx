@@ -1,226 +1,163 @@
-import { Brain, Code, FileText, Presentation, Cpu, Wrench, Construction, Calculator } from "lucide-react";
-import { Button } from "./ui/button";
-import { useEffect, useRef, useState } from "react";
-
-type Category = "All" | "AIML" | "ECE" | "Mechanical" | "Civil" | "CS";
-
-interface AITool {
-  id: number;
-  icon: any;
-  name: string;
-  tagline: string;
-  categories: Category[];
-  gradient: string;
-}
-
-const aiTools: AITool[] = [
-  {
-    id: 1,
-    icon: Brain,
-    name: "NoteSummarizer AI",
-    tagline: "Summarize notes instantly",
-    categories: ["All", "AIML", "CS"],
-    gradient: "from-purple-500 to-pink-500"
-  },
-  {
-    id: 2,
-    icon: Code,
-    name: "CodeGenius",
-    tagline: "Generate code snippets",
-    categories: ["All", "CS", "AIML"],
-    gradient: "from-blue-500 to-cyan-500"
-  },
-  {
-    id: 3,
-    icon: Presentation,
-    name: "SlideCreator Pro",
-    tagline: "Create presentations instantly",
-    categories: ["All", "AIML", "ECE", "Mechanical", "Civil", "CS"],
-    gradient: "from-green-500 to-emerald-500"
-  },
-  {
-    id: 4,
-    icon: FileText,
-    name: "EssayHelper AI",
-    tagline: "Write better essays faster",
-    categories: ["All", "AIML", "CS"],
-    gradient: "from-orange-500 to-red-500"
-  },
-  {
-    id: 5,
-    icon: Cpu,
-    name: "CircuitSim AI",
-    tagline: "Design & simulate circuits",
-    categories: ["All", "ECE"],
-    gradient: "from-indigo-500 to-purple-500"
-  },
-  {
-    id: 6,
-    icon: Calculator,
-    name: "MathSolver Plus",
-    tagline: "Solve complex equations",
-    categories: ["All", "AIML", "ECE", "Mechanical", "Civil", "CS"],
-    gradient: "from-pink-500 to-rose-500"
-  },
-  {
-    id: 7,
-    icon: Wrench,
-    name: "CAD Assistant",
-    tagline: "AI-powered 3D modeling",
-    categories: ["All", "Mechanical", "Civil"],
-    gradient: "from-yellow-500 to-orange-500"
-  },
-  {
-    id: 8,
-    icon: Construction,
-    name: "StructureAnalyzer",
-    tagline: "Analyze structural designs",
-    categories: ["All", "Civil"],
-    gradient: "from-teal-500 to-green-500"
-  },
-  {
-    id: 9,
-    icon: Brain,
-    name: "ML ModelBuilder",
-    tagline: "Build ML models visually",
-    categories: ["All", "AIML", "CS"],
-    gradient: "from-violet-500 to-purple-500"
-  }
-];
-
-const categories: Category[] = ["All", "AIML", "ECE", "Mechanical", "Civil", "CS"];
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Card, CardContent } from './ui/card';
+import { Badge } from './ui/badge';
+import { ExternalLink, Sparkles, Star } from 'lucide-react';
+import { parseAIToolsCSV } from '@/utils/csvParser';
+import type { AITool } from '@/types/ai-tools';
 
 export function AIToolsSection() {
-  const [selectedCategory, setSelectedCategory] = useState<Category>("All");
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const filteredTools = selectedCategory === "All" 
-    ? aiTools 
-    : aiTools.filter(tool => tool.categories.includes(selectedCategory));
+  const [tools, setTools] = useState<AITool[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+    const loadTools = async () => {
+      try {
+        setLoading(true);
+        const loadedTools = await parseAIToolsCSV('/assets/ai-tools-complete.csv');
+        // Get top 5 most popular tools
+        const popularTools = loadedTools
+          .filter(tool => tool.isPopular)
+          .slice(0, 5);
+        setTools(popularTools);
+      } catch (err) {
+        console.error('Failed to load AI tools preview:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
+    loadTools();
   }, []);
 
-  // Scroll to start when category changes
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-    }
-  }, [selectedCategory]);
+  if (loading) {
+    return (
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-pulse text-gray-400 dark:text-gray-600">
+              Loading AI Tools...
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (tools.length === 0) {
+    return null;
+  }
 
   return (
-    <section
-      ref={sectionRef}
-      className="py-20 px-4 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div
-          className={`text-center mb-8 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+    <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
         >
-          <h2 className="text-gradient-primary mb-4">
-            AI Tools for Smarter Study
+          <Badge
+            variant="secondary"
+            className="mb-4 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 text-purple-800 dark:text-purple-200 border-0"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            AI-Powered Tools
+          </Badge>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            Top AI Tools for Students
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Discover AI tools tailored for your field.
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Discover powerful AI tools to boost your productivity, enhance learning,
+            and accelerate your academic success.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Category Filters */}
-        <div
-          className={`flex flex-wrap justify-center gap-3 mb-8 transition-all duration-700 delay-100 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-5 py-2 rounded-full transition-all duration-300 ${
-                selectedCategory === category
-                  ? "bg-gradient-to-r from-blue-600 to-green-500 text-white shadow-lg scale-105"
-                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md"
-              }`}
+        {/* Tools Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {tools.map((tool, index) => (
+            <motion.div
+              key={tool.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -8 }}
+              className="group"
             >
-              {category}
-            </button>
+              <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden bg-white dark:bg-gray-800">
+                <CardContent className="p-6">
+                  {/* Top badges and pricing */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {tool.isPopular && (
+                        <div className="bg-gradient-to-r from-blue-600 to-green-500 text-white px-3 py-1 rounded-full text-sm flex items-center space-x-1">
+                          <Star className="w-3 h-3 fill-current" />
+                          <span>Popular</span>
+                        </div>
+                      )}
+                      {tool.isNew && !tool.isPopular && (
+                        <Badge variant="secondary" className="text-xs">
+                          New
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Pricing badge - matching benefits value style */}
+                    <span className="text-green-600 font-semibold text-sm">
+                      {tool.pricing}
+                    </span>
+                  </div>
+
+                  {/* Logo */}
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform duration-500">
+                      {tool.logo}
+                    </div>
+                  </div>
+
+                  {/* Name */}
+                  <h3 className="text-xl text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                    {tool.name}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+                    {tool.description}
+                  </p>
+
+                  {/* Learn more link - matching benefits style */}
+                  <div className="flex items-center text-blue-600 group-hover:text-blue-700 transition-colors duration-200">
+                    <span className="text-sm mr-2">Learn more</span>
+                    <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
-        {/* Scrollable Carousel */}
-        <div
-          ref={scrollContainerRef}
-          className={`overflow-x-auto pb-4 transition-all duration-700 delay-200 scrollbar-thin ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+        {/* Discover More Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="text-center mt-12"
         >
-          <div className="flex gap-6 min-w-max px-4">
-            {filteredTools.map((tool, index) => {
-              const Icon = tool.icon;
-              
-              return (
-                <div
-                  key={tool.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 w-80 flex-shrink-0 card-hover transition-all duration-500"
-                >
-                  {/* Icon with gradient background */}
-                  <div
-                    className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tool.gradient} flex items-center justify-center mb-4 shadow-lg`}
-                  >
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-
-                  {/* Content */}
-                  <div className="mb-4">
-                    <h3 className="mb-2 text-gray-900 dark:text-white">
-                      {tool.name}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {tool.tagline}
-                    </p>
-                  </div>
-
-                  {/* Action Button */}
-                  <Button
-                    className="w-full bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300"
-                  >
-                    Try Now
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Scroll Hint */}
-        {filteredTools.length > 3 && (
-          <div className="text-center mt-4">
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              ← Scroll to explore more tools →
-            </p>
-          </div>
-        )}
+          <Link to="/tools">
+            <button className="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden bg-gradient-to-r from-blue-600 to-green-500 rounded-xl text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25">
+              <span className="relative z-10 flex items-center space-x-2">
+                <span className="font-medium">Discover More AI Tools</span>
+                <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

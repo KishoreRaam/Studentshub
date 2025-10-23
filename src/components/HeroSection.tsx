@@ -81,11 +81,14 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button
+              asChild
               variant="outline"
               size="lg"
-              className="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-xl"
+              className="border-2 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-8 py-4 rounded-xl"
             >
-              View Dashboard
+              <Link to="/dashboard">
+                View Dashboard
+              </Link>
             </Button>
           </motion.div>
 

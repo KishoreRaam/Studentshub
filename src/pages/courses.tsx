@@ -1,13 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { toast } from "sonner";
+import Papa from "papaparse";
 
 import { CourseCard, type Course } from "@/components/courses/CourseCard";
 import { CourseDetailModal } from "@/components/courses/CourseDetailModal";
 import { HeroSection } from "@/components/courses/HeroSection";
 import { SearchAndFilter } from "@/components/courses/SearchAndFilter";
 import { Toaster } from "@/components/ui/sonner";
+import type { Resource } from "@/types/resource";
 
-const coursesData: Course[] = [
+// Hardcoded data as fallback
+const fallbackCoursesData: Course[] = [
   {
     id: "1",
     provider: "Coursera",
@@ -202,6 +205,74 @@ export default function Courses() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
   const [savedCourses, setSavedCourses] = useState<string[]>([]);
+  const [coursesData, setCoursesData] = useState<Course[]>(fallbackCoursesData);
+  const [loading, setLoading] = useState(true);
+
+  // Load CSV data on component mount
+  useEffect(() => {
+    const loadCSVData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/assets/student_courses_resources.csv');
+        const csvText = await response.text();
+
+        Papa.parse<Resource>(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const csvCourses: Course[] = results.data.map((resource, index) => ({
+              id: `csv-${index}`,
+              provider: resource.provider || 'Unknown',
+              logo: getCategoryEmoji(resource.category),
+              category: resource.category || 'Other',
+              description: resource.description || '',
+              validity: resource.validity || 'Ongoing',
+              verificationMethod: resource.verificationMethod || 'Email verification',
+              courses: [
+                resource.title || 'Course details',
+                resource.discountOfferINR ? `Value: ${resource.discountOfferINR}` : '',
+              ].filter(Boolean),
+              verificationSteps: [
+                `Visit: ${resource.claimLink}`,
+                resource.verificationMethod || 'Complete verification',
+                'Access your resources'
+              ],
+              claimLink: resource.claimLink
+            }));
+
+            setCoursesData(csvCourses.length > 0 ? csvCourses : fallbackCoursesData);
+            setLoading(false);
+          },
+          error: (error) => {
+            console.error('CSV parsing error:', error);
+            setCoursesData(fallbackCoursesData);
+            setLoading(false);
+          }
+        });
+      } catch (error) {
+        console.error('Failed to load CSV:', error);
+        setCoursesData(fallbackCoursesData);
+        setLoading(false);
+      }
+    };
+
+    loadCSVData();
+  }, []);
+
+  // Helper function to get emoji based on category
+  const getCategoryEmoji = (category: string): string => {
+    const emojiMap: Record<string, string> = {
+      'Development': '💻',
+      'Design': '🎨',
+      'Business': '💼',
+      'AI & ML': '🤖',
+      'Cloud': '☁️',
+      'Productivity': '⚡',
+      'Data Science': '📊',
+      'Marketing': '📢'
+    };
+    return emojiMap[category] || '📚';
+  };
 
   const filteredCourses = useMemo(() => {
     return coursesData
@@ -266,7 +337,7 @@ export default function Courses() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f8fbff] via-white to-[#f0f9ff] dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-[#f8fbff] via-white to-[#f0f9ff] dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <Toaster />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -284,17 +355,32 @@ export default function Courses() {
         </div>
 
         <div className="mb-6">
-          <h2 className="text-[#1e293b] dark:text-slate-100">
+          <h2 className="text-2xl font-bold text-[#1e293b] dark:text-white">
             {showSaved ? "Saved Courses" : "Available Courses"}
           </h2>
-          <p className="text-[#475569] dark:text-slate-300 mt-2">
+          <p className="text-[#475569] dark:text-gray-400 mt-2">
             {showSaved
               ? `${filteredCourses.length} saved course${filteredCourses.length !== 1 ? "s" : ""}`
               : `${filteredCourses.length} course provider${filteredCourses.length !== 1 ? "s" : ""} available`}
           </p>
         </div>
 
-        {filteredCourses.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 animate-pulse">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+                  <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+              </div>
+            ))}
+          </div>
+        ) : filteredCourses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredCourses.map((course) => (
               <CourseCard key={course.id} course={course} onClick={() => handleCourseClick(course)} />
@@ -303,10 +389,10 @@ export default function Courses() {
         ) : (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">📚</div>
-            <h3 className="text-[#1e293b] dark:text-slate-100 mb-2">
+            <h3 className="text-xl font-semibold text-[#1e293b] dark:text-white mb-2">
               {showSaved ? "No saved courses yet" : "No courses found"}
             </h3>
-            <p className="text-[#475569] dark:text-slate-300">
+            <p className="text-[#475569] dark:text-gray-400">
               {showSaved
                 ? "Start exploring and save courses for later!"
                 : "Try adjusting your search or filters"}
