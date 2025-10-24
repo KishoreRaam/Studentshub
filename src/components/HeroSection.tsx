@@ -1,11 +1,68 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 
 import { Button } from './ui/button';
 import { AnimatedTitle } from './AnimatedTitle';
 
+// Counter animation hook
+function useCountUp(end: number, duration: number = 2000, startCounting: boolean = false) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!startCounting) return;
+
+    let startTime: number | null = null;
+    let animationFrame: number;
+
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+
+      // Easing function for smooth animation
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      setCount(Math.floor(easeOutQuart * end));
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration, startCounting]);
+
+  return count;
+}
+
 export function HeroSection() {
+  const [startCounting, setStartCounting] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
+
+  // Intersection observer to trigger counting when stats come into view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setStartCounting(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const activeStudents = useCountUp(5, 2000, startCounting); // 5 Lakh
+  const benefits = useCountUp(150, 2000, startCounting);
+  const avgSavings = useCountUp(4, 2000, startCounting); // 4 Lakh
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20 overflow-hidden transition-colors duration-300">
       {/* Background decorative elements */}
@@ -94,22 +151,29 @@ export function HeroSection() {
 
           {/* Stats */}
           <motion.div
+            ref={statsRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="grid grid-cols-3 gap-8 max-w-md mx-auto pt-8"
+            className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-8"
           >
             <div className="text-center">
-              <div className="text-2xl text-blue-600">50K+</div>
-              <div className="text-sm text-gray-500">Active Students</div>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                {activeStudents}+ Lakh
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Active Students</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl text-green-600">100+</div>
-              <div className="text-sm text-gray-500">Benefits</div>
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">
+                {benefits}+
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Benefits</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl text-blue-600">$5K+</div>
-              <div className="text-sm text-gray-500">Avg. Savings</div>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                ₹{avgSavings}+ Lakh
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Avg. Savings</div>
             </div>
           </motion.div>
         </motion.div>

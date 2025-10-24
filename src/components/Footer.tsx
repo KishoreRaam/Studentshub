@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, Github, Twitter, Linkedin, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { CreatorBadge } from './CreatorBadge';
 
 export function Footer() {
   return (
@@ -93,7 +94,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-gray-800 mt-12 pt-8">
+        <div className="border-t border-gray-800 mt-12 pt-8 space-y-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
               © 2025 EduBuzz. All rights reserved.
@@ -103,6 +104,11 @@ export function Footer() {
               <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors duration-200">Terms</a>
               <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors duration-200">Cookies</a>
             </div>
+          </div>
+
+          {/* Creator Badge - More prominent */}
+          <div className="flex justify-center pt-6 pb-4">
+            <CreatorBadge />
           </div>
         </div>
       </div>
