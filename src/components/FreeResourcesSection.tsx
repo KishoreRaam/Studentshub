@@ -1,6 +1,7 @@
-import { BookOpen, FileText, GraduationCap } from "lucide-react";
+import { BookOpen, FileText, GraduationCap, ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const resources = [
   {
@@ -50,6 +51,7 @@ const resources = [
 export function FreeResourcesSection() {
   const [visibleCards, setVisibleCards] = useState<number[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -97,7 +99,7 @@ export function FreeResourcesSection() {
           {resources.map((resource, index) => {
             const Icon = resource.icon;
             const isVisible = visibleCards.includes(index);
-            
+
             return (
               <div
                 key={resource.id}
@@ -137,6 +139,17 @@ export function FreeResourcesSection() {
               </div>
             );
           })}
+        </div>
+
+        {/* Explore More Button */}
+        <div className="text-center">
+          <Button
+            onClick={() => navigate('/resources')}
+            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg font-semibold hover:scale-105"
+          >
+            Explore More Resources
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
         </div>
       </div>
     </section>

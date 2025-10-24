@@ -4,6 +4,7 @@ import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Calendar, Mail, AlertCircle, CheckCircle, TrendingUp, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const lineChartData = [
   { month: 'Jan', active: 45, expired: 5 },
@@ -36,6 +37,8 @@ const recentActivity = [
 ];
 
 export function DashboardPreview() {
+  const navigate = useNavigate();
+
   return (
     <section className="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -257,7 +260,10 @@ export function DashboardPreview() {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <button className="bg-gradient-to-r from-blue-600 to-green-500 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="bg-gradient-to-r from-blue-600 to-green-500 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 font-semibold"
+          >
             Access Your Dashboard
           </button>
         </motion.div>
