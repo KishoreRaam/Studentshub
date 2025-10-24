@@ -37,114 +37,103 @@ export function CourseDetailModal({ course, isOpen, onClose, onClaim, onSave }: 
         }
       }}
     >
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-white dark:bg-gray-800 dark:text-white rounded-3xl border border-gray-200 dark:border-gray-700 shadow-2xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-white dark:bg-gray-900 border-0 rounded-2xl shadow-2xl">
         <DialogTitle className="sr-only">{course.provider} - Free Courses</DialogTitle>
         <DialogDescription className="sr-only">{course.description}</DialogDescription>
 
-        <div className="grid md:grid-cols-5 min-h-[600px]">
-          {/* Left Side - Provider Logo & Gradient */}
-          <div className="md:col-span-2 bg-gradient-to-br from-[#2563eb] to-[#16a34a] dark:from-gray-900 dark:via-blue-900 dark:to-green-900 p-8 flex flex-col items-center justify-center rounded-l-3xl relative">
-            <div className="absolute top-4 right-4 md:hidden">
-              <button
-                type="button"
-                onClick={onClose}
-                className="p-2 bg-white/20 dark:bg-white/10 backdrop-blur-md rounded-full hover:bg-white/30 dark:hover:bg-white/20 transition-all"
-              >
-                <X className="h-5 w-5 text-white" />
-              </button>
+        {/* Close Button */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 z-50 p-2 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+        >
+          <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+        </button>
+
+        {/* Header Section */}
+        <div className="bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-800 dark:via-gray-850 dark:to-gray-800 p-8 rounded-t-2xl border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-start gap-6">
+            {/* Logo */}
+            <div className="w-24 h-24 bg-white dark:bg-gray-900 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-gray-700">
+              <span className="text-5xl">{course.logo}</span>
             </div>
 
-            <div className="w-48 h-48 bg-white dark:bg-gray-950 rounded-3xl shadow-2xl dark:shadow-blue-500/20 flex items-center justify-center mb-6 border border-white/40 dark:border-gray-700">
-              <span className="text-8xl">{course.logo}</span>
+            {/* Title and Category */}
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{course.provider}</h2>
+              <Badge className={`${categoryColors[course.category] || "bg-gray-600 text-white"} px-3 py-1 rounded-full text-sm font-medium`}>
+                {course.category}
+              </Badge>
+              <p className="text-gray-600 dark:text-gray-300 mt-4 leading-relaxed">{course.description}</p>
             </div>
+          </div>
+        </div>
 
-            <h2 className="text-2xl font-bold text-white text-center mb-2">{course.provider}</h2>
-
-            <Badge className={`${categoryColors[course.category] || "bg-gray-600 text-white"} px-4 py-1 rounded-full`}>
-              {course.category}
-            </Badge>
-
-            {/* Decorative elements */}
-            <div className="absolute bottom-10 left-10 w-32 h-32 bg-white/10 dark:bg-white/5 rounded-full blur-2xl"></div>
-            <div className="absolute top-10 right-10 w-40 h-40 bg-white/10 dark:bg-white/5 rounded-full blur-2xl"></div>
+        {/* Content Section */}
+        <div className="p-8 space-y-6 bg-white dark:bg-gray-900">
+          {/* Validity Info */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h4 className="font-semibold text-gray-900 dark:text-white">Validity</h4>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">{course.validity}</p>
           </div>
 
-          {/* Right Side - Course Details */}
-          <div className="md:col-span-3 p-8 relative bg-white dark:bg-gray-800">
-            <div className="hidden md:block absolute top-4 right-4">
-              <button
+          {/* Courses Available */}
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Courses Available</h3>
+            <div className="space-y-2.5">
+              {course.courses.map((courseName) => (
+                <div key={courseName} className="flex items-start gap-3 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                  <Check className="h-5 w-5 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-300 text-sm font-medium">{courseName}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* How to Get Started */}
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">How to Get Started</h3>
+            <div className="space-y-3">
+              {course.verificationSteps.map((step, index) => (
+                <div key={step} className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-green-600 text-white flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-md">
+                    {index + 1}
+                  </div>
+                  <span className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed pt-1">{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <a
+              href={course.claimLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1"
+            >
+              <Button
+                onClick={onClaim}
+                className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl h-14 font-bold text-lg hover:scale-[1.02]"
                 type="button"
-                onClick={onClose}
-                className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
               >
-                <X className="h-5 w-5 text-[#475569] dark:text-gray-300" />
-              </button>
-            </div>
-
-            <div className="space-y-6 mt-8 md:mt-0">
-              {/* Description */}
-              <div>
-                <p className="text-[#475569] dark:text-gray-300">{course.description}</p>
-              </div>
-
-              {/* Courses Available */}
-              <div>
-                <h3 className="text-lg font-semibold text-[#1e293b] dark:text-white mb-3">Courses Available</h3>
-                <div className="space-y-2">
-                  {course.courses.map((courseName) => (
-                    <div key={courseName} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-[#16a34a] dark:text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-[#475569] dark:text-gray-300 text-sm">{courseName}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* How to Verify */}
-              <div>
-                <h3 className="text-lg font-semibold text-[#1e293b] dark:text-white mb-3">How to Verify</h3>
-                <div className="space-y-3">
-                  {course.verificationSteps.map((step, index) => (
-                    <div key={step} className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#2563eb] to-[#16a34a] text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
-                        {index + 1}
-                      </div>
-                      <span className="text-[#475569] dark:text-gray-300 text-sm">{step}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Validity */}
-              <div className="bg-gradient-to-r from-[#f8fbff] to-[#e0f2fe] dark:from-gray-900 dark:to-blue-900/30 p-4 rounded-xl border border-[#2563eb]/20 dark:border-gray-700">
-                <div className="flex items-center gap-2 mb-1">
-                  <Calendar className="h-5 w-5 text-[#2563eb] dark:text-blue-400" />
-                  <h4 className="font-semibold text-[#1e293b] dark:text-white">Validity</h4>
-                </div>
-                <p className="text-[#475569] dark:text-gray-300 text-sm">{course.validity}</p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button
-                  onClick={onClaim}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/40 dark:hover:shadow-blue-500/30 transition-all duration-300 rounded-xl py-7 h-14 font-bold text-lg hover:scale-[1.02]"
-                  type="button"
-                >
-                  <Gift className="mr-2 h-6 w-6" />
-                  Claim Resources
-                </Button>
-                <Button
-                  onClick={onSave}
-                  variant="outline"
-                  className="flex-1 bg-white dark:bg-slate-800/50 border-2 border-blue-400 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-600 dark:hover:border-blue-400 transition-all duration-300 rounded-xl py-7 h-14 font-semibold text-lg hover:scale-[1.02]"
-                  type="button"
-                >
-                  <Bookmark className="mr-2 h-5 w-5" />
-                  Save for Later
-                </Button>
-              </div>
-            </div>
+                <Gift className="mr-2 h-6 w-6" />
+                Claim Now
+              </Button>
+            </a>
+            <Button
+              onClick={onSave}
+              variant="outline"
+              className="flex-1 bg-white dark:bg-gray-800 border-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-700 dark:hover:border-blue-400 transition-all duration-200 rounded-xl h-14 font-semibold text-lg hover:scale-[1.02]"
+              type="button"
+            >
+              <Bookmark className="mr-2 h-5 w-5" />
+              Save for Later
+            </Button>
           </div>
         </div>
       </DialogContent>

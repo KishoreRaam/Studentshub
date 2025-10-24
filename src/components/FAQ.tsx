@@ -64,13 +64,13 @@ export function FAQ() {
           className="text-center mb-16"
         >
           <div className="flex items-center justify-center mb-6">
-            <HelpCircle className="w-8 h-8 text-blue-600 mr-3" />
-            <h2 className="text-4xl md:text-5xl text-gray-900">
+            <HelpCircle className="w-8 h-8 text-blue-600 dark:text-blue-400 mr-3" />
+            <h2 className="text-4xl md:text-5xl text-gray-900 dark:text-white">
               Frequently Asked Questions
             </h2>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Got questions? We've got answers. Find everything you need to know 
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Got questions? We've got answers. Find everything you need to know
             about EduBuzz and student benefits.
           </p>
         </motion.div>
@@ -84,13 +84,13 @@ export function FAQ() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
-              <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+              <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden dark:bg-gray-800/80">
                 <CardContent className="p-0">
                   <button
                     onClick={() => toggleFAQ(faq.id)}
-                    className="w-full text-left p-6 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-between"
+                    className="w-full text-left p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200 flex items-center justify-between"
                   >
-                    <span className="text-lg text-gray-900 pr-4">
+                    <span className="text-lg text-gray-900 dark:text-white pr-4">
                       {faq.question}
                     </span>
                     <motion.div
@@ -98,7 +98,7 @@ export function FAQ() {
                       transition={{ duration: 0.3 }}
                       className="flex-shrink-0"
                     >
-                      <ChevronDown className="w-5 h-5 text-gray-500" />
+                      <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     </motion.div>
                   </button>
                   
@@ -111,7 +111,7 @@ export function FAQ() {
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
-                        <div className="px-6 pb-6 text-gray-600 leading-relaxed border-t border-gray-100 pt-4">
+                        <div className="px-6 pb-6 text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-700 pt-4">
                           {faq.answer}
                         </div>
                       </motion.div>

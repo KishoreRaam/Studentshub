@@ -63,7 +63,7 @@ export function SearchAndFilter({
               className={`px-4 py-2 rounded-full whitespace-nowrap transition-all duration-300 shadow-sm font-medium ${
                 selectedCategory === category
                   ? "bg-gradient-to-r from-[#2563eb] to-[#16a34a] text-white shadow-lg"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                  : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-2 border-gray-300 dark:border-gray-700"
               }`}
             >
               {category}
