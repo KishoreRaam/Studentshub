@@ -29,7 +29,7 @@ const statsData: Stat[] = [
   },
   {
     title: "Total Savings",
-    value: "$320",
+    value: "₹26,000",
     subtitle: "This academic year",
     icon: DollarSign,
   },

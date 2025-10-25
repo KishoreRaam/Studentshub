@@ -15,7 +15,7 @@ const benefits = [
     title: "Canva Pro",
     description: "Premium design tools with unlimited downloads, premium templates, and brand kit features.",
     image: "https://images.unsplash.com/photo-1649091245823-18be815da4f7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYW52YSUyMGRlc2lnbiUyMHRvb2x8ZW58MXx8fHwxNzU3NDMxMjg5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    value: "$120/year",
+    value: "₹10,000/year",
     badge: "Design",
     fullDescription: "Canva Pro unlocks premium design features for students, including access to millions of premium photos, graphics, and templates. Create stunning presentations, social media posts, and documents with professional design tools.",
     features: [
@@ -41,14 +41,14 @@ const benefits = [
       "Start creating amazing designs"
     ],
     validUntil: "End of studies",
-    usedBy: "15M+ Students"
+    usedBy: "1.5 Crore+ Students"
   },
   {
     id: 3,
     title: "Microsoft 365",
     description: "Complete Office suite with Word, Excel, PowerPoint, OneDrive storage, and collaboration tools.",
     image: "https://images.unsplash.com/photo-1649433391420-542fcd3835ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaWNyb3NvZnQlMjBvZmZpY2V8ZW58MXx8fHwxNzU3NDAyNjUyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    value: "$100/year",
+    value: "₹8,300/year",
     badge: "Productivity",
     fullDescription: "Microsoft 365 Education provides students with the full Office suite including Word, Excel, PowerPoint, and more. Get 1TB of OneDrive storage and collaborate seamlessly with classmates and professors.",
     features: [
@@ -74,14 +74,14 @@ const benefits = [
       "Sign in with your Microsoft account"
     ],
     validUntil: "Graduation",
-    usedBy: "150M+ Students"
+    usedBy: "15 Crore+ Students"
   },
   {
     id: 4,
     title: "Spotify Premium",
     description: "Ad-free music streaming with offline downloads and high-quality audio at student pricing.",
     image: "https://images.unsplash.com/photo-1658489958427-325ded050829?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG90aWZ5JTIwbXVzaWN8ZW58MXx8fHwxNzU3NDMxMjkwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    value: "$60/year",
+    value: "₹5,000/year",
     badge: "Entertainment",
     fullDescription: "Get Spotify Premium at 50% off the regular price with student discount. Enjoy ad-free music, offline downloads, and high-quality audio streaming with access to over 100 million songs and podcasts.",
     features: [
@@ -104,18 +104,18 @@ const benefits = [
       "Visit Spotify Premium Student page",
       "Click 'Get Premium Student'",
       "Verify student status through SheerID",
-      "Complete payment setup ($4.99/month)",
+      "Complete payment setup (₹419/month)",
       "Enjoy your premium music experience"
     ],
     validUntil: "Up to 4 years",
-    usedBy: "8M+ Students"
+    usedBy: "80 Lakh+ Students"
   },
   {
     id: 5,
     title: "Adobe Creative Cloud",
     description: "Professional creative software including Photoshop, Illustrator, Premiere Pro, and more.",
     image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZG9iZSUyMGNyZWF0aXZlfGVufDF8fHx8MTc1NzQzMTI5MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    value: "$600/year",
+    value: "₹50,000/year",
     badge: "Creative",
     fullDescription: "Adobe Creative Cloud for Students provides access to the complete collection of Adobe's creative applications at a significant discount. Perfect for design, photography, video editing, and digital art projects.",
     features: [
@@ -143,14 +143,14 @@ const benefits = [
       "Download and install your creative apps"
     ],
     validUntil: "Duration of studies",
-    usedBy: "5M+ Students"
+    usedBy: "50 Lakh+ Students"
   },
   {
     id: 6,
     title: "Figma Professional",
     description: "Advanced design and prototyping tools with unlimited projects and collaboration features.",
     image: "https://images.unsplash.com/photo-1653647054667-c99dc7f914ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaWdtYSUyMGRlc2lnbnxlbnwxfHx8fDE3NTc0MzEyOTF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    value: "$144/year",
+    value: "₹12,000/year",
     badge: "Design",
     fullDescription: "Figma Education provides free access to professional design and prototyping tools. Create stunning user interfaces, collaborate in real-time, and learn industry-standard design practices with unlimited projects and advanced features.",
     features: [
@@ -177,7 +177,7 @@ const benefits = [
       "Start designing with full professional features"
     ],
     validUntil: "2 years after graduation",
-    usedBy: "3M+ Students"
+    usedBy: "30 Lakh+ Students"
   }
 ];
 

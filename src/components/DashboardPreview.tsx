@@ -80,7 +80,7 @@ export function DashboardPreview() {
               <div className="flex items-center space-x-4">
                 <div className="text-right">
                   <div className="text-sm text-gray-500 dark:text-gray-400">Total Savings</div>
-                  <div className="text-2xl text-green-600">$4,847</div>
+                  <div className="text-2xl text-green-600">₹4 Lakh</div>
                 </div>
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-green-500 rounded-full flex items-center justify-center">
                   <span className="text-white">A</span>

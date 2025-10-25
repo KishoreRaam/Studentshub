@@ -219,7 +219,7 @@ export default function AITools() {
       <AIToolsHero
         toolsCount={tools.length}
         streamsCount={streams.length}
-        usersCount="15k"
+        usersCount="1.5 Lakh"
       />
 
       {/* Search and Filters */}
