@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { ThemeProvider } from "./components/ThemeProvider";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -15,6 +16,7 @@ export default function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="edubuzz-theme">
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+        <ScrollToTop />
         <Header />
 
         <Routes>

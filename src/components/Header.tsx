@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Menu, X, Home, Gift, BarChart3, Settings, Star, Search, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthButtons } from './AuthButtons';
 import { ThemeToggle } from './ThemeToggle';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // Auto-close mobile menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },

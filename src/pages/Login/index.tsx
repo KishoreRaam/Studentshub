@@ -40,7 +40,7 @@ const SignInPage = () => {
   }, []);
 
   return (
-    <div className="login-shell">
+    <div className="login-shell pt-16">
       <div className="login-bg-layer" data-auth-bg aria-hidden="true">
         <div className="ambient-circle ambient-blue"></div>
         <div className="ambient-circle ambient-green"></div>

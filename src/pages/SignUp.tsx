@@ -40,7 +40,7 @@ const SignUpPage = () => {
   }, []);
 
   return (
-    <div className="auth-layout">
+    <div className="auth-layout pt-16">
       <div className="auth-left">
         <div className="brand-lockup">
           <h1>Hub</h1>
