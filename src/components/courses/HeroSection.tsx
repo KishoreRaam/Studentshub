@@ -37,7 +37,7 @@ export function HeroSection({ onBrowseClick, onSavedClick }: HeroSectionProps) {
           <Button
             onClick={onSavedClick}
             variant="outline"
-            className="bg-white/20 dark:bg-white/10 backdrop-blur-md text-white border-2 border-white/60 dark:border-white/30 hover:bg-white/30 dark:hover:bg-white/20 hover:border-white/80 dark:hover:border-white/40 transition-all duration-300 px-8 py-6 rounded-xl font-semibold shadow-lg hover:shadow-xl"
+            className="bg-white dark:bg-white/10 backdrop-blur-md text-[#2563eb] dark:text-white border-2 border-white dark:border-white/30 hover:bg-white/95 dark:hover:bg-white/20 hover:border-white dark:hover:border-white/40 transition-all duration-300 px-8 py-6 rounded-xl font-semibold shadow-lg hover:shadow-xl"
           >
             <Bookmark className="mr-2 h-5 w-5" />
             Saved Courses
