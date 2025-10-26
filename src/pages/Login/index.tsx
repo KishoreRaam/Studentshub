@@ -1,8 +1,19 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { GoogleIcon, SheerIDIcon } from './AuthIcons';
 import './AuthStyles.css';
 
 const SignInPage = () => {
+  const navigate = useNavigate();
+  const { loginWithGoogle, user, loading } = useAuth();
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
+
   useEffect(() => {
     // Logic from auth-bg.js for background animations
     const bgContainer = document.querySelector('[data-auth-bg]');
@@ -39,6 +50,15 @@ const SignInPage = () => {
     };
   }, []);
 
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login failed. Please try again.');
+    }
+  };
+
   return (
     <div className="login-shell pt-16">
       <div className="login-bg-layer" data-auth-bg aria-hidden="true">
@@ -54,9 +74,9 @@ const SignInPage = () => {
         <p className="sub">Access your dashboard</p>
         
         <div className="oauth-stack" aria-label="Third-party sign in options">
-          <button type="button" className="oauth-btn google">
+          <button type="button" className="oauth-btn google" onClick={handleGoogleLogin} disabled={loading}>
             <GoogleIcon />
-            <span>Continue with Google</span>
+            <span>{loading ? 'Loading...' : 'Continue with Google'}</span>
           </button>
           <div className="sheerid-block">
             <button type="button" className="oauth-btn sheerid">
