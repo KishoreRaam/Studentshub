@@ -1,10 +1,13 @@
 import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import AccountInfoCard from '../components/profile/AccountInfoCard';
 import BenefitsGrid from '../components/profile/BenefitsGrid';
 import ActivityCard from '../components/profile/ActivityCard';
 import BenefitsStats from '../components/profile/BenefitsStats';
 import NotificationsCard from '../components/profile/NotificationsCard';
+import EditProfileModal, { ProfileUpdateData } from '../components/profile/EditProfileModal';
 import {
   UserProfile,
   ClaimedPerk,
@@ -12,6 +15,12 @@ import {
   Notification,
   BenefitsStats as BenefitsStatsType,
 } from '../types/profile.types';
+import {
+  getOrCreateProfile,
+  updateUserProfile,
+  uploadAvatar,
+} from '../services/profile.service';
+import { Loader2 } from 'lucide-react';
 
 // Mock data - Replace with actual Appwrite data later
 const mockUser: UserProfile = {
@@ -180,6 +189,104 @@ const mockStats: BenefitsStatsType = {
 };
 
 export default function ProfilePage() {
+  const { user: authUser } = useAuth();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [error, setError] = useState<string>('');
+
+  // Load user profile on mount
+  useEffect(() => {
+    async function loadProfile() {
+      if (!authUser) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const profile = await getOrCreateProfile(authUser);
+        setUserProfile(profile);
+        setError('');
+      } catch (err) {
+        console.error('Error loading profile:', err);
+        setError('Failed to load profile. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfile();
+  }, [authUser]);
+
+  // Handle profile update
+  const handleProfileUpdate = async (updates: ProfileUpdateData) => {
+    if (!authUser || !userProfile) return;
+
+    try {
+      let avatarUrl = userProfile.avatar;
+
+      // Upload avatar if it's a file
+      if (updates.avatar instanceof File) {
+        avatarUrl = await uploadAvatar(updates.avatar);
+      }
+
+      // Update profile in database
+      const updatedProfile = await updateUserProfile(authUser.$id, {
+        name: updates.name,
+        university: updates.university,
+        stream: updates.stream,
+        avatar: avatarUrl,
+      });
+
+      setUserProfile(updatedProfile);
+      setIsEditModalOpen(false);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      throw err; // Let the modal handle the error
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No profile state (shouldn't happen but just in case)
+  if (!userProfile) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 dark:text-gray-400">No profile found.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -196,14 +303,17 @@ export default function ProfilePage() {
         </motion.div>
 
         {/* Profile Header */}
-        <ProfileHeader user={mockUser} />
+        <ProfileHeader user={userProfile} />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - 2/3 width on desktop */}
           <div className="lg:col-span-2 space-y-6">
             {/* Account Information Card */}
-            <AccountInfoCard user={mockUser} />
+            <AccountInfoCard
+              user={userProfile}
+              onEditClick={() => setIsEditModalOpen(true)}
+            />
 
             {/* Available Benefits Grid */}
             <BenefitsGrid benefits={mockBenefits} />
@@ -217,7 +327,7 @@ export default function ProfilePage() {
             {/* Activity & Usage Card */}
             <ActivityCard
               activities={mockActivities}
-              lastLogin={mockUser.lastLogin}
+              lastLogin={userProfile.lastLogin}
             />
 
             {/* Notifications Card */}
@@ -225,6 +335,14 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        user={userProfile}
+        onSave={handleProfileUpdate}
+      />
     </div>
   );
 }
