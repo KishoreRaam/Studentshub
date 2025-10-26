@@ -4,6 +4,7 @@ import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ProfileButton } from "./components/ProfileButton";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Perks from "./pages/Perks";
@@ -19,6 +20,7 @@ export default function App() {
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
         <ScrollToTop />
         <Header />
+        <ProfileButton />
 
         <Routes>
           <Route path="/" element={<Home />} />
