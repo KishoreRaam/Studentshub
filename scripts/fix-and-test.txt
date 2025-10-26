@@ -1,0 +1,95 @@
+# Local Build Test Steps
+
+## Prerequisites
+Ensure you have Node.js and npm installed.
+
+## Steps to Test the Build
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Configure Environment Variables**
+   Create or verify `.env` file in the project root contains:
+   ```
+   VITE_APPWRITE_ENDPOINT=https://fra.cloud.appwrite.io/v1
+   VITE_APPWRITE_PROJECT=68d29c8100366fc856a6
+   ```
+
+   **IMPORTANT**: Do NOT add APPWRITE_API_KEY here - it's server-only and should never be in client code.
+
+3. **Run the Build**
+   ```bash
+   npm run build
+   ```
+
+   **Expected Result**: Build completes successfully without Rollup parse errors.
+   The output should end with something like:
+   ```
+   ✓ built in XXXms
+   ```
+
+4. **Test Development Server (Optional)**
+   ```bash
+   npm run dev
+   ```
+   Visit http://localhost:3002 and verify:
+   - Homepage loads
+   - Login/Signup pages are accessible
+   - No console errors related to Appwrite imports
+
+## Common Issues and Solutions
+
+### Issue: "Cannot find module 'appwrite'"
+**Solution**: Run `npm install` to ensure appwrite SDK is installed.
+
+### Issue: Build fails with "parseAst" or "findVariable" errors
+**Solution**:
+- Verify `src/lib/appwrite.js` uses pure ESM syntax (no CommonJS)
+- Check that all imports use `.js` extension: `from '../lib/appwrite.js'`
+- Ensure no `Models` or `OAuthProvider` imports from 'appwrite' package in client files
+
+### Issue: Environment variables not working
+**Solution**:
+- Verify variables start with `VITE_` prefix
+- Restart dev server after changing .env
+- For Vercel: Add env vars in Vercel dashboard, not in .env
+
+### Issue: OAuth not working in production
+**Solution**:
+- Configure OAuth redirect URLs in Appwrite Console
+- Add production domain to Platforms in Appwrite
+- Verify `VITE_APPWRITE_PROJECT` matches your Appwrite project ID
+
+## Files Modified in This Fix
+
+1. `src/lib/appwrite.js` - Replaced with pure ESM version
+2. `src/contexts/AuthContext.tsx` - Updated imports and removed TypeScript-only types
+3. `.env` - Changed VITE_APPWRITE_PROJECT_ID to VITE_APPWRITE_PROJECT
+4. `.env.example` - Updated variable names to match
+
+## What Was Fixed
+
+The original build failure was caused by:
+1. TypeScript-only imports (Models, OAuthProvider) in client code that Rollup couldn't parse
+2. Mixed use of environment variable names (PROJECT_ID vs PROJECT)
+3. Server-only code patterns at module top-level
+
+The fix:
+1. Created pure ESM `appwrite.js` client that uses only `import.meta.env.VITE_*` variables
+2. Removed TypeScript-only imports and replaced with simpler types
+3. Ensured all Appwrite API calls happen at runtime, not module initialization
+4. Standardized environment variable names
+
+## Vercel Deployment
+
+After confirming local build works:
+
+1. Push changes to your repository
+2. In Vercel dashboard, add environment variables:
+   - VITE_APPWRITE_ENDPOINT=https://fra.cloud.appwrite.io/v1
+   - VITE_APPWRITE_PROJECT=68d29c8100366fc856a6
+3. Redeploy
+
+The build should now pass on Vercel.

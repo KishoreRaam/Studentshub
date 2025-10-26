@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { account, OAUTH_CONFIG } from '../lib/appwrite';
-import { Models } from 'appwrite';
-import { OAuthProvider } from 'appwrite';
+import { account, OAUTH_CONFIG } from '../lib/appwrite.js';
 
 interface AuthContextType {
-  user: Models.User<Models.Preferences> | null;
+  user: any | null;
   loading: boolean;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
@@ -26,7 +24,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Check for existing session on mount
@@ -51,9 +49,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loginWithGoogle = async () => {
     try {
       account.createOAuth2Session(
-        OAuthProvider.Google,
-        OAUTH_CONFIG.SUCCESS_URL,
-        OAUTH_CONFIG.FAILURE_URL
+        'google',
+        OAUTH_CONFIG.successUrl,
+        OAUTH_CONFIG.failureUrl
       );
       // The page will redirect to Google, so no need to update state here
     } catch (error) {
