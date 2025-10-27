@@ -17,6 +17,14 @@ const account = new Account(client);
 const databases = new Databases(client);
 const AppwriteID = ID;
 
+// Database and collection IDs
+const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID || "";
+const COLLECTIONS = {
+  USERS: import.meta.env.VITE_APPWRITE_COLLECTION_USERS || "",
+  PERKS: import.meta.env.VITE_APPWRITE_COLLECTION_PERKS || "",
+  SAVED_PERKS: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_PERKS || "",
+};
+
 // Lightweight oauth config object for frontend usage only
 const OAUTH_CONFIG = {
   provider: "google",
@@ -25,5 +33,5 @@ const OAUTH_CONFIG = {
 };
 
 // Export named ESM bindings
-export { client, account, databases, AppwriteID, OAUTH_CONFIG };
+export { client, account, databases, AppwriteID, databaseId, COLLECTIONS, OAUTH_CONFIG };
 export default client;

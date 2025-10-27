@@ -7,7 +7,7 @@ import { ID, Storage } from 'appwrite';
 
 // Use environment variables for database IDs
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID || '';
-const PROFILES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PROFILES_COLLECTION_ID || '';
+const PROFILES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_USERS || '';
 const STORAGE_BUCKET_ID = import.meta.env.VITE_APPWRITE_STORAGE_BUCKET_ID || '';
 
 // Get current user from session
