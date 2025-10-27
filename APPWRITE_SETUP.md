@@ -1,339 +1,117 @@
-# Appwrite Integration Setup Guide
+# Appwrite Setup Guide
 
-## Overview
+## Issue: Profile Page Not Loading (404 Errors)
 
-StudentHub now uses Appwrite as its backend service for authentication, user management, and data storage. This guide will help you get started with the Appwrite integration.
+The 404 errors occur because the collection IDs in your `.env` file are incorrect. They should be alphanumeric IDs from Appwrite, not simple names like "users".
 
-## Current Implementation Status
+## Quick Fix Steps
 
-### ✅ Completed Features
+### 1. Get Your Collection IDs from Appwrite Console
 
-1. **Authentication System**
-   - Google OAuth integration
-   - Session management
-   - Protected routes
-   - Login/Signup pages with Appwrite integration
-   - Logout functionality
+1. Go to [Appwrite Console](https://cloud.appwrite.io/console)
+2. Select your project: **68d29c8100366fc856a6**
+3. Navigate to **Databases** in the left sidebar
+4. Click on your database (ID: **68d3d183000b0146b221**)
+5. You should see a list of collections
 
-2. **User Interface**
-   - Dynamic auth buttons (show login/signup or profile/logout based on auth state)
-   - Loading states during authentication
-   - Automatic redirects for authenticated users
+### 2. Find or Create These Collections
 
-3. **Security**
-   - Protected routes for Dashboard and Profile pages
-   - Environment variable configuration for sensitive data
-   - Proper error handling
+You need **3 collections** with specific attributes:
 
-## Architecture
+#### Collection 1: **users** (User Profiles)
 
-### File Structure
+**Attributes:**
+- `name` (String, required)
+- `email` (String, required)
+- `university` (String, optional)
+- `stream` (String, optional)
+- `avatar` (String, optional)
+- `verificationStatus` (String, optional, default: "pending")
+- `accountStatus` (String, optional, default: "active")
+- `validityStart` (DateTime, optional)
+- `validityEnd` (DateTime, optional)
+- `linkedAccounts` (String array, optional)
 
-```
-src/
-├── lib/
-│   └── appwrite.ts              # Appwrite client configuration
-├── contexts/
-│   └── AuthContext.tsx          # Authentication state management
-├── components/
-│   ├── ProtectedRoute.tsx       # Route protection wrapper
-│   └── AuthButtons.tsx          # Dynamic auth UI component
-└── pages/
-    ├── Login/
-    │   └── index.tsx            # Login page with OAuth
-    └── SignUp.tsx               # Signup page with OAuth
-```
+**Permissions:**
+- Role: Any → Create, Read, Update
+- Or better: Create specific permissions for authenticated users
 
-### Authentication Flow
+#### Collection 2: **perks** (Perks Data)
 
-1. **Login/Signup**:
-   - User clicks "Continue with Google"
-   - Redirects to Google OAuth
-   - Google authenticates and redirects back
-   - Appwrite creates session
-   - User redirected to `/dashboard`
+**Attributes:**
+- `name` (String, required)
+- `category` (String, required)
+- `description` (String, optional)
+- `logo` (String, optional)
+- `claimLink` (String, optional)
+- `validity` (String, optional)
+- `discount` (String, optional)
 
-2. **Session Management**:
-   - AuthContext checks for existing session on app load
-   - User object stored in context
-   - All components can access auth state via `useAuth()` hook
+**Permissions:**
+- Role: Any → Read
+- Admin only → Create, Update, Delete
 
-3. **Protected Routes**:
-   - ProtectedRoute component wraps sensitive pages
-   - Checks if user is authenticated
-   - Redirects to `/login` if not authenticated
-   - Shows loading state during auth check
+#### Collection 3: **saved_perks** (User's Saved Perks)
 
-## Environment Variables
+**Attributes:**
+- `userId` (String, required)
+- `perkId` (String, required)
+- `savedAt` (DateTime, required)
 
-Required environment variables (add to `.env` file):
+**Permissions:**
+- Role: Any → Create, Read, Update, Delete
+- Or better: User-specific permissions
+
+### 3. Copy Collection IDs
+
+After creating each collection:
+1. Click on the collection name
+2. Look at the URL or the collection details page
+3. Copy the **Collection ID** (looks like: `68d3418abc123def456`)
+
+### 4. Update Your .env File
+
+Open `.env` and replace these lines:
 
 ```env
-# Appwrite Configuration
-VITE_APPWRITE_ENDPOINT=https://fra.cloud.appwrite.io/v1
-VITE_APPWRITE_PROJECT_ID=68d29c8100366fc856a6
+# BEFORE (❌ Wrong - these are names, not IDs)
+VITE_APPWRITE_COLLECTION_USERS=users
+VITE_APPWRITE_COLLECTION_PERKS=perks
+VITE_APPWRITE_COLLECTION_SAVED_PERKS=saved_perks
 
-# Database Configuration (Get these from Appwrite Console)
-VITE_APPWRITE_DATABASE_ID=your_database_id_here
-VITE_APPWRITE_COLLECTION_USERS=your_users_collection_id_here
-VITE_APPWRITE_COLLECTION_PERKS=your_perks_collection_id_here
-VITE_APPWRITE_COLLECTION_SAVED_PERKS=your_saved_perks_collection_id_here
+# AFTER (✅ Correct - actual collection IDs from Appwrite)
+VITE_APPWRITE_COLLECTION_USERS=68d3418abc123def456  # Replace with your actual ID
+VITE_APPWRITE_COLLECTION_PERKS=68d3419xyz789ghi012  # Replace with your actual ID
+VITE_APPWRITE_COLLECTION_SAVED_PERKS=68d341axyz789  # Replace with your actual ID
 ```
 
-## Usage Examples
+### 5. Restart Your Dev Server
 
-### Using the Auth Hook
+After updating the .env file:
 
-```tsx
-import { useAuth } from '../contexts/AuthContext';
-
-function MyComponent() {
-  const { user, loading, logout } = useAuth();
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (user) {
-    return (
-      <div>
-        <p>Welcome, {user.name}!</p>
-        <button onClick={logout}>Logout</button>
-      </div>
-    );
-  }
-
-  return <div>Please log in</div>;
-}
+```bash
+npm run dev
 ```
 
-### Protecting a Route
+## Alternative: Use the Check Script
 
-```tsx
-import { ProtectedRoute } from '../components/ProtectedRoute';
+Run this command to see your current Appwrite setup:
 
-function App() {
-  return (
-    <Routes>
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
-  );
-}
+```bash
+node scripts/check-appwrite-setup.js
 ```
 
-### Accessing Appwrite Services
+This will show you all available databases and collections with their IDs.
 
-```tsx
-import { account, databases, storage } from '../lib/appwrite';
+## Still Having Issues?
 
-// Get current user
-const user = await account.get();
+If collections don't exist:
+1. You need to create them in Appwrite Console
+2. Set up the attributes as described above
+3. Configure proper permissions
+4. Copy the collection IDs to your .env file
 
-// Query database
-const response = await databases.listDocuments(
-  DATABASE_ID,
-  COLLECTIONS.PERKS
-);
-
-// Upload file
-const file = await storage.createFile(
-  BUCKET_ID,
-  ID.unique(),
-  fileToUpload
-);
-```
-
-## Next Steps for Full Integration
-
-### 1. User Profile Management
-
-**Goal**: Store user profile data in Appwrite database
-
-**Implementation**:
-1. Create user profile document on first login
-2. Store additional user info (institution, student status, etc.)
-3. Update profile page to display and edit data from Appwrite
-
-### 2. Perks Database Migration
-
-**Goal**: Move perks data from CSV to Appwrite database
-
-**Steps**:
-1. Design perks collection schema in Appwrite
-2. Create migration script to import CSV data
-3. Update Perks page to fetch from Appwrite
-4. Add admin functionality to manage perks
-
-**Schema Example**:
-```json
-{
-  "name": "string",
-  "category": "string",
-  "description": "string",
-  "discount": "string",
-  "logo": "string",
-  "claimLink": "string",
-  "requirements": "array",
-  "benefits": "array",
-  "verificationSteps": "array",
-  "validity": "string",
-  "usersCount": "integer"
-}
-```
-
-### 3. Saved Perks Feature
-
-**Goal**: Allow users to save and track their favorite perks
-
-**Implementation**:
-1. Create saved_perks collection
-2. Add save/unsave buttons to perk cards
-3. Create "My Saved Perks" page
-4. Track which perks user has claimed
-
-**Schema Example**:
-```json
-{
-  "userId": "string",
-  "perkId": "string",
-  "savedAt": "datetime",
-  "claimed": "boolean",
-  "claimedAt": "datetime"
-}
-```
-
-### 4. User Verification Status
-
-**Goal**: Track student verification status
-
-**Implementation**:
-1. Add verification status field to user profile
-2. Integrate SheerID or similar service
-3. Show verified badge on profile
-4. Gate premium perks behind verification
-
-## Appwrite Collections Schema
-
-### Users Collection
-```
-- userId (string, unique)
-- email (string)
-- name (string)
-- institution (string)
-- studentEmail (string)
-- verified (boolean)
-- verificationDate (datetime)
-- createdAt (datetime)
-```
-
-### Perks Collection
-```
-- perkId (string, unique)
-- name (string)
-- category (string)
-- description (string)
-- discount (string)
-- logo (string)
-- claimLink (string)
-- requirements (array)
-- benefits (array)
-- verificationSteps (array)
-- validity (string)
-- usersCount (integer)
-- featured (boolean)
-- active (boolean)
-```
-
-### Saved Perks Collection
-```
-- userId (string)
-- perkId (string)
-- savedAt (datetime)
-- claimed (boolean)
-- claimedAt (datetime)
-- notes (string)
-```
-
-## Security Considerations
-
-### Current Security Measures
-
-1. **Environment Variables**: All sensitive data in environment variables
-2. **No API Keys in Frontend**: Only using client-side SDK with proper scopes
-3. **Protected Routes**: Dashboard and Profile require authentication
-4. **Session Management**: Appwrite handles session tokens securely
-
-### Additional Recommendations
-
-1. **Implement Rate Limiting**: Add rate limits in Appwrite for API calls
-2. **Email Verification**: Require email verification for accounts
-3. **Student Email Validation**: Verify .edu emails or use SheerID
-4. **Data Permissions**: Set proper read/write permissions in Appwrite collections
-5. **HTTPS Only**: Always use HTTPS in production
-
-## Database Permissions Setup
-
-### For Users Collection:
-- **Create**: Any authenticated user
-- **Read**: Owner only (user can only read their own profile)
-- **Update**: Owner only
-- **Delete**: No one (require admin intervention)
-
-### For Perks Collection:
-- **Create**: Admin only
-- **Read**: Any user (including guests)
-- **Update**: Admin only
-- **Delete**: Admin only
-
-### For Saved Perks Collection:
-- **Create**: Owner only
-- **Read**: Owner only
-- **Update**: Owner only
-- **Delete**: Owner only
-
-## Troubleshooting
-
-### Common Issues
-
-1. **OAuth Not Working**:
-   - Check Google OAuth credentials in Appwrite
-   - Verify redirect URLs are configured correctly
-   - Ensure domain is added to Platforms in Appwrite
-
-2. **Environment Variables Not Loading**:
-   - Make sure variables start with `VITE_` prefix
-   - Restart dev server after changing .env
-   - Check .env file is in project root
-
-3. **CORS Errors**:
-   - Add your domain to Platforms in Appwrite Console
-   - Check endpoint URL is correct
-   - Clear browser cache
-
-4. **Session Expired**:
-   - Sessions last 1 year by default
-   - User needs to re-authenticate
-   - Call `checkSession()` to refresh
-
-## Resources
-
-- **Appwrite Documentation**: https://appwrite.io/docs
-- **Appwrite Web SDK**: https://appwrite.io/docs/sdks#client
-- **Authentication Guide**: https://appwrite.io/docs/products/auth
-- **Database Guide**: https://appwrite.io/docs/products/databases
-- **React Integration**: https://appwrite.io/docs/quick-starts/react
-
-## Support
-
-For issues or questions:
-1. Check the DEPLOYMENT.md file for deployment-specific help
-2. Review Appwrite documentation
-3. Check browser console for error messages
-4. Verify environment variables are set correctly
+If you see other errors:
+- Check that your `VITE_APPWRITE_PROJECT` is correct
+- Verify database permissions in Appwrite Console
+- Make sure you're logged in (authentication is required)

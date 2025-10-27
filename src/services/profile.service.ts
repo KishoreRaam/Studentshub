@@ -1,13 +1,12 @@
 // Profile service for Appwrite database operations
 // Uses client-side SDK with user session - NO API KEYS
 
-import { databases, AppwriteID, account } from '../lib/appwrite';
+import { databases, account, databaseId, COLLECTIONS } from '../lib/appwrite';
 import { UserProfile } from '../types/profile.types';
-import { ID, Storage } from 'appwrite';
+import { Permission, Role } from 'appwrite';
 
-// Use environment variables for database IDs
-const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID || '';
-const PROFILES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_USERS || '';
+// Use environment variables for database and collection IDs
+const USERS_COLLECTION = COLLECTIONS.USERS;
 const STORAGE_BUCKET_ID = import.meta.env.VITE_APPWRITE_STORAGE_BUCKET_ID || '';
 
 // Get current user from session
@@ -20,23 +19,32 @@ export async function getCurrentUser() {
   }
 }
 
+// Helper to check if error is 404
+function isNotFoundError(err: any): boolean {
+  if (!err) return false;
+  if (err.code === 404) return true;
+  const msg = err.message || '';
+  return typeof msg === 'string' && msg.toLowerCase().includes('not found');
+}
+
 // Get user profile from database
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   try {
     const response = await databases.getDocument(
-      DATABASE_ID,
-      PROFILES_COLLECTION_ID,
+      databaseId,
+      USERS_COLLECTION,
       userId
     );
 
     return {
       id: response.$id,
-      name: response.name,
-      email: response.email,
-      university: response.university || '',
+      name: response.name || '',
+      email: response.email || '',
+      // Map database fields to profile fields
+      university: response.institution || response.university || '',
       stream: response.stream || '',
       avatar: response.avatar || '',
-      verificationStatus: response.verificationStatus || 'pending',
+      verificationStatus: response.sheeridstatus || response.verificationStatus || 'pending',
       accountStatus: response.accountStatus || 'active',
       createdAt: new Date(response.$createdAt),
       lastLogin: new Date(),
@@ -48,7 +56,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     } as UserProfile;
   } catch (error: any) {
     // If document doesn't exist (404), return null
-    if (error?.code === 404) {
+    if (isNotFoundError(error)) {
       return null;
     }
     console.error('Error getting user profile:', error);
@@ -68,40 +76,50 @@ export async function createUserProfile(userId: string, data: {
     const now = new Date();
     const fourYearsLater = new Date(now.getTime() + 4 * 365 * 24 * 60 * 60 * 1000);
 
+    // Build document data - use fields that exist in the database
+    const docData: any = {
+      name: data.name,
+      email: data.email,
+      logintype: 'email', // Default login type
+      sheeridstatus: 'pending', // Maps to verificationStatus
+      institution: data.university || '', // Maps to university
+    };
+
+    // Add optional fields if they exist in schema
+    if (data.stream) docData.stream = data.stream;
+    if (data.avatar) docData.avatar = data.avatar;
+
+    // Set permissions - user and admins can read/write
+    const permissions = [
+      Permission.read(Role.user(userId)),
+      Permission.update(Role.user(userId)),
+      Permission.delete(Role.user(userId)),
+    ];
+
     const response = await databases.createDocument(
-      DATABASE_ID,
-      PROFILES_COLLECTION_ID,
+      databaseId,
+      USERS_COLLECTION,
       userId, // Use userId as document ID
-      {
-        name: data.name,
-        email: data.email,
-        university: data.university || '',
-        stream: data.stream || '',
-        avatar: data.avatar || '',
-        verificationStatus: 'pending',
-        accountStatus: 'active',
-        validityStart: now.toISOString(),
-        validityEnd: fourYearsLater.toISOString(),
-        linkedAccounts: [],
-      }
+      docData,
+      permissions
     );
 
     return {
       id: response.$id,
-      name: response.name,
-      email: response.email,
-      university: response.university || '',
+      name: response.name || '',
+      email: response.email || '',
+      university: response.institution || '',
       stream: response.stream || '',
       avatar: response.avatar || '',
-      verificationStatus: response.verificationStatus || 'pending',
-      accountStatus: response.accountStatus || 'active',
+      verificationStatus: response.sheeridstatus || 'pending',
+      accountStatus: 'active',
       createdAt: new Date(response.$createdAt),
       lastLogin: new Date(),
       validityPeriod: {
-        start: new Date(response.validityStart),
-        end: new Date(response.validityEnd),
+        start: now,
+        end: fourYearsLater,
       },
-      linkedAccounts: response.linkedAccounts || [],
+      linkedAccounts: [],
     } as UserProfile;
   } catch (error) {
     console.error('Error creating user profile:', error);
@@ -120,29 +138,36 @@ export async function updateUserProfile(
   }
 ): Promise<UserProfile> {
   try {
+    // Map frontend fields to database fields
+    const docUpdates: any = {};
+    if (updates.name !== undefined) docUpdates.name = updates.name;
+    if (updates.university !== undefined) docUpdates.institution = updates.university;
+    if (updates.stream !== undefined) docUpdates.stream = updates.stream;
+    if (updates.avatar !== undefined) docUpdates.avatar = updates.avatar;
+
     const response = await databases.updateDocument(
-      DATABASE_ID,
-      PROFILES_COLLECTION_ID,
+      databaseId,
+      USERS_COLLECTION,
       userId,
-      updates
+      docUpdates
     );
 
     return {
       id: response.$id,
-      name: response.name,
-      email: response.email,
-      university: response.university || '',
+      name: response.name || '',
+      email: response.email || '',
+      university: response.institution || '',
       stream: response.stream || '',
       avatar: response.avatar || '',
-      verificationStatus: response.verificationStatus || 'pending',
-      accountStatus: response.accountStatus || 'active',
+      verificationStatus: response.sheeridstatus || 'pending',
+      accountStatus: 'active',
       createdAt: new Date(response.$createdAt),
       lastLogin: new Date(),
       validityPeriod: {
-        start: new Date(response.validityStart),
-        end: new Date(response.validityEnd),
+        start: new Date(),
+        end: new Date(Date.now() + 4 * 365 * 24 * 60 * 60 * 1000),
       },
-      linkedAccounts: response.linkedAccounts || [],
+      linkedAccounts: [],
     } as UserProfile;
   } catch (error) {
     console.error('Error updating user profile:', error);
@@ -187,12 +212,15 @@ export async function uploadAvatar(file: File): Promise<string> {
 // Get or create user profile (useful for new users)
 export async function getOrCreateProfile(authUser: any): Promise<UserProfile> {
   try {
+    const userId = authUser.$id;
+
     // Try to get existing profile
-    let profile = await getUserProfile(authUser.$id);
+    let profile = await getUserProfile(userId);
 
     if (!profile) {
+      console.log('Profile not found, creating new profile for user:', userId);
       // Create new profile from auth data
-      profile = await createUserProfile(authUser.$id, {
+      profile = await createUserProfile(userId, {
         name: authUser.name || authUser.email.split('@')[0],
         email: authUser.email,
         university: '',

@@ -1,18 +1,23 @@
-import { useState } from "react";
-import { CheckCircle, Clock, DollarSign, Star, BookOpen, AlertTriangle, Plus, Bell } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CheckCircle, Clock, DollarSign, Star, BookOpen, AlertTriangle, Plus, Bell, Loader2 } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import PerkCard from "@/components/dashboard/PerkCard";
 import ResourceCard from "@/components/dashboard/ResourceCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import RecentUpdates from "@/components/dashboard/RecentUpdates";
 import type { Stat, SavedPerk, SavedResource, Subscription, Update, UserProfile } from "@/types/dashboard";
+import { useAuth } from "@/contexts/AuthContext";
+import { getOrCreateProfile } from "@/services/profile.service";
 
-// Mock Data
-const userProfile: UserProfile = {
-  name: "Sarah Johnson",
-  stream: "Computer Science",
-  initials: "SJ",
-};
+// Helper function to get user initials
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 const statsData: Stat[] = [
   {
@@ -153,8 +158,42 @@ const updatesData: Update[] = [
 ];
 
 export default function Dashboard() {
+  const { user: authUser } = useAuth();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
   const [savedPerks, setSavedPerks] = useState(savedPerksData);
   const [savedResources, setSavedResources] = useState(savedResourcesData);
+
+  // Load user profile on mount
+  useEffect(() => {
+    async function loadUserProfile() {
+      if (!authUser) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const profile = await getOrCreateProfile(authUser);
+        setUserProfile({
+          name: profile.name,
+          stream: profile.stream || 'Not specified',
+          initials: getInitials(profile.name),
+        });
+      } catch (error) {
+        console.error('Error loading user profile:', error);
+        // Fallback to basic info from auth user
+        setUserProfile({
+          name: authUser.name || authUser.email.split('@')[0],
+          stream: 'Not specified',
+          initials: getInitials(authUser.name || authUser.email),
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadUserProfile();
+  }, [authUser]);
 
   // Handler functions
   const handleViewPerkDetails = (perk: SavedPerk) => {
@@ -194,6 +233,18 @@ export default function Dashboard() {
     console.log("View subscription details:", subscription);
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center pt-16">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 pt-16">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -209,19 +260,21 @@ export default function Dashboard() {
           </div>
 
           {/* User Profile */}
-          <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-600 dark:to-blue-700 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-              {userProfile.initials}
+          {userProfile && (
+            <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-600 dark:to-blue-700 rounded-full flex items-center justify-center text-white font-semibold text-lg">
+                {userProfile.initials}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">
+                  {userProfile.name}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {userProfile.stream}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-gray-900 dark:text-white">
-                {userProfile.name}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {userProfile.stream}
-              </p>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Stats Cards */}
