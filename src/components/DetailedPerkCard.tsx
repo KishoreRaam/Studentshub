@@ -136,10 +136,21 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
     "bg-muted text-muted-foreground";
 
   // Handle claim perk with proper validation
-  const handleClaimPerk = () => {
+  const handleClaimPerk = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log('Claim button clicked!');
+    console.log('Perk title:', perk.title);
+    console.log('Claim link:', perk.claimLink);
+
     if (perk.claimLink && perk.claimLink.trim() !== '') {
+      console.log('Opening URL:', perk.claimLink);
       // Open in new tab with security features
-      window.open(perk.claimLink, '_blank', 'noopener,noreferrer');
+      const newWindow = window.open(perk.claimLink, '_blank', 'noopener,noreferrer');
+      if (!newWindow) {
+        alert('Popup blocked! Please allow popups for this site and try again.');
+      }
     } else {
       console.error('No claim link available for:', perk.title);
       alert('Claim link not available for this perk. Please try again later.');
@@ -225,7 +236,7 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
             </div>
 
             {/* Scrollable Content */}
-            <div className="max-h-[60vh] overflow-y-auto">
+            <div className="max-h-[50vh] overflow-y-auto pb-4">
               <div className="space-y-6">
                 {/* Main Description */}
                 <div className="px-6 pt-6">
@@ -249,20 +260,19 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="p-6 border-t border-border bg-muted/30">
+            {/* Action Buttons - Fixed at bottom, always visible */}
+            <div className="sticky bottom-0 p-6 border-t border-border bg-card/95 backdrop-blur-sm">
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button
+                <button
                   onClick={handleClaimPerk}
                   disabled={!perk.claimLink || perk.claimLink.trim() === ''}
-                  size="lg"
-                  className={`flex-1 ${getCategoryButtonColor()} text-white font-semibold h-16 text-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400`}
+                  className={`flex-1 ${getCategoryButtonColor()} text-white font-semibold h-16 text-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 rounded-lg flex items-center justify-center gap-2`}
                   type="button"
                 >
-                  <Gift className="w-6 h-6 mr-2" />
-                  Claim Perk
-                  <ExternalLink className="w-5 h-5 ml-2" />
-                </Button>
+                  <Gift className="w-6 h-6" />
+                  <span>Claim Perk</span>
+                  <ExternalLink className="w-5 h-5" />
+                </button>
                 <Button
                   variant="outline"
                   size="lg"

@@ -10,10 +10,13 @@ type CsvPerkRow = {
   Category?: string;
   category?: string;
   Description?: string;
+  description?: string;
   DiscountOfferINR?: string;
   DiscountOffer?: string;
   ClaimLink?: string;
+  claimlink?: string;
   Validity?: string;
+  validity?: string;
   VerificationMethod?: string;
 };
 
@@ -782,9 +785,9 @@ export default function Perks() {
 
             const category = row.Category?.trim() || row.category?.trim() || 'General';
 
-            const validityText = row.Validity?.trim();
+            const validityText = row.Validity?.trim() || row.validity?.trim();
             const verificationText = row.VerificationMethod?.trim();
-            const descriptionText = row.Description?.trim() || 'Student offer.';
+            const descriptionText = row.Description?.trim() || row.description?.trim() || 'Student offer.';
 
             // Get enhanced data for this perk if available
             const enhancement = PERK_ENHANCEMENTS[title];
@@ -801,6 +804,9 @@ export default function Perks() {
               verificationText ? [`Verify using ${verificationText}.`] : undefined
             );
 
+            // Extract claim link - check both lowercase and camelCase
+            const claimLinkRaw = (row as any).claimlink || (row as any).ClaimLink || (row as any).claim_link;
+
             return {
               id: String(index),
               title,
@@ -809,7 +815,7 @@ export default function Perks() {
               image: getImagePath(title),
               isPopular: Math.random() < 0.3,
               discount: row.DiscountOfferINR?.trim() || row.DiscountOffer?.trim() || 'See Offer',
-              claimLink: normalizeClaimLink(row.ClaimLink),
+              claimLink: normalizeClaimLink(claimLinkRaw),
               validity: validityText || undefined,
               verification: verificationText || undefined,
               benefits: benefitsList,
