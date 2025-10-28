@@ -13,6 +13,7 @@ interface Benefit {
   value: string;
   badge: string;
   popular?: boolean;
+  link?: string;
   fullDescription: string;
   features: string[];
   requirements: string[];
@@ -193,13 +194,31 @@ export function BenefitDetail({ benefit, onClose }: BenefitDetailProps) {
             {/* Action Buttons */}
             <div className="p-6 border-t border-gray-100 bg-gray-50/50">
               <div className="flex space-x-4">
-                <Button
-                  size="lg"
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white"
-                >
-                  <ExternalLink className="w-5 h-5 mr-2" />
-                  Apply Now
-                </Button>
+                {benefit.link ? (
+                  <a
+                    href={benefit.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1"
+                  >
+                    <Button
+                      size="lg"
+                      className="w-full bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white"
+                    >
+                      <ExternalLink className="w-5 h-5 mr-2" />
+                      Apply Now
+                    </Button>
+                  </a>
+                ) : (
+                  <Button
+                    size="lg"
+                    disabled
+                    className="flex-1 bg-gray-400 text-white opacity-60"
+                  >
+                    <ExternalLink className="w-5 h-5 mr-2" />
+                    Apply Now
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="lg"

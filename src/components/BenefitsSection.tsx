@@ -11,45 +11,13 @@ import { ExternalLink, Star } from 'lucide-react';
 // Remove GitHub Student Pack from regular benefits array
 const benefits = [
   {
-    id: 2,
-    title: "Canva Pro",
-    description: "Premium design tools with unlimited downloads, premium templates, and brand kit features.",
-    image: "https://images.unsplash.com/photo-1649091245823-18be815da4f7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYW52YSUyMGRlc2lnbiUyMHRvb2x8ZW58MXx8fHwxNzU3NDMxMjg5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    value: "₹10,000/year",
-    badge: "Design",
-    fullDescription: "Canva Pro unlocks premium design features for students, including access to millions of premium photos, graphics, and templates. Create stunning presentations, social media posts, and documents with professional design tools.",
-    features: [
-      "100GB cloud storage for your designs",
-      "Access to 75M+ premium photos and graphics",
-      "Unlimited folders to organize your work",
-      "Brand Kit with custom colors and fonts",
-      "Magic Resize for instant format changes",
-      "Background remover tool",
-      "Premium animations and effects",
-      "Team collaboration features"
-    ],
-    requirements: [
-      "Valid student email address",
-      "Currently enrolled in educational institution",
-      "Canva account (free to create)"
-    ],
-    howToApply: [
-      "Sign up for a free Canva account",
-      "Navigate to Canva for Education page",
-      "Verify your student status with school email",
-      "Get instant access to Pro features",
-      "Start creating amazing designs"
-    ],
-    validUntil: "End of studies",
-    usedBy: "1.5 Crore+ Students"
-  },
-  {
     id: 3,
     title: "Microsoft 365",
     description: "Complete Office suite with Word, Excel, PowerPoint, OneDrive storage, and collaboration tools.",
     image: "https://images.unsplash.com/photo-1649433391420-542fcd3835ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaWNyb3NvZnQlMjBvZmZpY2V8ZW58MXx8fHwxNzU3NDAyNjUyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     value: "₹8,300/year",
     badge: "Productivity",
+    link: "https://www.microsoft.com/en-us/education/products/office",
     fullDescription: "Microsoft 365 Education provides students with the full Office suite including Word, Excel, PowerPoint, and more. Get 1TB of OneDrive storage and collaborate seamlessly with classmates and professors.",
     features: [
       "Microsoft Word, Excel, PowerPoint desktop apps",
@@ -83,6 +51,7 @@ const benefits = [
     image: "https://images.unsplash.com/photo-1658489958427-325ded050829?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG90aWZ5JTIwbXVzaWN8ZW58MXx8fHwxNzU3NDMxMjkwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     value: "₹5,000/year",
     badge: "Entertainment",
+    link: "https://www.spotify.com/in/student/",
     fullDescription: "Get Spotify Premium at 50% off the regular price with student discount. Enjoy ad-free music, offline downloads, and high-quality audio streaming with access to over 100 million songs and podcasts.",
     features: [
       "Ad-free music streaming",
@@ -117,6 +86,7 @@ const benefits = [
     image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZG9iZSUyMGNyZWF0aXZlfGVufDF8fHx8MTc1NzQzMTI5MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     value: "₹50,000/year",
     badge: "Creative",
+    link: "https://www.adobe.com/in/creativecloud/buy/students.html",
     fullDescription: "Adobe Creative Cloud for Students provides access to the complete collection of Adobe's creative applications at a significant discount. Perfect for design, photography, video editing, and digital art projects.",
     features: [
       "20+ creative desktop and mobile apps",
@@ -152,6 +122,7 @@ const benefits = [
     image: "https://images.unsplash.com/photo-1653647054667-c99dc7f914ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaWdtYSUyMGRlc2lnbnxlbnwxfHx8fDE3NTc0MzEyOTF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     value: "₹12,000/year",
     badge: "Design",
+    link: "https://www.figma.com/education/",
     fullDescription: "Figma Education provides free access to professional design and prototyping tools. Create stunning user interfaces, collaborate in real-time, and learn industry-standard design practices with unlimited projects and advanced features.",
     features: [
       "Unlimited Figma and FigJam files",

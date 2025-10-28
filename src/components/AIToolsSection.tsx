@@ -86,7 +86,8 @@ export function AIToolsSection() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
               whileHover={{ y: -8 }}
-              className="group"
+              className="group cursor-pointer"
+              onClick={() => window.open(tool.link, '_blank', 'noopener,noreferrer')}
             >
               <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden bg-white dark:bg-gray-800">
                 <CardContent className="p-6">

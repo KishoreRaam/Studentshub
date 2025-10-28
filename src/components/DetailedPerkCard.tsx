@@ -135,6 +135,30 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
     categoryColors[perk.category as keyof typeof categoryColors] ??
     "bg-muted text-muted-foreground";
 
+  // Handle claim perk with proper validation
+  const handleClaimPerk = () => {
+    if (perk.claimLink && perk.claimLink.trim() !== '') {
+      // Open in new tab with security features
+      window.open(perk.claimLink, '_blank', 'noopener,noreferrer');
+    } else {
+      console.error('No claim link available for:', perk.title);
+      alert('Claim link not available for this perk. Please try again later.');
+    }
+  };
+
+  // Get category-based color for button
+  const getCategoryButtonColor = () => {
+    const categoryColorMap: Record<string, string> = {
+      'Productivity': 'bg-green-600 hover:bg-green-700 active:bg-green-800',
+      'Entertainment': 'bg-purple-600 hover:bg-purple-700 active:bg-purple-800',
+      'Cloud': 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800',
+      'Developer': 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800',
+      'Design': 'bg-pink-600 hover:bg-pink-700 active:bg-pink-800',
+      'Education': 'bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800',
+    };
+    return categoryColorMap[perk.category] || 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800';
+  };
+
   return (
     <Dialog
       open={isOpen}
@@ -228,37 +252,21 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
             {/* Action Buttons */}
             <div className="p-6 border-t border-border bg-muted/30">
               <div className="flex flex-col sm:flex-row gap-3">
-                {perk.claimLink ? (
-                  <a
-                    href={perk.claimLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1"
-                  >
-                    <Button
-                      size="lg"
-                      className="w-full bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white border-0 h-14 font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
-                      type="button"
-                    >
-                      <Gift className="w-6 h-6 mr-2" />
-                      Claim Perk
-                      <ExternalLink className="w-5 h-5 ml-2" />
-                    </Button>
-                  </a>
-                ) : (
-                  <Button
-                    disabled
-                    size="lg"
-                    className="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 text-white border-0 h-14 font-bold text-lg opacity-60"
-                  >
-                    <Gift className="w-6 h-6 mr-2" />
-                    Claim Perk
-                  </Button>
-                )}
+                <Button
+                  onClick={handleClaimPerk}
+                  disabled={!perk.claimLink || perk.claimLink.trim() === ''}
+                  size="lg"
+                  className={`flex-1 ${getCategoryButtonColor()} text-white font-semibold h-16 text-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400`}
+                  type="button"
+                >
+                  <Gift className="w-6 h-6 mr-2" />
+                  Claim Perk
+                  <ExternalLink className="w-5 h-5 ml-2" />
+                </Button>
                 <Button
                   variant="outline"
                   size="lg"
-                  className="flex-1 h-14 border-2 border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-500 transition-all duration-200"
+                  className="flex-1 h-16 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
                   type="button"
                 >
                   <Bookmark className="w-5 h-5 mr-2" />
