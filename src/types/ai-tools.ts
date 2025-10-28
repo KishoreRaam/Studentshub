@@ -3,6 +3,8 @@ export interface AITool {
   name: string;
   description: string;
   logo: string;
+  logo_url?: string;
+  logo_source?: string;
   category: string[];
   pricing: 'Free' | 'Freemium' | 'Student Discount' | 'Paid';
   features: string[];

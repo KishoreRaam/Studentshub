@@ -75,8 +75,22 @@ export function ToolCard({ tool, onToggleSave, isSaved }: ToolCardProps) {
 
         {/* Logo */}
         <div className="flex justify-center mb-4">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-3xl">
-            {tool.logo}
+          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-3xl overflow-hidden">
+            {tool.logo_url ? (
+              <img
+                src={tool.logo_url}
+                alt={`${tool.name} logo`}
+                className="w-full h-full object-contain p-2"
+                onError={(e) => {
+                  // Fallback to emoji if image fails to load
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+            ) : null}
+            <span className={tool.logo_url ? 'hidden' : ''}>
+              {tool.logo}
+            </span>
           </div>
         </div>
 

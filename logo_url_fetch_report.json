@@ -1,0 +1,19 @@
+{
+  "total_rows": 110,
+  "brandfetch_count": 110,
+  "favicon_count": 0,
+  "emoji_dataurl_count": 0,
+  "placeholder_count": 0,
+  "skipped_count": 0,
+  "existing_count": 0,
+  "errors": [],
+  "guessed_domains": [],
+  "start_time": "2025-10-28T17:57:23.272Z",
+  "end_time": "2025-10-28T17:57:35.618Z",
+  "input_file": "C:\\Users\\Raam\\Downloads\\Studentshub\\public\\assets\\ai-tools-complete.csv",
+  "output_file": "C:\\Users\\Raam\\Downloads\\Studentshub\\public\\assets\\ai-tools-complete.with-logo-urls.csv",
+  "backup_file": "C:\\Users\\Raam\\Downloads\\Studentshub\\public\\assets\\ai-tools-complete.backup.csv",
+  "force_refetch": true,
+  "concurrency": 5,
+  "max_retries": 3
+}

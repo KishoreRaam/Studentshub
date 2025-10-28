@@ -1,0 +1,111 @@
+id,name,description,logo,category,pricing,features,link,isOpenSource,isPopular,isNew,requiresVerification
+1,ChatGPT,Conversational AI for research writing and problem-solving,🤖,"All Tools|Computer Science & Engineering|Information Technology",Freemium,"Natural language processing|Code generation|Research assistance",https://chat.openai.com,false,true,false,false
+2,GitHub Copilot,AI-powered code completion and pair programming assistant,💻,"Computer Science & Engineering|Information Technology",Student Discount,"Code completion|Multi-language support|Context-aware suggestions",https://github.com/features/copilot,false,true,false,true
+3,Claude,Advanced AI assistant for analysis coding and creative tasks,🧠,"All Tools|Computer Science & Engineering|Data Science & Analytics",Freemium,"Long context understanding|Code generation|Document analysis",https://claude.ai,false,true,false,false
+4,Midjourney,AI-powered image generation from text descriptions,🎨,"Design & Architecture|Arts & Humanities|Media & Communication",Paid,"Image generation|Art creation|Design concepts",https://midjourney.com,false,true,false,false
+5,Grammarly,AI writing assistant for grammar spelling and style,✍️,"All Tools|Arts & Humanities|Business & Management",Freemium,"Grammar checking|Style suggestions|Plagiarism detection",https://grammarly.com,false,true,false,true
+6,Notion AI,AI-powered workspace for notes docs and collaboration,📝,"All Tools|Business & Management",Freemium,"Note-taking|AI writing|Project management",https://notion.so,false,true,false,false
+7,Wolfram Alpha,Computational knowledge engine for math and science,🔢,"Mathematics & Statistics|Computer Science & Engineering",Freemium,"Math solutions|Data analysis|Scientific computing",https://wolframalpha.com,false,true,false,true
+8,Canva AI,Design platform with AI-powered creative tools,🎨,"Design & Architecture|Media & Communication|Business & Management",Freemium,"Graphic design|AI image generation|Template creation",https://canva.com,false,true,false,true
+9,Perplexity AI,AI-powered search engine with citations,🔍,"All Tools|Computer Science & Engineering",Freemium,"AI search|Research assistance|Source citations",https://perplexity.ai,false,true,true,false
+10,Jupyter AI,AI assistant integrated into Jupyter notebooks,🪐,"Data Science & Analytics|Computer Science & Engineering",Free,"Code completion|Data analysis|Documentation",https://jupyter-ai.readthedocs.io,true,false,true,false
+11,Tabnine,AI code completion for multiple IDEs,⚡,"Computer Science & Engineering|Information Technology",Freemium,"Code completion|Multi-language|Privacy-focused",https://tabnine.com,false,true,false,false
+12,DALL-E 3,OpenAI's advanced image generation model,🖼️,"Design & Architecture|Arts & Humanities",Freemium,"Image generation|Creative AI|Text-to-image",https://openai.com/dall-e-3,false,true,false,false
+13,Otter.ai,AI meeting transcription and note-taking,🎙️,"All Tools|Business & Management",Freemium,"Audio transcription|Meeting notes|Real-time captions",https://otter.ai,false,true,false,true
+14,Mathway,Step-by-step math problem solver,➗,"Mathematics & Statistics",Freemium,"Math solutions|Step-by-step|Multiple topics",https://mathway.com,false,true,false,false
+15,QuillBot,AI paraphrasing and summarization tool,📄,"All Tools|Arts & Humanities",Freemium,"Paraphrasing|Summarization|Grammar checking",https://quillbot.com,false,true,false,true
+16,Synthesia,AI video creation with virtual avatars,🎥,"Media & Communication|Business & Management",Paid,"Video generation|AI avatars|Text-to-video",https://synthesia.io,false,false,false,true
+17,Jasper AI,AI content creation for marketing and business,✨,"Business & Management|Media & Communication",Paid,"Content generation|Marketing copy|Blog writing",https://jasper.ai,false,true,false,true
+18,Copy.ai,AI-powered copywriting and content tool,📝,"Business & Management|Media & Communication",Freemium,"Copywriting|Content ideas|Marketing text",https://copy.ai,false,true,false,false
+19,Runway ML,Creative AI suite for video and image editing,🎬,"Media & Communication|Design & Architecture",Freemium,"Video editing|Image generation|AI effects",https://runwayml.com,false,true,false,false
+20,Replika,AI companion for conversation and support,💬,"All Tools",Freemium,"Conversational AI|Mental wellness|Personal assistant",https://replika.com,false,false,false,false
+21,Gemini,Google's multimodal AI assistant,💎,"All Tools|Computer Science & Engineering|Data Science & Analytics",Freemium,"Multimodal AI|Code generation|Research",https://gemini.google.com,false,true,true,false
+22,Microsoft Copilot,Integrated productivity AI across Microsoft suite,🪟,"All Tools|Business & Management|Information Technology",Freemium,"Productivity|Document creation|Data analysis",https://copilot.microsoft.com,false,true,false,true
+23,Replit Ghostwriter,AI coding assistant in browser IDE,👻,"Computer Science & Engineering|Information Technology",Freemium,"Code completion|Debugging|Explanation",https://replit.com,false,false,false,true
+24,Cursor,AI-first code editor,🖱️,"Computer Science & Engineering|Information Technology",Freemium,"AI editing|Code generation|Refactoring",https://cursor.sh,false,true,true,false
+25,Codeium,Free AI code completion,🆓,"Computer Science & Engineering|Information Technology",Free,"Code completion|Chat|Command execution",https://codeium.com,false,true,false,false
+26,Amazon CodeWhisperer,AWS-integrated coding assistant,☁️,"Computer Science & Engineering|Information Technology",Free,"Code completion|Security scanning|AWS integration",https://aws.amazon.com/codewhisperer,false,true,false,false
+27,Phind,AI search engine for developers,🔍,"Computer Science & Engineering|Information Technology",Freemium,"Developer search|Code examples|Documentation",https://phind.com,false,true,false,false
+28,Stack Overflow AI,Programming Q&A assistant,📚,"Computer Science & Engineering|Information Technology",Free,"Q&A search|Code solutions|Community",https://stackoverflow.com,false,true,true,false
+29,Mintlify,Automated code documentation generator,📖,"Computer Science & Engineering|Information Technology",Freemium,"Documentation|Code explanation|API docs",https://mintlify.com,false,false,false,false
+30,Julius AI,Data analysis and visualization platform,📊,"Data Science & Analytics|Business & Management",Freemium,"Data analysis|Visualization|AI insights",https://julius.ai,false,true,true,false
+31,DataRobot,Enterprise AutoML platform,🤖,"Data Science & Analytics",Paid,"AutoML|Model deployment|Predictions",https://datarobot.com,false,false,false,true
+32,H2O.ai,Open-source machine learning automation,💧,"Data Science & Analytics|Computer Science & Engineering",Free,"AutoML|Model training|Deployment",https://h2o.ai,true,true,false,false
+33,Obviously AI,No-code predictive analytics,📈,"Data Science & Analytics|Business & Management",Freemium,"No-code ML|Predictions|Business intelligence",https://obviously.ai,false,false,false,false
+34,MonkeyLearn,Text analysis and NLP platform,🐵,"Data Science & Analytics|Computer Science & Engineering",Freemium,"Text classification|Sentiment analysis|NLP",https://monkeylearn.com,false,false,false,false
+35,Tableau GPT,AI-powered data visualization,📊,"Data Science & Analytics|Business & Management",Paid,"Data visualization|AI insights|Dashboards",https://tableau.com,false,true,false,true
+36,Adobe Firefly,Adobe's creative AI tools,🔥,"Design & Architecture|Media & Communication",Freemium,"Image generation|Text effects|Design assets",https://firefly.adobe.com,false,true,false,true
+37,Figma AI,AI-powered design assistance,🎨,"Design & Architecture|Information Technology",Freemium,"Design automation|Prototyping|Collaboration",https://figma.com,false,true,true,false
+38,Uizard,UI/UX design from sketches and text,🎨,"Design & Architecture|Information Technology",Freemium,"UI generation|Wireframing|Design to code",https://uizard.io,false,false,false,false
+39,Galileo AI,AI UI design generation,🔭,"Design & Architecture|Information Technology",Freemium,"UI generation|Design systems|Prototyping",https://usegalileo.ai,false,false,true,false
+40,Khroma,AI color palette generator,🎨,"Design & Architecture",Free,"Color palettes|Design inspiration|Accessibility",https://khroma.co,false,false,false,false
+41,Remove.bg,AI background removal tool,🖼️,"Design & Architecture|Media & Communication",Freemium,"Background removal|Image editing|Batch processing",https://remove.bg,false,true,false,false
+42,Vizcom,3D rendering for product designers,🎨,"Design & Architecture|Mechanical Engineering",Freemium,"3D rendering|Product design|Sketching",https://vizcom.ai,false,false,false,false
+43,Finch 3D,AI for building design optimization,🏢,"Design & Architecture|Civil Engineering",Freemium,"Building design|Optimization|3D modeling",https://finch3d.com,false,false,false,false
+44,Consensus,AI research search engine,🔬,"All Tools|Life Sciences & Biotechnology",Freemium,"Research papers|Scientific search|Evidence-based",https://consensus.app,false,true,false,false
+45,Elicit,Research paper analysis assistant,📄,"All Tools|Life Sciences & Biotechnology",Freemium,"Paper analysis|Literature review|Research automation",https://elicit.org,false,true,false,false
+46,SciSpace,Scientific paper understanding,🔬,"All Tools|Life Sciences & Biotechnology",Freemium,"Paper explanations|Literature review|Citations",https://scispace.com,false,true,false,true
+47,Semantic Scholar,AI-powered academic search,📚,"All Tools|Life Sciences & Biotechnology",Free,"Academic search|Paper recommendations|Citations",https://semanticscholar.org,true,true,false,false
+48,Research Rabbit,Research paper discovery tool,🐰,"All Tools|Life Sciences & Biotechnology",Free,"Paper discovery|Citation networks|Collections",https://researchrabbit.ai,false,true,false,false
+49,Jenni AI,Academic writing assistant,✍️,"All Tools|Arts & Humanities",Freemium,"Academic writing|Citations|Research help",https://jenni.ai,false,true,false,true
+50,Writefull,Academic writing feedback tool,📝,"All Tools|Arts & Humanities",Freemium,"Writing feedback|Language polishing|Academic style",https://writefull.com,false,false,false,true
+51,Wordtune,AI writing enhancement tool,✏️,"All Tools|Arts & Humanities|Business & Management",Freemium,"Rewriting|Tone adjustment|Summarization",https://wordtune.com,false,true,false,false
+52,Hemingway Editor,Readability and clarity improvement,📖,"All Tools|Arts & Humanities",Freemium,"Readability|Clarity|Style suggestions",https://hemingwayapp.com,false,true,false,false
+53,ProWritingAid,Comprehensive writing assistant,✍️,"All Tools|Arts & Humanities",Freemium,"Grammar|Style|Structure analysis",https://prowritingaid.com,false,true,false,true
+54,Descript,Audio and video transcription editor,🎙️,"Media & Communication|Arts & Humanities",Freemium,"Transcription|Audio editing|Video editing",https://descript.com,false,true,false,false
+55,Scholarcy,Article summarization tool,📄,"All Tools|Arts & Humanities",Freemium,"Summarization|Flashcards|Reference extraction",https://scholarcy.com,false,false,false,true
+56,ChatPDF,PDF document Q&A assistant,📄,"All Tools",Freemium,"PDF chat|Document analysis|Summarization",https://chatpdf.com,false,true,false,false
+57,Humata,Document AI assistant,📁,"All Tools|Business & Management",Freemium,"Document Q&A|Summarization|Analysis",https://humata.ai,false,false,false,false
+58,Symbolab,Advanced math problem solver,∞,"Mathematics & Statistics",Freemium,"Math solutions|Step-by-step|Practice problems",https://symbolab.com,false,true,false,false
+59,Photomath,Camera-based math solver,📷,"Mathematics & Statistics",Freemium,"Photo solving|Step-by-step|Learning",https://photomath.com,false,true,false,false
+60,Microsoft Math Solver,Comprehensive math assistance,➕,"Mathematics & Statistics",Free,"Math solving|Graphing|Step-by-step",https://math.microsoft.com,false,true,false,false
+61,Socratic,Google's homework help assistant,🎓,"All Tools|Mathematics & Statistics",Free,"Homework help|Explanations|Multiple subjects",https://socratic.org,false,true,false,false
+62,Maple Learn,Interactive math learning platform,🍁,"Mathematics & Statistics",Freemium,"Interactive math|Graphing|Learning",https://maplelearn.com,false,false,false,true
+63,GeoGebra,Mathematical visualization tool,📐,"Mathematics & Statistics",Free,"Graphing|Geometry|Calculus",https://geogebra.org,true,true,false,false
+64,Cymath,Math problem solver with steps,🔢,"Mathematics & Statistics",Freemium,"Math solving|Step-by-step|Practice",https://cymath.com,false,false,false,false
+65,Fusion 360 AI,CAD with generative design,🔧,"Mechanical Engineering|Mechatronics Engineering",Student Discount,"CAD|Generative design|Simulation",https://autodesk.com/products/fusion-360,false,true,false,true
+66,Onshape AI,Cloud-based CAD platform,☁️,"Mechanical Engineering|Mechatronics Engineering",Freemium,"Cloud CAD|Collaboration|Version control",https://onshape.com,false,true,false,true
+67,SimScale,Cloud-based engineering simulation,🌊,"Mechanical Engineering|Civil Engineering",Freemium,"CFD|FEA|Thermal simulation",https://simscale.com,false,true,false,true
+68,Ansys AI,Simulation and analysis platform,🔬,"Mechanical Engineering|Civil Engineering|Electronics & Communication Engineering",Paid,"FEA|CFD|Electromagnetic simulation",https://ansys.com,false,true,false,true
+69,MATLAB Copilot,AI assistant for MATLAB,📊,"Mechanical Engineering|Electrical Engineering|Data Science & Analytics",Paid,"Code generation|Debugging|Documentation",https://mathworks.com,false,false,true,true
+70,nTop,Generative design for manufacturing,🏭,"Mechanical Engineering|Mechatronics Engineering",Paid,"Generative design|Lattice structures|Optimization",https://ntop.com,false,false,false,true
+71,ParaMatters,Additive manufacturing AI,🖨️,"Mechanical Engineering|Mechatronics Engineering",Paid,"Topology optimization|AM design|Lightweighting",https://paramatters.com,false,false,false,true
+72,Altium 365 Copilot,PCB design AI assistant,⚡,"Electronics & Communication Engineering|Electrical Engineering",Paid,"PCB design|Routing|Component placement",https://altium.com,false,true,false,true
+73,KiCad,Open-source PCB design,🔌,"Electronics & Communication Engineering|Electrical Engineering",Free,"PCB design|Schematic capture|3D visualization",https://kicad.org,true,true,false,false
+74,LTSpice,Free circuit simulation,⚡,"Electronics & Communication Engineering|Electrical Engineering",Free,"Circuit simulation|SPICE|Analysis",https://analog.com/ltspice,false,true,false,false
+75,Proteus,Electronics design and simulation,🔬,"Electronics & Communication Engineering|Electrical Engineering",Paid,"Circuit simulation|PCB design|Microcontroller simulation",https://labcenter.com,false,true,false,true
+76,AlphaFold,Protein structure prediction,🧬,"Life Sciences & Biotechnology",Free,"Protein folding|Structure prediction|Research",https://alphafold.ebi.ac.uk,true,true,false,false
+77,BioGPT,Biomedical text mining AI,🧬,"Life Sciences & Biotechnology",Free,"Biomedical NLP|Literature mining|Research",https://github.com/microsoft/BioGPT,true,false,false,false
+78,Benchling AI,Life sciences R&D platform,🔬,"Life Sciences & Biotechnology",Freemium,"Lab notebook|Molecular biology|Collaboration",https://benchling.com,false,true,false,true
+79,HeyGen,AI video avatar creation,🎥,"Media & Communication",Freemium,"Video avatars|Voice cloning|Video generation",https://heygen.com,false,true,false,false
+80,Pictory,Video creation from text,📹,"Media & Communication|Business & Management",Freemium,"Text-to-video|Video editing|Captions",https://pictory.ai,false,false,false,false
+81,Lumen5,AI video marketing platform,💡,"Media & Communication|Business & Management",Freemium,"Video creation|Marketing|Social media",https://lumen5.com,false,true,false,false
+82,CapCut,Video editing with AI features,✂️,"Media & Communication",Free,"Video editing|Effects|Auto-captions",https://capcut.com,false,true,false,false
+83,Murf AI,AI voiceover generator,🎙️,"Media & Communication|Business & Management",Freemium,"Text-to-speech|Voiceovers|Multiple voices",https://murf.ai,false,true,false,false
+84,ElevenLabs,Advanced voice synthesis,🔊,"Media & Communication",Freemium,"Voice cloning|Text-to-speech|Dubbing",https://elevenlabs.io,false,true,false,false
+85,Podcastle,AI podcast production,🎙️,"Media & Communication",Freemium,"Recording|Editing|AI enhancement",https://podcastle.ai,false,false,false,false
+86,Beautiful.ai,AI-powered presentations,🎨,"Business & Management|All Tools",Freemium,"Presentation design|Templates|Collaboration",https://beautiful.ai,false,true,false,false
+87,Tome,AI storytelling presentations,📖,"Business & Management|All Tools",Freemium,"AI presentations|Storytelling|Design",https://tome.app,false,true,false,false
+88,Gamma,Document and presentation AI,γ,"Business & Management|All Tools",Freemium,"Presentations|Documents|AI generation",https://gamma.app,false,true,false,false
+89,Slidesgo AI,AI presentation templates,🎨,"Business & Management|All Tools",Freemium,"Templates|Design|Customization",https://slidesgo.com,false,true,false,false
+90,Fireflies.ai,AI meeting assistant,🔥,"Business & Management|All Tools",Freemium,"Meeting transcription|Notes|Action items",https://fireflies.ai,false,true,false,false
+91,Krisp,AI noise cancellation,🔇,"Business & Management|All Tools",Freemium,"Noise cancellation|Call quality|Meetings",https://krisp.ai,false,true,false,false
+92,Zapier AI,Workflow automation platform,⚡,"Business & Management|Information Technology",Freemium,"Automation|Integrations|AI workflows",https://zapier.com,false,true,false,false
+93,Make,Visual process automation,🔧,"Business & Management|Information Technology",Freemium,"Automation|Integrations|Visual builder",https://make.com,false,true,false,false
+94,DeepL,Advanced translation AI,🌐,"All Tools|Arts & Humanities",Freemium,"Translation|Writing improvement|Tone",https://deepl.com,false,true,false,false
+95,Duolingo,AI language learning platform,🦉,"Arts & Humanities",Freemium,"Language learning|Practice|Gamification",https://duolingo.com,false,true,false,false
+96,Speak,AI language tutor,🗣️,"Arts & Humanities",Freemium,"Speaking practice|Pronunciation|Feedback",https://speak.com,false,false,false,false
+97,Elsa Speak,AI pronunciation coach,🎯,"Arts & Humanities",Freemium,"Pronunciation|Accent reduction|Speaking",https://elsaspeak.com,false,false,false,false
+98,Motion,AI calendar and task manager,📅,"Business & Management|All Tools",Freemium,"Smart scheduling|Task management|Calendar",https://usemotion.com,false,true,false,false
+99,Reclaim.ai,Smart scheduling assistant,🔄,"Business & Management|All Tools",Freemium,"Smart scheduling|Calendar management|Habits",https://reclaim.ai,false,true,false,false
+100,Mem,AI-powered note-taking,🧠,"All Tools|Business & Management",Freemium,"Notes|Knowledge management|AI search",https://mem.ai,false,false,false,false
+101,Reflect,Networked note-taking with AI,🪞,"All Tools|Business & Management",Freemium,"Notes|Backlinking|AI assistant",https://reflect.app,false,false,false,false
+102,Taskade,AI productivity workspace,✅,"Business & Management|All Tools",Freemium,"Tasks|Projects|Collaboration|AI",https://taskade.com,false,true,false,false
+103,Scribe,AI process documentation,📝,"Business & Management|Information Technology",Freemium,"Process documentation|Screenshots|Guides",https://scribehow.com,false,true,false,false
+104,Magical,AI text expander and automation,✨,"All Tools|Business & Management",Free,"Text expansion|Automation|Data entry",https://magical.so,false,true,false,false
+105,Timely,AI time tracking,⏰,"Business & Management",Freemium,"Automatic time tracking|Productivity|Reporting",https://timelyapp.com,false,false,false,false
+106,Superhuman,AI email assistant,📧,"Business & Management|All Tools",Paid,"Email management|AI writing|Productivity",https://superhuman.com,false,true,false,false
+107,SaneBox,AI email organizer,📥,"Business & Management|All Tools",Freemium,"Email filtering|Unsubscribe|Priority inbox",https://sanebox.com,false,false,false,false
+108,Compose AI,AI writing assistant for Chrome,✍️,"All Tools|Business & Management",Free,"Writing acceleration|Auto-complete|Email",https://compose.ai,false,true,false,false
+109,Moonbeam,AI writing assistant for long-form,🌙,"Arts & Humanities|Business & Management",Freemium,"Long-form writing|Essays|Blogs",https://moonbeam.ai,false,false,false,false
+110,Rytr,AI writing assistant,✍️,"Business & Management|Media & Communication",Freemium,"Content writing|Copywriting|Multiple formats",https://rytr.me,false,true,false,false

@@ -7,7 +7,11 @@
       "Bash(cat:*)",
       "Bash(npm install:*)",
       "Bash(timeout /t 3 /nobreak)",
-      "Bash(node scripts/check-appwrite-setup.js:*)"
+      "Bash(node scripts/check-appwrite-setup.js:*)",
+      "Bash(node fetch_logo_urls.js:*)",
+      "Bash(node -e:*)",
+      "Bash(node test_domains.js:*)",
+      "Bash(del test_domains.js)"
     ],
     "deny": [],
     "ask": []

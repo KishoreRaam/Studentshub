@@ -24,7 +24,24 @@ export const parseAIToolsCSV = async (filepath: string): Promise<AITool[]> => {
       throw new Error('CSV file has no data rows');
     }
 
-    const headers = lines[0].split(',').map(h => h.trim());
+    // Parse headers properly (handle quoted CSV)
+    const headers: string[] = [];
+    let currentHeader = '';
+    let insideQuotes = false;
+    const headerLine = lines[0];
+
+    for (let j = 0; j < headerLine.length; j++) {
+      const char = headerLine[j];
+      if (char === '"') {
+        insideQuotes = !insideQuotes;
+      } else if (char === ',' && !insideQuotes) {
+        headers.push(currentHeader.trim().replace(/^"|"$/g, ''));
+        currentHeader = '';
+      } else {
+        currentHeader += char;
+      }
+    }
+    headers.push(currentHeader.trim().replace(/^"|"$/g, ''));
 
     // Validate required columns exist
     const requiredColumns = ['id', 'name', 'description', 'logo', 'category', 'pricing', 'features', 'link'];
@@ -33,6 +50,23 @@ export const parseAIToolsCSV = async (filepath: string): Promise<AITool[]> => {
     if (missingColumns.length > 0) {
       throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
     }
+
+    // Get column indices (for flexible column ordering)
+    const getColIndex = (name: string) => headers.indexOf(name);
+    const idIdx = getColIndex('id');
+    const nameIdx = getColIndex('name');
+    const descIdx = getColIndex('description');
+    const logoIdx = getColIndex('logo');
+    const logoUrlIdx = getColIndex('logo_url');
+    const logoSourceIdx = getColIndex('logo_source');
+    const categoryIdx = getColIndex('category');
+    const pricingIdx = getColIndex('pricing');
+    const featuresIdx = getColIndex('features');
+    const linkIdx = getColIndex('link');
+    const isOpenSourceIdx = getColIndex('isOpenSource');
+    const isPopularIdx = getColIndex('isPopular');
+    const isNewIdx = getColIndex('isNew');
+    const requiresVerificationIdx = getColIndex('requiresVerification');
 
     const tools: AITool[] = [];
 
@@ -62,14 +96,14 @@ export const parseAIToolsCSV = async (filepath: string): Promise<AITool[]> => {
         }
         values.push(currentValue.trim()); // Push the last value
 
-        // Skip malformed rows
-        if (values.length < 12) {
+        // Skip malformed rows (must have at least the required columns)
+        if (values.length < requiredColumns.length) {
           console.warn(`Skipping malformed row ${i + 1}: insufficient columns`);
           continue;
         }
 
         // Parse pricing and validate
-        const pricing = values[5].trim() as AITool['pricing'];
+        const pricing = values[pricingIdx]?.trim() as AITool['pricing'];
         const validPricing: AITool['pricing'][] = ['Free', 'Freemium', 'Student Discount', 'Paid'];
 
         if (!validPricing.includes(pricing)) {
@@ -77,18 +111,20 @@ export const parseAIToolsCSV = async (filepath: string): Promise<AITool[]> => {
         }
 
         const tool: AITool = {
-          id: values[0].trim(),
-          name: values[1].trim(),
-          description: values[2].trim(),
-          logo: values[3].trim(),
-          category: values[4].split('|').map(s => s.trim()).filter(Boolean),
+          id: values[idIdx]?.trim() || '',
+          name: values[nameIdx]?.trim() || '',
+          description: values[descIdx]?.trim() || '',
+          logo: values[logoIdx]?.trim() || '',
+          logo_url: logoUrlIdx >= 0 ? values[logoUrlIdx]?.trim() : undefined,
+          logo_source: logoSourceIdx >= 0 ? values[logoSourceIdx]?.trim() : undefined,
+          category: values[categoryIdx]?.split('|').map(s => s.trim()).filter(Boolean) || [],
           pricing: validPricing.includes(pricing) ? pricing : 'Paid',
-          features: values[6].split('|').map(f => f.trim()).filter(Boolean),
-          link: values[7].trim(),
-          isOpenSource: values[8]?.trim().toLowerCase() === 'true',
-          isPopular: values[9]?.trim().toLowerCase() === 'true',
-          isNew: values[10]?.trim().toLowerCase() === 'true',
-          requiresVerification: values[11]?.trim().toLowerCase() === 'true'
+          features: values[featuresIdx]?.split('|').map(f => f.trim()).filter(Boolean) || [],
+          link: values[linkIdx]?.trim() || '',
+          isOpenSource: values[isOpenSourceIdx]?.trim().toLowerCase() === 'true',
+          isPopular: values[isPopularIdx]?.trim().toLowerCase() === 'true',
+          isNew: values[isNewIdx]?.trim().toLowerCase() === 'true',
+          requiresVerification: values[requiresVerificationIdx]?.trim().toLowerCase() === 'true'
         };
 
         // Validate essential fields
