@@ -1,7 +1,6 @@
 import { Gift, Check, Calendar, Clock, ArrowLeft, Bookmark, Users, Shield, Star, ExternalLink } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Card } from "./ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { motion } from "motion/react";
@@ -163,27 +162,26 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
         }
       }}
     >
-      <DialogContent className="max-w-4xl w-full mx-4 p-0 gap-0 bg-card rounded-2xl shadow-2xl border-0 max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-4xl w-full mx-4 p-0 gap-0 bg-transparent rounded-2xl shadow-2xl border-0 max-h-[85vh] flex flex-col">
         <DialogTitle className="sr-only">{perk.title} Details</DialogTitle>
         <DialogDescription className="sr-only">
           Detailed information about {perk.title} including benefits, verification steps, and validity.
         </DialogDescription>
 
-        <Card className="border-0 shadow-none rounded-2xl overflow-hidden relative">
-          {/* Background Image Overlay */}
-          <div className="absolute inset-0 opacity-30 overflow-hidden pointer-events-none">
-            <ImageWithFallback
-              src={perk.image}
-              alt={`${perk.title} background`}
-              className="w-full h-full object-cover scale-110 blur-sm"
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-green-500/20" />
-          </div>
+        {/* Background Image Overlay */}
+        <div className="absolute inset-0 opacity-30 overflow-hidden pointer-events-none rounded-2xl">
+          <ImageWithFallback
+            src={perk.image}
+            alt={`${perk.title} background`}
+            className="w-full h-full object-cover scale-110 blur-sm"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-green-500/20" />
+        </div>
 
-          {/* Content with backdrop blur */}
-          <div className="relative bg-card/95 backdrop-blur-sm">
-            {/* Header */}
-            <div className="p-6 border-b border-border">
+        {/* Content container with backdrop blur */}
+        <div className="relative bg-card/95 backdrop-blur-sm flex flex-col rounded-2xl overflow-hidden max-h-[85vh]">
+          {/* Header - Fixed at top */}
+          <div className="flex-shrink-0 p-6 border-b border-border">
               <div className="flex items-start space-x-4">
                 <div className="w-20 h-20 rounded-xl overflow-hidden shadow-lg bg-muted flex-shrink-0">
                   <ImageWithFallback
@@ -219,11 +217,11 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
               </div>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="max-h-[55vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-              <div className="space-y-6 pb-4">
+            {/* Scrollable Content - Takes remaining space */}
+            <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent" style={{ maxHeight: 'calc(85vh - 300px)' }}>
+              <div className="space-y-6 px-6 py-6">
                 {/* Main Description */}
-                <div className="px-6 pt-6">
+                <div>
                   <h3 className="text-xl font-semibold text-foreground mb-4">About this benefit</h3>
                   <p className="text-muted-foreground leading-relaxed text-lg">
                     {perk.description}
@@ -245,7 +243,7 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
             </div>
 
             {/* Action Buttons - Fixed at bottom, always visible */}
-            <div className="p-6 border-t border-border bg-card/95 backdrop-blur-sm">
+            <div className="flex-shrink-0 p-6 border-t-2 border-border bg-card backdrop-blur-sm shadow-lg">
               <div className="flex flex-col sm:flex-row gap-3">
                 {perk.claimLink && perk.claimLink.trim() !== '' ? (
                   <a
@@ -289,7 +287,6 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
               </button>
             </div>
           </div>
-        </Card>
       </DialogContent>
     </Dialog>
   );
