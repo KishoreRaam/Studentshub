@@ -135,28 +135,6 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
     categoryColors[perk.category as keyof typeof categoryColors] ??
     "bg-muted text-muted-foreground";
 
-  // Handle claim perk with proper validation
-  const handleClaimPerk = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    console.log('Claim button clicked!');
-    console.log('Perk title:', perk.title);
-    console.log('Claim link:', perk.claimLink);
-
-    if (perk.claimLink && perk.claimLink.trim() !== '') {
-      console.log('Opening URL:', perk.claimLink);
-      // Open in new tab with security features
-      const newWindow = window.open(perk.claimLink, '_blank', 'noopener,noreferrer');
-      if (!newWindow) {
-        alert('Popup blocked! Please allow popups for this site and try again.');
-      }
-    } else {
-      console.error('No claim link available for:', perk.title);
-      alert('Claim link not available for this perk. Please try again later.');
-    }
-  };
-
   // Get category-based color for button
   const getCategoryButtonColor = () => {
     const categoryColorMap: Record<string, string> = {
@@ -166,6 +144,12 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
       'Developer': 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800',
       'Design': 'bg-pink-600 hover:bg-pink-700 active:bg-pink-800',
       'Education': 'bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800',
+      'Learning': 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800',
+      'Food/Dining': 'bg-orange-600 hover:bg-orange-700 active:bg-orange-800',
+      'Hardware': 'bg-slate-600 hover:bg-slate-700 active:bg-slate-800',
+      'Security': 'bg-red-600 hover:bg-red-700 active:bg-red-800',
+      'Travel': 'bg-teal-600 hover:bg-teal-700 active:bg-teal-800',
+      'Wellbeing': 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800',
     };
     return categoryColorMap[perk.category] || 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800';
   };
@@ -236,8 +220,8 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
             </div>
 
             {/* Scrollable Content */}
-            <div className="max-h-[50vh] overflow-y-auto pb-4">
-              <div className="space-y-6">
+            <div className="max-h-[55vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+              <div className="space-y-6 pb-4">
                 {/* Main Description */}
                 <div className="px-6 pt-6">
                   <h3 className="text-xl font-semibold text-foreground mb-4">About this benefit</h3>
@@ -261,18 +245,29 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
             </div>
 
             {/* Action Buttons - Fixed at bottom, always visible */}
-            <div className="sticky bottom-0 p-6 border-t border-border bg-card/95 backdrop-blur-sm">
+            <div className="p-6 border-t border-border bg-card/95 backdrop-blur-sm">
               <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={handleClaimPerk}
-                  disabled={!perk.claimLink || perk.claimLink.trim() === ''}
-                  className={`flex-1 ${getCategoryButtonColor()} text-white font-semibold h-16 text-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 rounded-lg flex items-center justify-center gap-2`}
-                  type="button"
-                >
-                  <Gift className="w-6 h-6" />
-                  <span>Claim Perk</span>
-                  <ExternalLink className="w-5 h-5" />
-                </button>
+                {perk.claimLink && perk.claimLink.trim() !== '' ? (
+                  <a
+                    href={perk.claimLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex-1 ${getCategoryButtonColor()} text-white font-semibold h-16 text-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg flex items-center justify-center gap-2 no-underline`}
+                  >
+                    <Gift className="w-6 h-6" />
+                    <span>Apply Now</span>
+                    <ExternalLink className="w-5 h-5" />
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    className="flex-1 bg-gray-400 text-white font-semibold h-16 text-lg opacity-50 cursor-not-allowed rounded-lg flex items-center justify-center gap-2"
+                    type="button"
+                  >
+                    <Gift className="w-6 h-6" />
+                    <span>Apply Now</span>
+                  </button>
+                )}
                 <Button
                   variant="outline"
                   size="lg"
