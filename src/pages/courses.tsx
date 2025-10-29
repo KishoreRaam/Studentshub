@@ -205,7 +205,7 @@ export default function Courses() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
   const [savedCourses, setSavedCourses] = useState<string[]>([]);
-  const [coursesData, setCoursesData] = useState<Course[]>(fallbackCoursesData);
+  const [coursesData, setCoursesData] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load CSV data on component mount

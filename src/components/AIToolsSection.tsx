@@ -115,8 +115,26 @@ export function AIToolsSection() {
 
                   {/* Logo */}
                   <div className="flex justify-center mb-4">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform duration-500">
-                      {tool.logo}
+                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+                      {tool.logo_url ? (
+                        <img
+                          src={tool.logo_url}
+                          alt={`${tool.name} logo`}
+                          className="w-full h-full object-contain p-2"
+                          onError={(e) => {
+                            // Fallback to emoji if image fails to load
+                            e.currentTarget.style.display = 'none';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              const emojiSpan = parent.querySelector('.logo-emoji');
+                              emojiSpan?.classList.remove('hidden');
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <span className={`logo-emoji ${tool.logo_url ? 'hidden' : ''}`}>
+                        {tool.logo}
+                      </span>
                     </div>
                   </div>
 
