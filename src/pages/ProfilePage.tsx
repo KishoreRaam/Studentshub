@@ -21,6 +21,7 @@ import {
   uploadAvatar,
 } from '../services/profile.service';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Mock data - Replace with actual Appwrite data later
 const mockUser: UserProfile = {
@@ -228,6 +229,7 @@ export default function ProfilePage() {
 
       // Upload avatar if it's a file
       if (updates.avatar instanceof File) {
+        toast.info('Uploading profile picture...');
         avatarUrl = await uploadAvatar(updates.avatar);
       }
 
@@ -241,8 +243,14 @@ export default function ProfilePage() {
 
       setUserProfile(updatedProfile);
       setIsEditModalOpen(false);
+      toast.success('Profile updated successfully!', {
+        description: 'Your changes have been saved.',
+      });
     } catch (err) {
       console.error('Error updating profile:', err);
+      toast.error('Failed to update profile', {
+        description: 'Please try again later.',
+      });
       throw err; // Let the modal handle the error
     }
   };

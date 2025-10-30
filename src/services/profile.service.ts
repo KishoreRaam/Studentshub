@@ -1,13 +1,13 @@
 // Profile service for Appwrite database operations
 // Uses client-side SDK with user session - NO API KEYS
 
-import { databases, account, databaseId, COLLECTIONS } from '../lib/appwrite';
+import { databases, account, storage, databaseId, COLLECTIONS, AppwriteID, avatarsBucket } from '../lib/appwrite';
 import { UserProfile } from '../types/profile.types';
 import { Permission, Role } from 'appwrite';
 
 // Use environment variables for database and collection IDs
 const USERS_COLLECTION = COLLECTIONS.USERS;
-const STORAGE_BUCKET_ID = import.meta.env.VITE_APPWRITE_STORAGE_BUCKET_ID || '';
+const STORAGE_BUCKET_ID = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || avatarsBucket;
 
 // Get current user from session
 export async function getCurrentUser() {
@@ -43,7 +43,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
       // Map database fields to profile fields
       university: response.institution || response.university || '',
       stream: response.stream || '',
-      avatar: response.avatar || '',
+      avatar: response.profilePicture || response.avatar || '',
       verificationStatus: response.sheeridstatus || response.verificationStatus || 'pending',
       accountStatus: response.accountStatus || 'active',
       createdAt: new Date(response.$createdAt),
@@ -83,11 +83,12 @@ export async function createUserProfile(userId: string, data: {
       logintype: 'email', // Default login type
       sheeridstatus: 'pending', // Maps to verificationStatus
       institution: data.university || '', // Maps to university
+      onboardingComplete: false, // Initially false
     };
 
     // Add optional fields if they exist in schema
     if (data.stream) docData.stream = data.stream;
-    if (data.avatar) docData.avatar = data.avatar;
+    if (data.avatar) docData.profilePicture = data.avatar;
 
     // Set permissions - user and admins can read/write
     const permissions = [
@@ -110,7 +111,7 @@ export async function createUserProfile(userId: string, data: {
       email: response.email || '',
       university: response.institution || '',
       stream: response.stream || '',
-      avatar: response.avatar || '',
+      avatar: response.profilePicture || '',
       verificationStatus: response.sheeridstatus || 'pending',
       accountStatus: 'active',
       createdAt: new Date(response.$createdAt),
@@ -143,7 +144,7 @@ export async function updateUserProfile(
     if (updates.name !== undefined) docUpdates.name = updates.name;
     if (updates.university !== undefined) docUpdates.institution = updates.university;
     if (updates.stream !== undefined) docUpdates.stream = updates.stream;
-    if (updates.avatar !== undefined) docUpdates.avatar = updates.avatar;
+    if (updates.avatar !== undefined) docUpdates.profilePicture = updates.avatar;
 
     const response = await databases.updateDocument(
       databaseId,
@@ -158,7 +159,7 @@ export async function updateUserProfile(
       email: response.email || '',
       university: response.institution || '',
       stream: response.stream || '',
-      avatar: response.avatar || '',
+      avatar: response.profilePicture || '',
       verificationStatus: response.sheeridstatus || 'pending',
       accountStatus: 'active',
       createdAt: new Date(response.$createdAt),
@@ -175,36 +176,48 @@ export async function updateUserProfile(
   }
 }
 
-// Upload avatar image
+// Upload avatar image to Appwrite Storage
 export async function uploadAvatar(file: File): Promise<string> {
   try {
-    // Note: Storage requires proper setup in Appwrite console
-    // For now, we'll use a placeholder. In production:
-    // 1. Create a storage bucket in Appwrite
-    // 2. Set proper permissions
-    // 3. Uncomment the code below
+    // If no storage bucket is configured, fall back to base64
+    if (!STORAGE_BUCKET_ID || STORAGE_BUCKET_ID === 'avatars') {
+      console.warn('Storage bucket not configured, using base64 fallback');
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
 
-    /*
-    const storage = new Storage(client);
+    // Upload file to Appwrite Storage
+    const fileId = AppwriteID.unique();
     const response = await storage.createFile(
       STORAGE_BUCKET_ID,
-      ID.unique(),
-      file
+      fileId,
+      file,
+      [
+        Permission.read(Role.any()), // Anyone can view avatars
+      ]
     );
 
-    // Return the file URL
-    return storage.getFileView(STORAGE_BUCKET_ID, response.$id).href;
-    */
-
-    // Placeholder: Convert to base64 data URL for now
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  } catch (error) {
+    // Get the file view URL
+    const fileUrl = storage.getFileView(STORAGE_BUCKET_ID, response.$id);
+    return fileUrl.href;
+  } catch (error: any) {
     console.error('Error uploading avatar:', error);
+
+    // If storage upload fails, fall back to base64
+    if (error.code === 404 || error.message?.includes('bucket')) {
+      console.warn('Storage bucket not found, falling back to base64');
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     throw error;
   }
 }
