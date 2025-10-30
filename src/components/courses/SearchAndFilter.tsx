@@ -62,8 +62,8 @@ export function SearchAndFilter({
               onClick={() => onCategoryChange(category)}
               className={`px-4 py-2 rounded-full whitespace-nowrap transition-all duration-300 shadow-sm font-medium ${
                 selectedCategory === category
-                  ? "bg-gradient-to-r from-[#2563eb] to-[#16a34a] text-white shadow-lg"
-                  : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-2 border-gray-300 dark:border-gray-700"
+                  ? "bg-[#1799A7] text-white shadow-lg scale-105"
+                  : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 hover:bg-[#1799A7]/10 hover:text-[#1799A7] dark:hover:bg-[#1799A7]/20 dark:hover:text-[#1799A7] border-2 border-gray-300 dark:border-gray-700 hover:border-[#1799A7]/50"
               }`}
             >
               {category}

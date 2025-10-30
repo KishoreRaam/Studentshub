@@ -146,6 +146,9 @@ export async function updateUserProfile(
     if (updates.stream !== undefined) docUpdates.stream = updates.stream;
     if (updates.avatar !== undefined) docUpdates.profilePicture = updates.avatar;
 
+    // Mark onboarding as complete when user updates profile
+    docUpdates.onboardingComplete = true;
+
     const response = await databases.updateDocument(
       databaseId,
       USERS_COLLECTION,

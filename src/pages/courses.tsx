@@ -292,7 +292,7 @@ export default function Courses() {
         // Default: popularity or recent (mock sorting)
         return 0;
       });
-  }, [savedCourses, searchTerm, selectedCategory, showSaved, sortBy]);
+  }, [coursesData, savedCourses, searchTerm, selectedCategory, showSaved, sortBy]);
 
   const handleCourseClick = (course: Course) => {
     setSelectedCourse(course);

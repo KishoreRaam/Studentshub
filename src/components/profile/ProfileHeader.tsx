@@ -22,7 +22,7 @@ export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps)
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl shadow-sm p-8 mb-6 border border-blue-100 dark:border-gray-700"
+      className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl shadow-sm p-8 mb-6 mt-4 border border-blue-100 dark:border-gray-700"
     >
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
         {/* Avatar */}
