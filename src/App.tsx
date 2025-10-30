@@ -9,6 +9,7 @@ import { ProfileButton } from "./components/ProfileButton";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Perks from "./pages/Perks";
+import Events from "./pages/Events";
 import Login from "./pages/Login/index";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
@@ -35,6 +36,7 @@ export default function App() {
               }
             />
             <Route path="/perks" element={<Perks />} />
+            <Route path="/events" element={<Events />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route

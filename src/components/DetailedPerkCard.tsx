@@ -11,6 +11,7 @@ interface DetailedPerkCardProps {
   perk: Perk | null;
   isOpen: boolean;
   onClose: () => void;
+  onSaveChange?: () => void; // Optional callback when save state changes
 }
 
 const categoryColors: Record<string, string> = {
@@ -126,7 +127,7 @@ const renderStatsRow = (perk: Perk) => {
   );
 };
 
-export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProps) {
+export function DetailedPerkCard({ perk, isOpen, onClose, onSaveChange }: DetailedPerkCardProps) {
   // Use saved items hook for save functionality
   const { isSaved, toggleSave, isSaving } = useSavedItems('perk');
 
@@ -138,10 +139,26 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
     categoryColors[perk.category as keyof typeof categoryColors] ??
     "bg-muted text-muted-foreground";
 
-  // Handle save button click
+  // Handle save button click - pass full perk data
   const handleSaveClick = async () => {
     if (perk) {
-      await toggleSave(perk.id);
+      await toggleSave({
+        id: perk.id,
+        title: perk.title,
+        category: perk.category,
+        description: perk.description,
+        website: perk.website,
+        logo: perk.logo,
+        color: perk.color,
+        discount: perk.discount,
+        validUntil: perk.validity, // Map validity to validUntil for Appwrite
+        claimLink: perk.claimLink,
+      });
+
+      // Notify parent component that save state changed
+      if (onSaveChange) {
+        onSaveChange();
+      }
     }
   };
 

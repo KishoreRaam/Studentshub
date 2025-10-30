@@ -13,10 +13,17 @@ import {
   getSavedPerks,
   getSavedResources,
   getSavedAITools,
+  PerkData,
 } from '@/services/saved-items.service';
+import {
+  saveEvent,
+  unsaveEvent,
+  getSavedEvents,
+  EventData,
+} from '@/services/saved-events.service';
 import { toast } from 'sonner';
 
-type ItemType = 'perk' | 'resource' | 'aiTool';
+type ItemType = 'perk' | 'resource' | 'aiTool' | 'event';
 
 interface SavedItem {
   id: string;
@@ -52,6 +59,9 @@ export function useSavedItems(itemType: ItemType) {
           case 'aiTool':
             items = await getSavedAITools(userId);
             break;
+          case 'event':
+            items = await getSavedEvents(userId);
+            break;
         }
 
         // Extract IDs and savedIds
@@ -85,12 +95,15 @@ export function useSavedItems(itemType: ItemType) {
     return savingStates[itemId] || false;
   }, [savingStates]);
 
-  // Save an item
-  const saveItem = useCallback(async (itemId: string) => {
+  // Save an item (accepts full item data for perks and events)
+  const saveItem = useCallback(async (itemIdOrData: string | PerkData | EventData) => {
     if (!user) {
       toast.error('Please sign in to save items');
       return false;
     }
+
+    // Get the item ID from either a string or the data object
+    const itemId = typeof itemIdOrData === 'string' ? itemIdOrData : itemIdOrData.id;
 
     if (isSaved(itemId)) {
       console.log('Item already saved locally, skipping');
@@ -106,7 +119,34 @@ export function useSavedItems(itemType: ItemType) {
 
       switch (itemType) {
         case 'perk':
-          response = await savePerk(userId, itemId);
+          // For perks, pass full data if available, otherwise just ID (backward compatibility)
+          if (typeof itemIdOrData === 'object') {
+            response = await savePerk(userId, itemIdOrData as PerkData);
+          } else {
+            // Fallback for backward compatibility - convert string ID to minimal PerkData
+            response = await savePerk(userId, {
+              id: itemIdOrData,
+              title: 'Unknown Perk',
+              category: 'Other',
+              description: '',
+            });
+          }
+          break;
+        case 'event':
+          // For events, pass full data if available
+          if (typeof itemIdOrData === 'object') {
+            response = await saveEvent(userId, itemIdOrData as EventData);
+          } else {
+            // Fallback - convert string ID to minimal EventData
+            response = await saveEvent(userId, {
+              id: itemIdOrData,
+              title: 'Unknown Event',
+              category: 'Webinar',
+              description: '',
+              date: new Date().toISOString(),
+              time: '',
+            });
+          }
           break;
         case 'resource':
           response = await saveResource(userId, itemId);
@@ -129,7 +169,7 @@ export function useSavedItems(itemType: ItemType) {
       }
 
       // Show success toast
-      const itemTypeLabel = itemType === 'aiTool' ? 'AI tool' : itemType;
+      const itemTypeLabel = itemType === 'aiTool' ? 'AI tool' : itemType === 'event' ? 'Event' : itemType;
       toast.success(`${itemTypeLabel.charAt(0).toUpperCase() + itemTypeLabel.slice(1)} saved!`, {
         description: 'You can find it in your dashboard',
       });
@@ -154,6 +194,9 @@ export function useSavedItems(itemType: ItemType) {
               break;
             case 'aiTool':
               items = await getSavedAITools(userId);
+              break;
+            case 'event':
+              items = await getSavedEvents(userId);
               break;
           }
           setSavedItems(items.map(item => ({
@@ -195,6 +238,9 @@ export function useSavedItems(itemType: ItemType) {
         case 'perk':
           await unsavePerk(savedItem.savedId);
           break;
+        case 'event':
+          await unsaveEvent(savedItem.savedId);
+          break;
         case 'resource':
           await unsaveResource(savedItem.savedId);
           break;
@@ -207,7 +253,7 @@ export function useSavedItems(itemType: ItemType) {
       setSavedItems(prev => prev.filter(item => item.id !== itemId));
 
       // Show success toast
-      const itemTypeLabel = itemType === 'aiTool' ? 'AI tool' : itemType;
+      const itemTypeLabel = itemType === 'aiTool' ? 'AI tool' : itemType === 'event' ? 'Event' : itemType;
       toast.success(`${itemTypeLabel.charAt(0).toUpperCase() + itemTypeLabel.slice(1)} removed`, {
         description: 'Removed from your dashboard',
       });
@@ -224,12 +270,14 @@ export function useSavedItems(itemType: ItemType) {
     }
   }, [user, itemType, getSavedItem]);
 
-  // Toggle save state
-  const toggleSave = useCallback(async (itemId: string) => {
+  // Toggle save state (accepts either item ID or full item data for perks and events)
+  const toggleSave = useCallback(async (itemIdOrData: string | PerkData | EventData) => {
+    const itemId = typeof itemIdOrData === 'string' ? itemIdOrData : itemIdOrData.id;
+
     if (isSaved(itemId)) {
       return await unsaveItem(itemId);
     } else {
-      return await saveItem(itemId);
+      return await saveItem(itemIdOrData);
     }
   }, [isSaved, saveItem, unsaveItem]);
 

@@ -6,10 +6,10 @@ import { Query, Permission, Role } from 'appwrite';
 
 // ====== SAVED PERKS ======
 
-// Get all saved perks for a user with full perk details
+// Get all saved perks for a user - returns data directly from SAVED_PERKS
 export async function getSavedPerks(userId: string) {
   try {
-    // First, get all saved perk records for this user
+    // Get all saved perk records for this user with full perk data
     const savedPerksResponse = await databases.listDocuments(
       databaseId,
       COLLECTIONS.SAVED_PERKS,
@@ -20,45 +20,46 @@ export async function getSavedPerks(userId: string) {
       return [];
     }
 
-    // Extract perk IDs
-    const perkIds = savedPerksResponse.documents.map(doc => doc.perkID);
-
-    // Fetch full perk details
-    const perksResponse = await databases.listDocuments(
-      databaseId,
-      COLLECTIONS.PERKS,
-      [
-        Query.equal('$id', perkIds),
-        Query.equal('isActive', true)
-      ]
-    );
-
-    // Combine saved perk data with full perk details
-    return savedPerksResponse.documents.map(savedPerk => {
-      const perk = perksResponse.documents.find(p => p.$id === savedPerk.perkID);
-      if (!perk) return null;
-
-      return {
-        id: perk.$id,
-        title: perk.title || '',
-        category: perk.category || '',
-        icon: perk.icon || '💎',
-        validity: perk.validity || '',
-        description: perk.description || '',
-        isSaved: true,
-        claimed: savedPerk.claimed || false,
-        claimedDate: savedPerk.claimedDate || null,
-        savedId: savedPerk.$id, // Keep track of the saved_perks document ID
-      };
-    }).filter(Boolean);
+    // Return saved perks with all their stored data
+    return savedPerksResponse.documents.map(savedPerk => ({
+      id: savedPerk.perkID,
+      title: savedPerk.title || '',
+      category: savedPerk.category || '',
+      icon: savedPerk.logo || '💎',
+      validity: savedPerk.validUntil || '',
+      description: savedPerk.description || '',
+      website: savedPerk.website || '',
+      logo: savedPerk.logo || '',
+      color: savedPerk.color || '#3B82F6',
+      discount: savedPerk.discount || '',
+      claimLink: savedPerk.claimLink || '',
+      isSaved: true,
+      claimed: savedPerk.claimed || false,
+      claimedDate: savedPerk.claimedDate || null,
+      savedId: savedPerk.$id, // Keep track of the saved_perks document ID
+    }));
   } catch (error) {
     console.error('Error getting saved perks:', error);
     throw error;
   }
 }
 
-// Save a perk for a user
-export async function savePerk(userId: string, perkId: string) {
+// Define the Perk type for saving
+export interface PerkData {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  website?: string;
+  logo?: string;
+  color?: string;
+  discount?: string;
+  validUntil?: string;
+  claimLink?: string;
+}
+
+// Save a perk for a user with full perk data
+export async function savePerk(userId: string, perkData: PerkData) {
   try {
     // Check if already saved
     try {
@@ -67,7 +68,7 @@ export async function savePerk(userId: string, perkId: string) {
         COLLECTIONS.SAVED_PERKS,
         [
           Query.equal('userID', userId),
-          Query.equal('perkID', perkId)
+          Query.equal('perkID', perkData.id)
         ]
       );
 
@@ -80,14 +81,23 @@ export async function savePerk(userId: string, perkId: string) {
       // Continue to create - might be a permission issue with query
     }
 
-    // Create new saved perk record
+    // Create new saved perk record with full perk data
     const response = await databases.createDocument(
       databaseId,
       COLLECTIONS.SAVED_PERKS,
       AppwriteID.unique(),
       {
         userID: userId,
-        perkID: perkId,
+        perkID: perkData.id,
+        title: perkData.title,
+        category: perkData.category,
+        description: perkData.description,
+        website: perkData.website || '',
+        logo: perkData.logo || '',
+        color: perkData.color || '#3B82F6',
+        discount: perkData.discount || '',
+        validUntil: perkData.validUntil || '',
+        claimLink: perkData.claimLink || '',
         claimed: false,
         claimedDate: null,
       },
@@ -109,7 +119,7 @@ export async function savePerk(userId: string, perkId: string) {
           COLLECTIONS.SAVED_PERKS,
           [
             Query.equal('userID', userId),
-            Query.equal('perkID', perkId)
+            Query.equal('perkID', perkData.id)
           ]
         );
         if (existing.documents.length > 0) {

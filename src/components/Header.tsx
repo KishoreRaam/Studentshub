@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Menu, X, Home, Gift, BarChart3, Settings, Star, Search, BookOpen } from 'lucide-react';
+import { Menu, X, Home, Gift, BarChart3, Settings, Star, Search, BookOpen, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthButtons } from './AuthButtons';
 import { ThemeToggle } from './ThemeToggle';
@@ -32,6 +32,7 @@ export function Header() {
     { name: 'Home', path: '/', icon: Home },
     { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
     { name: 'Perks', path: '/perks', icon: Gift },
+    { name: 'Events', path: '/events', icon: Calendar },
     { name: 'Resources', path: '/resources', icon: Star },
     { name: 'Tools', path: '/tools', icon: Settings },
   ];

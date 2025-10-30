@@ -6,7 +6,9 @@ import ResourceCard from "@/components/dashboard/ResourceCard";
 import AIToolCard from "@/components/dashboard/AIToolCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import RecentUpdates from "@/components/dashboard/RecentUpdates";
+import { DetailedPerkCard } from "@/components/DetailedPerkCard";
 import type { Stat, SavedPerk, SavedResource, SavedAITool, Subscription, Update, UserProfile } from "@/types/dashboard";
+import type { Perk } from "@/pages/benfits/Perks";
 import { useAuth } from "@/contexts/AuthContext";
 import { getOrCreateProfile } from "@/services/profile.service";
 import { getSavedPerks, getSavedResources, getSavedAITools, unsavePerk, unsaveResource, unsaveAITool } from "@/services/saved-items.service";
@@ -103,6 +105,7 @@ export default function Dashboard() {
   const [savedPerks, setSavedPerks] = useState<SavedPerk[]>([]);
   const [savedResources, setSavedResources] = useState<SavedResource[]>([]);
   const [savedAITools, setSavedAITools] = useState<SavedAITool[]>([]);
+  const [selectedPerk, setSelectedPerk] = useState<Perk | null>(null);
 
   // Load user profile on mount
   useEffect(() => {
@@ -163,9 +166,27 @@ export default function Dashboard() {
     }
   }, [authUser, loading]);
 
+  // Convert SavedPerk to Perk type for the detailed modal
+  const convertToPerk = (savedPerk: SavedPerk): Perk => {
+    return {
+      id: savedPerk.id,
+      title: savedPerk.title,
+      description: savedPerk.description,
+      category: savedPerk.category,
+      image: (savedPerk as any).logo || savedPerk.icon || '',
+      isPopular: false,
+      discount: (savedPerk as any).discount || '',
+      claimLink: (savedPerk as any).claimLink || '',
+      validity: savedPerk.validity,
+      website: (savedPerk as any).website || '',
+      logo: (savedPerk as any).logo || '',
+      color: (savedPerk as any).color || '#3B82F6',
+    };
+  };
+
   // Handler functions
   const handleViewPerkDetails = (perk: SavedPerk) => {
-    console.log("View perk details:", perk);
+    setSelectedPerk(convertToPerk(perk));
   };
 
   const handleToggleSavePerk = async (perkId: string) => {
@@ -178,8 +199,34 @@ export default function Dashboard() {
 
       // Remove from state
       setSavedPerks(prev => prev.filter(p => p.id !== perkId));
+
+      // Close modal if this perk was open
+      if (selectedPerk && selectedPerk.id === perkId) {
+        setSelectedPerk(null);
+      }
     } catch (error) {
       console.error("Error toggling save perk:", error);
+    }
+  };
+
+  // Refresh saved perks when modal saves/unsaves
+  const handlePerkModalChange = async () => {
+    if (!authUser) return;
+
+    try {
+      const userId = authUser.$id;
+      const perks = await getSavedPerks(userId);
+      setSavedPerks(perks as any[]);
+
+      // Close modal if current perk was unsaved
+      if (selectedPerk) {
+        const stillSaved = perks.some(p => p.id === selectedPerk.id);
+        if (!stillSaved) {
+          setSelectedPerk(null);
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing saved perks:', error);
     }
   };
 
@@ -286,112 +333,106 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Saved Perks Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-              Saved Perks
-            </h2>
+        {/* Three Column Layout for Saved Items */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Saved Perks Column */}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-4">
+              <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Saved Perks
+              </h2>
+            </div>
+
+            <div className="flex-1 space-y-4">
+              {savedPerks.length === 0 ? (
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-8 text-center">
+                  <Star className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                    No Saved Perks
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Save perks to see them here
+                  </p>
+                </div>
+              ) : (
+                savedPerks.map((perk) => (
+                  <PerkCard
+                    key={perk.id}
+                    perk={perk}
+                    onViewDetails={handleViewPerkDetails}
+                    onToggleSave={handleToggleSavePerk}
+                  />
+                ))
+              )}
+            </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Quick access to the perks you've saved for later.
-          </p>
 
-          {savedPerks.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-12 text-center">
-              <Star className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                No Saved Perks Yet
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Start exploring perks and save your favorites to access them quickly from here.
-              </p>
+          {/* Saved Resources Column */}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-4">
+              <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Saved Resources
+              </h2>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {savedPerks.map((perk) => (
-                <PerkCard
-                  key={perk.id}
-                  perk={perk}
-                  onViewDetails={handleViewPerkDetails}
-                  onToggleSave={handleToggleSavePerk}
-                />
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Saved Resources Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-              Saved Resources
-            </h2>
+            <div className="flex-1 space-y-4">
+              {savedResources.length === 0 ? (
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-8 text-center">
+                  <BookOpen className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                    No Saved Resources
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Save resources to see them here
+                  </p>
+                </div>
+              ) : (
+                savedResources.map((resource) => (
+                  <ResourceCard
+                    key={resource.id}
+                    resource={resource}
+                    onAccessResource={handleAccessResource}
+                    onToggleSave={handleToggleSaveResource}
+                  />
+                ))
+              )}
+            </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Educational resources and tools you've bookmarked.
-          </p>
 
-          {savedResources.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-12 text-center">
-              <BookOpen className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                No Saved Resources Yet
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Discover educational resources and bookmark them to access them quickly from here.
-              </p>
+          {/* Saved AI Tools Column */}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Saved AI Tools
+              </h2>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {savedResources.map((resource) => (
-                <ResourceCard
-                  key={resource.id}
-                  resource={resource}
-                  onAccessResource={handleAccessResource}
-                  onToggleSave={handleToggleSaveResource}
-                />
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Saved AI Tools Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-              Saved AI Tools
-            </h2>
+            <div className="flex-1 space-y-4">
+              {savedAITools.length === 0 ? (
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-8 text-center">
+                  <Sparkles className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                    No Saved AI Tools
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Save AI tools to see them here
+                  </p>
+                </div>
+              ) : (
+                savedAITools.map((aiTool) => (
+                  <AIToolCard
+                    key={aiTool.id}
+                    aiTool={aiTool}
+                    onAccessTool={handleAccessAITool}
+                    onToggleSave={handleToggleSaveAITool}
+                  />
+                ))
+              )}
+            </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            AI-powered tools and assistants to boost your productivity.
-          </p>
-
-          {savedAITools.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-12 text-center">
-              <Sparkles className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                No Saved AI Tools Yet
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Explore AI-powered tools and save them to boost your productivity.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {savedAITools.map((aiTool) => (
-                <AIToolCard
-                  key={aiTool.id}
-                  aiTool={aiTool}
-                  onAccessTool={handleAccessAITool}
-                  onToggleSave={handleToggleSaveAITool}
-                />
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Active Subscriptions and Recent Updates */}
@@ -419,6 +460,14 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Detailed Perk Modal */}
+      <DetailedPerkCard
+        perk={selectedPerk}
+        isOpen={selectedPerk !== null}
+        onClose={() => setSelectedPerk(null)}
+        onSaveChange={handlePerkModalChange}
+      />
     </div>
   );
 }
