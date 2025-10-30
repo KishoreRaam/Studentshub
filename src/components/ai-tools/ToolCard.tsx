@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, ExternalLink, Check, Lock, Code } from 'lucide-react';
+import { Heart, ExternalLink, Check, Lock, Code, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AITool } from '@/types/ai-tools';
 
@@ -7,9 +7,10 @@ interface ToolCardProps {
   tool: AITool;
   onToggleSave: (toolId: string) => void;
   isSaved: boolean;
+  isSaving?: boolean;
 }
 
-export function ToolCard({ tool, onToggleSave, isSaved }: ToolCardProps) {
+export function ToolCard({ tool, onToggleSave, isSaved, isSaving = false }: ToolCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   // Get pricing badge color
@@ -60,16 +61,21 @@ export function ToolCard({ tool, onToggleSave, isSaved }: ToolCardProps) {
           </div>
           <button
             onClick={handleSaveClick}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            disabled={isSaving}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={isSaved ? 'Remove from saved' : 'Save tool'}
           >
-            <Heart
-              className={`w-5 h-5 transition-all duration-200 ${
-                isSaved
-                  ? 'fill-red-500 text-red-500'
-                  : 'text-gray-400 hover:text-red-500'
-              }`}
-            />
+            {isSaving ? (
+              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+            ) : (
+              <Heart
+                className={`w-5 h-5 transition-all duration-200 ${
+                  isSaved
+                    ? 'fill-red-500 text-red-500'
+                    : 'text-gray-400 hover:text-red-500'
+                }`}
+              />
+            )}
           </button>
         </div>
 

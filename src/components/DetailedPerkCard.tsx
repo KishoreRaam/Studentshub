@@ -1,10 +1,11 @@
-import { Gift, Check, Calendar, Clock, ArrowLeft, Bookmark, Users, Shield, Star, ExternalLink } from "lucide-react";
+import { Gift, Check, Calendar, Clock, ArrowLeft, Bookmark, Users, Shield, Star, ExternalLink, Loader2 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { motion } from "motion/react";
 import type { Perk } from "@/pages/benfits/Perks";
+import { useSavedItems } from "@/hooks/useSavedItems";
 
 interface DetailedPerkCardProps {
   perk: Perk | null;
@@ -126,6 +127,9 @@ const renderStatsRow = (perk: Perk) => {
 };
 
 export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProps) {
+  // Use saved items hook for save functionality
+  const { isSaved, toggleSave, isSaving } = useSavedItems('perk');
+
   if (!perk) {
     return null;
   }
@@ -133,6 +137,13 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
   const categoryClass =
     categoryColors[perk.category as keyof typeof categoryColors] ??
     "bg-muted text-muted-foreground";
+
+  // Handle save button click
+  const handleSaveClick = async () => {
+    if (perk) {
+      await toggleSave(perk.id);
+    }
+  };
 
   // Get category-based color for button
   const getCategoryButtonColor = () => {
@@ -269,11 +280,31 @@ export function DetailedPerkCard({ perk, isOpen, onClose }: DetailedPerkCardProp
                 <Button
                   variant="outline"
                   size="lg"
-                  className="flex-1 h-16 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
+                  onClick={handleSaveClick}
+                  disabled={isSaving(perk.id)}
+                  className={`flex-1 h-16 font-semibold border-2 transition-all duration-200 ${
+                    isSaved(perk.id)
+                      ? 'bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400 border-green-500 dark:border-green-600'
+                      : 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                   type="button"
                 >
-                  <Bookmark className="w-5 h-5 mr-2" />
-                  Save for Later
+                  {isSaving(perk.id) ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : isSaved(perk.id) ? (
+                    <>
+                      <Bookmark className="w-5 h-5 mr-2 fill-current" />
+                      Saved ✓
+                    </>
+                  ) : (
+                    <>
+                      <Bookmark className="w-5 h-5 mr-2" />
+                      Save for Later
+                    </>
+                  )}
                 </Button>
               </div>
               

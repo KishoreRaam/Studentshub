@@ -6,8 +6,7 @@ import { ToolCard } from '@/components/ai-tools/ToolCard';
 import { parseAIToolsCSV, extractUniqueStreams } from '@/utils/csvParser';
 import type { AITool, SortOption, SecondaryFilter } from '@/types/ai-tools';
 import { Button } from '@/components/ui/button';
-
-const SAVED_TOOLS_KEY = 'savedAITools';
+import { useSavedItems } from '@/hooks/useSavedItems';
 
 export default function AITools() {
   // State management
@@ -18,28 +17,9 @@ export default function AITools() {
   const [selectedStream, setSelectedStream] = useState('All Tools');
   const [selectedFilters, setSelectedFilters] = useState<SecondaryFilter[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('most-popular');
-  const [savedTools, setSavedTools] = useState<string[]>([]);
 
-  // Load saved tools from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(SAVED_TOOLS_KEY);
-      if (saved) {
-        setSavedTools(JSON.parse(saved));
-      }
-    } catch (err) {
-      console.error('Error loading saved tools:', err);
-    }
-  }, []);
-
-  // Save tools to localStorage whenever it changes
-  useEffect(() => {
-    try {
-      localStorage.setItem(SAVED_TOOLS_KEY, JSON.stringify(savedTools));
-    } catch (err) {
-      console.error('Error saving tools:', err);
-    }
-  }, [savedTools]);
+  // Use saved items hook for Appwrite integration
+  const { isSaved, toggleSave, isSaving, loading: savedItemsLoading } = useSavedItems('aiTool');
 
   // Load tools from CSV
   useEffect(() => {
@@ -63,15 +43,9 @@ export default function AITools() {
   // Extract unique streams
   const streams = useMemo(() => extractUniqueStreams(tools), [tools]);
 
-  // Toggle save/unsave tool
-  const handleToggleSave = (toolId: string) => {
-    setSavedTools(prev => {
-      if (prev.includes(toolId)) {
-        return prev.filter(id => id !== toolId);
-      } else {
-        return [...prev, toolId];
-      }
-    });
+  // Toggle save/unsave tool - now using Appwrite
+  const handleToggleSave = async (toolId: string) => {
+    await toggleSave(toolId);
   };
 
   // Filter and sort tools
@@ -281,7 +255,8 @@ export default function AITools() {
                 key={tool.id}
                 tool={tool}
                 onToggleSave={handleToggleSave}
-                isSaved={savedTools.includes(tool.id)}
+                isSaved={isSaved(tool.id)}
+                isSaving={isSaving(tool.id)}
               />
             ))}
           </div>
