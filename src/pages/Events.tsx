@@ -301,13 +301,13 @@ export default function Events() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 px-4 leading-tight">
               Discover Events That{' '}
               <span className="bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">
                 Matter
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto px-4">
               Join webinars, hackathons, and workshops designed for students
             </p>
 
