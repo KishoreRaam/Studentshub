@@ -26,6 +26,18 @@ export type SavedResource = {
   link?: string;
 };
 
+export type SavedAITool = {
+  id: string;
+  title: string;
+  category: string;
+  icon: string;
+  description: string;
+  isPremium: boolean;
+  isSaved: boolean;
+  link?: string;
+  features?: string[];
+};
+
 export type Subscription = {
   id: string;
   title: string;

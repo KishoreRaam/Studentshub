@@ -25,6 +25,10 @@ const COLLECTIONS = {
   USERS: import.meta.env.VITE_APPWRITE_COLLECTION_USERS || "",
   PERKS: import.meta.env.VITE_APPWRITE_COLLECTION_PERKS || "",
   SAVED_PERKS: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_PERKS || "",
+  RESOURCES: import.meta.env.VITE_APPWRITE_COLLECTION_RESOURCES || "",
+  SAVED_RESOURCES: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_RESOURCES || "",
+  AI_TOOLS: import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS || "",
+  SAVED_AI_TOOLS: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_AI_TOOLS || "",
 };
 
 // Lightweight oauth config object for frontend usage only

@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, Clock, DollarSign, Star, BookOpen, AlertTriangle, Plus, Bell, Loader2 } from "lucide-react";
+import { CheckCircle, Clock, DollarSign, Star, BookOpen, AlertTriangle, Plus, Bell, Loader2, Sparkles } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import PerkCard from "@/components/dashboard/PerkCard";
 import ResourceCard from "@/components/dashboard/ResourceCard";
+import AIToolCard from "@/components/dashboard/AIToolCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import RecentUpdates from "@/components/dashboard/RecentUpdates";
-import type { Stat, SavedPerk, SavedResource, Subscription, Update, UserProfile } from "@/types/dashboard";
+import type { Stat, SavedPerk, SavedResource, SavedAITool, Subscription, Update, UserProfile } from "@/types/dashboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { getOrCreateProfile } from "@/services/profile.service";
+import { getSavedPerks, getSavedResources, getSavedAITools, unsavePerk, unsaveResource, unsaveAITool } from "@/services/saved-items.service";
 
 // Helper function to get user initials
 function getInitials(name: string): string {
@@ -37,69 +39,6 @@ const statsData: Stat[] = [
     value: "₹26,000",
     subtitle: "This academic year",
     icon: DollarSign,
-  },
-];
-
-const savedPerksData: SavedPerk[] = [
-  {
-    id: "1",
-    title: "GitHub Student Developer Pack",
-    category: "Productivity",
-    icon: "💻",
-    validity: "Valid until Graduation",
-    description: "Free access to developer tools and services including GitHub Pro, cloud credits, and more.",
-    isSaved: true,
-  },
-  {
-    id: "2",
-    title: "Canva Pro",
-    category: "Design",
-    icon: "🎨",
-    validity: "Valid until Dec 2025",
-    description: "Professional design tools with unlimited downloads, premium templates, and brand kit features.",
-    isSaved: true,
-  },
-  {
-    id: "3",
-    title: "Spotify Premium",
-    category: "Entertainment",
-    icon: "🎵",
-    validity: "Valid until Graduation",
-    description: "Ad-free music streaming with offline downloads and high-quality audio at student pricing.",
-    isSaved: true,
-  },
-];
-
-const savedResourcesData: SavedResource[] = [
-  {
-    id: "1",
-    title: "Coursera Free Courses",
-    category: "Education",
-    icon: "🎓",
-    description: "Access thousands of free courses from top universities and companies worldwide.",
-    isPremium: false,
-    isSaved: true,
-    link: "https://www.coursera.org",
-  },
-  {
-    id: "2",
-    title: "IEEE Xplore",
-    category: "Research",
-    icon: "📚",
-    description: "Access research papers, journals, and conference proceedings in technology and engineering.",
-    isPremium: true,
-    isSaved: true,
-    link: "https://ieeexplore.ieee.org",
-  },
-  {
-    id: "3",
-    title: "LinkedIn Learning",
-    category: "Professional Development",
-    icon: "💼",
-    description: "Unlimited access to expert-led courses in business, technology, and creative skills.",
-    isPremium: true,
-    isSaved: true,
-    link: "https://www.linkedin.com/learning",
   },
 ];
 
@@ -161,8 +100,9 @@ export default function Dashboard() {
   const { user: authUser } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [savedPerks, setSavedPerks] = useState(savedPerksData);
-  const [savedResources, setSavedResources] = useState(savedResourcesData);
+  const [savedPerks, setSavedPerks] = useState<SavedPerk[]>([]);
+  const [savedResources, setSavedResources] = useState<SavedResource[]>([]);
+  const [savedAITools, setSavedAITools] = useState<SavedAITool[]>([]);
 
   // Load user profile on mount
   useEffect(() => {
@@ -195,18 +135,52 @@ export default function Dashboard() {
     loadUserProfile();
   }, [authUser]);
 
+  // Load saved items
+  useEffect(() => {
+    async function loadSavedItems() {
+      if (!authUser) return;
+
+      try {
+        const userId = authUser.$id;
+
+        // Fetch all saved items in parallel
+        const [perks, resources, aiTools] = await Promise.all([
+          getSavedPerks(userId),
+          getSavedResources(userId),
+          getSavedAITools(userId),
+        ]);
+
+        setSavedPerks(perks as any[]);
+        setSavedResources(resources as any[]);
+        setSavedAITools(aiTools as any[]);
+      } catch (error) {
+        console.error('Error loading saved items:', error);
+      }
+    }
+
+    if (authUser && !loading) {
+      loadSavedItems();
+    }
+  }, [authUser, loading]);
+
   // Handler functions
   const handleViewPerkDetails = (perk: SavedPerk) => {
     console.log("View perk details:", perk);
   };
 
-  const handleToggleSavePerk = (perkId: string) => {
-    setSavedPerks((prev) =>
-      prev.map((perk) =>
-        perk.id === perkId ? { ...perk, isSaved: !perk.isSaved } : perk
-      )
-    );
-    console.log("Toggle save perk:", perkId);
+  const handleToggleSavePerk = async (perkId: string) => {
+    try {
+      const perk = savedPerks.find(p => p.id === perkId);
+      if (!perk || !(perk as any).savedId) return;
+
+      // Unsave the perk
+      await unsavePerk((perk as any).savedId);
+
+      // Remove from state
+      setSavedPerks(prev => prev.filter(p => p.id !== perkId));
+    } catch (error) {
+      console.error("Error toggling save perk:", error);
+    }
   };
 
   const handleAccessResource = (resource: SavedResource) => {
@@ -216,13 +190,41 @@ export default function Dashboard() {
     }
   };
 
-  const handleToggleSaveResource = (resourceId: string) => {
-    setSavedResources((prev) =>
-      prev.map((resource) =>
-        resource.id === resourceId ? { ...resource, isSaved: !resource.isSaved } : resource
-      )
-    );
-    console.log("Toggle save resource:", resourceId);
+  const handleToggleSaveResource = async (resourceId: string) => {
+    try {
+      const resource = savedResources.find(r => r.id === resourceId);
+      if (!resource || !(resource as any).savedId) return;
+
+      // Unsave the resource
+      await unsaveResource((resource as any).savedId);
+
+      // Remove from state
+      setSavedResources(prev => prev.filter(r => r.id !== resourceId));
+    } catch (error) {
+      console.error("Error toggling save resource:", error);
+    }
+  };
+
+  const handleAccessAITool = (aiTool: SavedAITool) => {
+    console.log("Access AI tool:", aiTool);
+    if (aiTool.link) {
+      window.open(aiTool.link, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const handleToggleSaveAITool = async (aiToolId: string) => {
+    try {
+      const aiTool = savedAITools.find(t => t.id === aiToolId);
+      if (!aiTool || !(aiTool as any).savedId) return;
+
+      // Unsave the AI tool
+      await unsaveAITool((aiTool as any).savedId);
+
+      // Remove from state
+      setSavedAITools(prev => prev.filter(t => t.id !== aiToolId));
+    } catch (error) {
+      console.error("Error toggling save AI tool:", error);
+    }
   };
 
   const handleRenewSubscription = (subscriptionId: string) => {
@@ -296,16 +298,28 @@ export default function Dashboard() {
             Quick access to the perks you've saved for later.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {savedPerks.map((perk) => (
-              <PerkCard
-                key={perk.id}
-                perk={perk}
-                onViewDetails={handleViewPerkDetails}
-                onToggleSave={handleToggleSavePerk}
-              />
-            ))}
-          </div>
+          {savedPerks.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-12 text-center">
+              <Star className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                No Saved Perks Yet
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Start exploring perks and save your favorites to access them quickly from here.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {savedPerks.map((perk) => (
+                <PerkCard
+                  key={perk.id}
+                  perk={perk}
+                  onViewDetails={handleViewPerkDetails}
+                  onToggleSave={handleToggleSavePerk}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Saved Resources Section */}
@@ -320,16 +334,64 @@ export default function Dashboard() {
             Educational resources and tools you've bookmarked.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {savedResources.map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                resource={resource}
-                onAccessResource={handleAccessResource}
-                onToggleSave={handleToggleSaveResource}
-              />
-            ))}
+          {savedResources.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-12 text-center">
+              <BookOpen className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                No Saved Resources Yet
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Discover educational resources and bookmark them to access them quickly from here.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {savedResources.map((resource) => (
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  onAccessResource={handleAccessResource}
+                  onToggleSave={handleToggleSaveResource}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Saved AI Tools Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Saved AI Tools
+            </h2>
           </div>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            AI-powered tools and assistants to boost your productivity.
+          </p>
+
+          {savedAITools.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-12 text-center">
+              <Sparkles className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                No Saved AI Tools Yet
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Explore AI-powered tools and save them to boost your productivity.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {savedAITools.map((aiTool) => (
+                <AIToolCard
+                  key={aiTool.id}
+                  aiTool={aiTool}
+                  onAccessTool={handleAccessAITool}
+                  onToggleSave={handleToggleSaveAITool}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Active Subscriptions and Recent Updates */}
