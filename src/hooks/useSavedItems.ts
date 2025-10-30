@@ -93,6 +93,7 @@ export function useSavedItems(itemType: ItemType) {
     }
 
     if (isSaved(itemId)) {
+      console.log('Item already saved locally, skipping');
       return true; // Already saved
     }
 
@@ -115,8 +116,17 @@ export function useSavedItems(itemType: ItemType) {
           break;
       }
 
-      // Add to saved items
-      setSavedItems(prev => [...prev, { id: itemId, savedId: response.$id }]);
+      // Check if already in saved items (might have been added during save)
+      const alreadyInState = savedItems.some(item => item.id === itemId);
+      if (!alreadyInState) {
+        // Add to saved items
+        setSavedItems(prev => [...prev, { id: itemId, savedId: response.$id }]);
+      } else {
+        console.log('Item already in local state, updating savedId if needed');
+        setSavedItems(prev => prev.map(item =>
+          item.id === itemId ? { ...item, savedId: response.$id } : item
+        ));
+      }
 
       // Show success toast
       const itemTypeLabel = itemType === 'aiTool' ? 'AI tool' : itemType;
@@ -127,6 +137,35 @@ export function useSavedItems(itemType: ItemType) {
       return true;
     } catch (error: any) {
       console.error('Error saving item:', error);
+
+      // Don't show error toast for duplicate documents - it means item was already saved
+      if (error.code === 409 || error.message?.includes('already exists')) {
+        console.log('Item already exists in database, treating as success');
+        // Reload saved items to get the correct state
+        const userId = user.$id;
+        try {
+          let items: any[] = [];
+          switch (itemType) {
+            case 'perk':
+              items = await getSavedPerks(userId);
+              break;
+            case 'resource':
+              items = await getSavedResources(userId);
+              break;
+            case 'aiTool':
+              items = await getSavedAITools(userId);
+              break;
+          }
+          setSavedItems(items.map(item => ({
+            id: item.id,
+            savedId: item.savedId,
+          })));
+        } catch (reloadError) {
+          console.error('Error reloading saved items:', reloadError);
+        }
+        return true;
+      }
+
       toast.error('Failed to save', {
         description: error.message || 'Please try again later',
       });
@@ -134,7 +173,7 @@ export function useSavedItems(itemType: ItemType) {
     } finally {
       setSavingStates(prev => ({ ...prev, [itemId]: false }));
     }
-  }, [user, itemType, isSaved]);
+  }, [user, itemType, isSaved, savedItems]);
 
   // Unsave an item
   const unsaveItem = useCallback(async (itemId: string) => {

@@ -61,17 +61,23 @@ export async function getSavedPerks(userId: string) {
 export async function savePerk(userId: string, perkId: string) {
   try {
     // Check if already saved
-    const existing = await databases.listDocuments(
-      databaseId,
-      COLLECTIONS.SAVED_PERKS,
-      [
-        Query.equal('userID', userId),
-        Query.equal('perkID', perkId)
-      ]
-    );
+    try {
+      const existing = await databases.listDocuments(
+        databaseId,
+        COLLECTIONS.SAVED_PERKS,
+        [
+          Query.equal('userID', userId),
+          Query.equal('perkID', perkId)
+        ]
+      );
 
-    if (existing.documents.length > 0) {
-      return existing.documents[0]; // Already saved
+      if (existing.documents.length > 0) {
+        console.log('Perk already saved, returning existing:', existing.documents[0].$id);
+        return existing.documents[0]; // Already saved
+      }
+    } catch (queryError) {
+      console.warn('Error checking for existing perk, proceeding with save:', queryError);
+      // Continue to create - might be a permission issue with query
     }
 
     // Create new saved perk record
@@ -93,7 +99,26 @@ export async function savePerk(userId: string, perkId: string) {
     );
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
+    // If document already exists, try to fetch and return it
+    if (error.code === 409 || error.message?.includes('already exists')) {
+      console.log('Document already exists, fetching existing document...');
+      try {
+        const existing = await databases.listDocuments(
+          databaseId,
+          COLLECTIONS.SAVED_PERKS,
+          [
+            Query.equal('userID', userId),
+            Query.equal('perkID', perkId)
+          ]
+        );
+        if (existing.documents.length > 0) {
+          return existing.documents[0];
+        }
+      } catch (fetchError) {
+        console.error('Error fetching existing document:', fetchError);
+      }
+    }
     console.error('Error saving perk:', error);
     throw error;
   }
@@ -188,17 +213,22 @@ export async function getSavedResources(userId: string) {
 export async function saveResource(userId: string, resourceId: string) {
   try {
     // Check if already saved
-    const existing = await databases.listDocuments(
-      databaseId,
-      COLLECTIONS.SAVED_RESOURCES,
-      [
-        Query.equal('userID', userId),
-        Query.equal('resourceID', resourceId)
-      ]
-    );
+    try {
+      const existing = await databases.listDocuments(
+        databaseId,
+        COLLECTIONS.SAVED_RESOURCES,
+        [
+          Query.equal('userID', userId),
+          Query.equal('resourceID', resourceId)
+        ]
+      );
 
-    if (existing.documents.length > 0) {
-      return existing.documents[0];
+      if (existing.documents.length > 0) {
+        console.log('Resource already saved, returning existing:', existing.documents[0].$id);
+        return existing.documents[0];
+      }
+    } catch (queryError) {
+      console.warn('Error checking for existing resource, proceeding with save:', queryError);
     }
 
     // Create new saved resource record
@@ -218,7 +248,26 @@ export async function saveResource(userId: string, resourceId: string) {
     );
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
+    // If document already exists, try to fetch and return it
+    if (error.code === 409 || error.message?.includes('already exists')) {
+      console.log('Document already exists, fetching existing document...');
+      try {
+        const existing = await databases.listDocuments(
+          databaseId,
+          COLLECTIONS.SAVED_RESOURCES,
+          [
+            Query.equal('userID', userId),
+            Query.equal('resourceID', resourceId)
+          ]
+        );
+        if (existing.documents.length > 0) {
+          return existing.documents[0];
+        }
+      } catch (fetchError) {
+        console.error('Error fetching existing document:', fetchError);
+      }
+    }
     console.error('Error saving resource:', error);
     throw error;
   }
@@ -295,17 +344,22 @@ export async function getSavedAITools(userId: string) {
 export async function saveAITool(userId: string, toolId: string) {
   try {
     // Check if already saved
-    const existing = await databases.listDocuments(
-      databaseId,
-      COLLECTIONS.SAVED_AI_TOOLS,
-      [
-        Query.equal('userID', userId),
-        Query.equal('toolID', toolId)
-      ]
-    );
+    try {
+      const existing = await databases.listDocuments(
+        databaseId,
+        COLLECTIONS.SAVED_AI_TOOLS,
+        [
+          Query.equal('userID', userId),
+          Query.equal('toolID', toolId)
+        ]
+      );
 
-    if (existing.documents.length > 0) {
-      return existing.documents[0];
+      if (existing.documents.length > 0) {
+        console.log('AI tool already saved, returning existing:', existing.documents[0].$id);
+        return existing.documents[0];
+      }
+    } catch (queryError) {
+      console.warn('Error checking for existing AI tool, proceeding with save:', queryError);
     }
 
     // Create new saved AI tool record
@@ -325,7 +379,26 @@ export async function saveAITool(userId: string, toolId: string) {
     );
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
+    // If document already exists, try to fetch and return it
+    if (error.code === 409 || error.message?.includes('already exists')) {
+      console.log('Document already exists, fetching existing document...');
+      try {
+        const existing = await databases.listDocuments(
+          databaseId,
+          COLLECTIONS.SAVED_AI_TOOLS,
+          [
+            Query.equal('userID', userId),
+            Query.equal('toolID', toolId)
+          ]
+        );
+        if (existing.documents.length > 0) {
+          return existing.documents[0];
+        }
+      } catch (fetchError) {
+        console.error('Error fetching existing document:', fetchError);
+      }
+    }
     console.error('Error saving AI tool:', error);
     throw error;
   }
