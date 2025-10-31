@@ -8,6 +8,7 @@ import { HeroSection } from "@/components/courses/HeroSection";
 import { SearchAndFilter } from "@/components/courses/SearchAndFilter";
 import { Toaster } from "@/components/ui/sonner";
 import type { Resource } from "@/types/resource";
+import { useSavedItems } from "@/hooks/useSavedItems";
 
 // Hardcoded data as fallback
 const fallbackCoursesData: Course[] = [
@@ -204,9 +205,11 @@ export default function Courses() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
-  const [savedCourses, setSavedCourses] = useState<string[]>([]);
   const [coursesData, setCoursesData] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Use the saved items hook for Resources
+  const { isSaved, toggleSave, isSaving } = useSavedItems('resource');
 
   // Load CSV data on component mount
   useEffect(() => {
@@ -282,7 +285,7 @@ export default function Courses() {
           course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
           course.category.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = selectedCategory === "All" || course.category === selectedCategory;
-        const matchesSavedView = !showSaved || savedCourses.includes(course.id);
+        const matchesSavedView = !showSaved || isSaved(course.id);
         return matchesSearch && matchesCategory && matchesSavedView;
       })
       .sort((a, b) => {
@@ -292,7 +295,7 @@ export default function Courses() {
         // Default: popularity or recent (mock sorting)
         return 0;
       });
-  }, [coursesData, savedCourses, searchTerm, selectedCategory, showSaved, sortBy]);
+  }, [coursesData, isSaved, searchTerm, selectedCategory, showSaved, sortBy]);
 
   const handleCourseClick = (course: Course) => {
     setSelectedCourse(course);
@@ -309,19 +312,26 @@ export default function Courses() {
     setIsModalOpen(false);
   };
 
-  const handleSaveCourse = () => {
+  const handleSaveCourse = async () => {
     if (!selectedCourse) {
       return;
     }
 
-    setSavedCourses((prev) => {
-      if (prev.includes(selectedCourse.id)) {
-        return prev;
-      }
-      toast.success(`Saved ${selectedCourse.provider} for later!`);
-      return [...prev, selectedCourse.id];
-    });
-    setIsModalOpen(false);
+    // Get the full resource data from the CSV
+    const resourceData = {
+      id: selectedCourse.id,
+      provider: selectedCourse.provider,
+      title: selectedCourse.courses[0] || selectedCourse.provider, // Use first course as title
+      category: selectedCourse.category,
+      description: selectedCourse.description,
+      validity: selectedCourse.validity,
+      verificationMethod: selectedCourse.verificationMethod,
+      claimLink: selectedCourse.claimLink || '',
+      discountOfferINR: '',
+      badge: selectedCourse.logo,
+    };
+
+    await toggleSave(resourceData);
   };
 
   const handleBrowseClick = () => {
@@ -407,6 +417,8 @@ export default function Courses() {
         onClose={() => setIsModalOpen(false)}
         onClaim={handleClaimCourse}
         onSave={handleSaveCourse}
+        isSaved={selectedCourse ? isSaved(selectedCourse.id) : false}
+        isSaving={selectedCourse ? isSaving(selectedCourse.id) : false}
       />
     </div>
   );

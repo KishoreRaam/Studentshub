@@ -43,9 +43,34 @@ export default function AITools() {
   // Extract unique streams
   const streams = useMemo(() => extractUniqueStreams(tools), [tools]);
 
-  // Toggle save/unsave tool - now using Appwrite
+  // Toggle save/unsave tool - now using Appwrite with full tool data
   const handleToggleSave = async (toolId: string) => {
-    await toggleSave(toolId);
+    // Find the tool by ID to get full data
+    const tool = tools.find(t => t.id === toolId);
+    if (!tool) {
+      console.error('Tool not found:', toolId);
+      return;
+    }
+
+    // Pass full tool data to save
+    const toolData = {
+      id: tool.id,
+      name: tool.name,
+      description: tool.description,
+      logo: tool.logo,
+      logo_url: tool.logo_url,
+      logo_source: tool.logo_source,
+      category: tool.category,
+      pricing: tool.pricing,
+      features: tool.features,
+      link: tool.link,
+      isOpenSource: tool.isOpenSource,
+      isPopular: tool.isPopular,
+      isNew: tool.isNew,
+      requiresVerification: tool.requiresVerification,
+    };
+
+    await toggleSave(toolData);
   };
 
   // Filter and sort tools

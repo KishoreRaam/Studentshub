@@ -1,4 +1,4 @@
-import { Calendar, Check, X, Gift, Bookmark } from "lucide-react";
+import { Calendar, Check, X, Gift, Bookmark, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ type CourseDetailModalProps = {
   onClose: () => void;
   onClaim: () => void;
   onSave: () => void;
+  isSaved?: boolean;
+  isSaving?: boolean;
 };
 
 const categoryColors: Record<string, string> = {
@@ -23,7 +25,7 @@ const categoryColors: Record<string, string> = {
   Productivity: "bg-indigo-600 text-white",
 };
 
-export function CourseDetailModal({ course, isOpen, onClose, onClaim, onSave }: CourseDetailModalProps) {
+export function CourseDetailModal({ course, isOpen, onClose, onClaim, onSave, isSaved = false, isSaving = false }: CourseDetailModalProps) {
   if (!course) {
     return null;
   }
@@ -127,12 +129,31 @@ export function CourseDetailModal({ course, isOpen, onClose, onClaim, onSave }: 
             </a>
             <Button
               onClick={onSave}
+              disabled={isSaving}
               variant="outline"
-              className="flex-1 bg-white dark:bg-gray-800 border-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-700 dark:hover:border-blue-400 transition-all duration-200 rounded-xl h-14 font-semibold text-lg hover:scale-[1.02]"
+              className={`flex-1 bg-white dark:bg-gray-800 border-2 ${
+                isSaved
+                  ? 'border-green-600 dark:border-green-500 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
+                  : 'border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+              } hover:border-blue-700 dark:hover:border-blue-400 transition-all duration-200 rounded-xl h-14 font-semibold text-lg hover:scale-[1.02]`}
               type="button"
             >
-              <Bookmark className="mr-2 h-5 w-5" />
-              Save for Later
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Saving...
+                </>
+              ) : isSaved ? (
+                <>
+                  <Bookmark className="mr-2 h-5 w-5 fill-current" />
+                  Saved ✓
+                </>
+              ) : (
+                <>
+                  <Bookmark className="mr-2 h-5 w-5" />
+                  Save for Later
+                </>
+              )}
             </Button>
           </div>
         </div>

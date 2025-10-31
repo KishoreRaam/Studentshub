@@ -169,10 +169,24 @@ export async function claimPerk(savedPerkId: string) {
 
 // ====== SAVED RESOURCES ======
 
-// Get all saved resources for a user
+// Define the Resource type for saving
+export interface ResourceData {
+  id: string;
+  provider: string;
+  title: string;
+  category: string;
+  description: string;
+  discountOfferINR?: string;
+  validity?: string;
+  verificationMethod?: string;
+  claimLink?: string;
+  badge?: string;
+}
+
+// Get all saved resources for a user - returns data directly from SAVED_RESOURCES
 export async function getSavedResources(userId: string) {
   try {
-    // Get all saved resource records
+    // Get all saved resource records for this user with full resource data
     const savedResourcesResponse = await databases.listDocuments(
       databaseId,
       COLLECTIONS.SAVED_RESOURCES,
@@ -183,44 +197,29 @@ export async function getSavedResources(userId: string) {
       return [];
     }
 
-    // Extract resource IDs
-    const resourceIds = savedResourcesResponse.documents.map(doc => doc.resourceID);
-
-    // Fetch full resource details
-    const resourcesResponse = await databases.listDocuments(
-      databaseId,
-      COLLECTIONS.RESOURCES,
-      [
-        Query.equal('$id', resourceIds),
-        Query.equal('isActive', true)
-      ]
-    );
-
-    // Combine saved resource data with full resource details
-    return savedResourcesResponse.documents.map(savedResource => {
-      const resource = resourcesResponse.documents.find(r => r.$id === savedResource.resourceID);
-      if (!resource) return null;
-
-      return {
-        id: resource.$id,
-        title: resource.title || '',
-        category: resource.category || '',
-        icon: resource.icon || '📚',
-        description: resource.description || '',
-        isPremium: resource.pricing?.toLowerCase().includes('premium') || resource.pricing?.toLowerCase().includes('paid') || false,
-        isSaved: true,
-        link: resource.link || '',
-        savedId: savedResource.$id, // Keep track of saved_resources document ID
-      };
-    }).filter(Boolean);
+    // Return saved resources with all their stored data
+    return savedResourcesResponse.documents.map(savedResource => ({
+      id: savedResource.resourceID,
+      provider: savedResource.provider || '',
+      title: savedResource.title || '',
+      category: savedResource.category || '',
+      description: savedResource.description || '',
+      discountOfferINR: savedResource.discountOfferINR || '',
+      validity: savedResource.validity || '',
+      verificationMethod: savedResource.verificationMethod || '',
+      claimLink: savedResource.claimLink || '',
+      badge: savedResource.badge || '',
+      isSaved: true,
+      savedId: savedResource.$id, // Keep track of the saved_resources document ID
+    }));
   } catch (error) {
     console.error('Error getting saved resources:', error);
     throw error;
   }
 }
 
-// Save a resource
-export async function saveResource(userId: string, resourceId: string) {
+// Save a resource for a user with full resource data
+export async function saveResource(userId: string, resourceData: ResourceData) {
   try {
     // Check if already saved
     try {
@@ -229,7 +228,7 @@ export async function saveResource(userId: string, resourceId: string) {
         COLLECTIONS.SAVED_RESOURCES,
         [
           Query.equal('userID', userId),
-          Query.equal('resourceID', resourceId)
+          Query.equal('resourceID', resourceData.id)
         ]
       );
 
@@ -241,14 +240,23 @@ export async function saveResource(userId: string, resourceId: string) {
       console.warn('Error checking for existing resource, proceeding with save:', queryError);
     }
 
-    // Create new saved resource record
+    // Create new saved resource record with full resource data
     const response = await databases.createDocument(
       databaseId,
       COLLECTIONS.SAVED_RESOURCES,
       AppwriteID.unique(),
       {
         userID: userId,
-        resourceID: resourceId,
+        resourceID: resourceData.id,
+        provider: resourceData.provider,
+        title: resourceData.title,
+        category: resourceData.category,
+        description: resourceData.description,
+        discountOfferINR: resourceData.discountOfferINR || '',
+        validity: resourceData.validity || '',
+        verificationMethod: resourceData.verificationMethod || '',
+        claimLink: resourceData.claimLink || '',
+        badge: resourceData.badge || '',
       },
       [
         Permission.read(Role.user(userId)),
@@ -268,7 +276,7 @@ export async function saveResource(userId: string, resourceId: string) {
           COLLECTIONS.SAVED_RESOURCES,
           [
             Query.equal('userID', userId),
-            Query.equal('resourceID', resourceId)
+            Query.equal('resourceID', resourceData.id)
           ]
         );
         if (existing.documents.length > 0) {
@@ -299,10 +307,28 @@ export async function unsaveResource(savedResourceId: string) {
 
 // ====== SAVED AI TOOLS ======
 
-// Get all saved AI tools for a user
+// Define the AI Tool type for saving
+export interface AIToolData {
+  id: string;
+  name: string;
+  description: string;
+  logo: string;
+  logo_url?: string;
+  logo_source?: string;
+  category: string[];
+  pricing: string;
+  features: string[];
+  link: string;
+  isOpenSource?: boolean;
+  isPopular?: boolean;
+  isNew?: boolean;
+  requiresVerification?: boolean;
+}
+
+// Get all saved AI tools for a user - returns data directly from SAVED_AI_TOOLS
 export async function getSavedAITools(userId: string) {
   try {
-    // Get all saved AI tool records
+    // Get all saved AI tool records for this user with full tool data
     const savedAIToolsResponse = await databases.listDocuments(
       databaseId,
       COLLECTIONS.SAVED_AI_TOOLS,
@@ -313,45 +339,33 @@ export async function getSavedAITools(userId: string) {
       return [];
     }
 
-    // Extract AI tool IDs
-    const toolIds = savedAIToolsResponse.documents.map(doc => doc.toolID);
-
-    // Fetch full AI tool details
-    const aiToolsResponse = await databases.listDocuments(
-      databaseId,
-      COLLECTIONS.AI_TOOLS,
-      [
-        Query.equal('$id', toolIds),
-        Query.equal('isActive', true)
-      ]
-    );
-
-    // Combine saved AI tool data with full AI tool details
-    return savedAIToolsResponse.documents.map(savedTool => {
-      const tool = aiToolsResponse.documents.find(t => t.$id === savedTool.toolID);
-      if (!tool) return null;
-
-      return {
-        id: tool.$id,
-        title: tool.toolName || '',
-        category: tool.category || '',
-        icon: tool.icon || '🤖',
-        description: tool.description || '',
-        isPremium: tool.pricing?.toLowerCase().includes('premium') || tool.pricing?.toLowerCase().includes('paid') || false,
-        isSaved: true,
-        link: tool.websiteUrl || '',
-        features: tool.features || [],
-        savedId: savedTool.$id, // Keep track of saved_ai_tools document ID
-      };
-    }).filter(Boolean);
+    // Return saved AI tools with all their stored data
+    return savedAIToolsResponse.documents.map(savedTool => ({
+      id: savedTool.toolID,
+      name: savedTool.name || '',
+      description: savedTool.description || '',
+      logo: savedTool.logo || '',
+      logo_url: savedTool.logo_url || '',
+      logo_source: savedTool.logo_source || '',
+      category: savedTool.category ? (typeof savedTool.category === 'string' ? JSON.parse(savedTool.category) : savedTool.category) : [],
+      pricing: savedTool.pricing || 'Free',
+      features: savedTool.features ? (typeof savedTool.features === 'string' ? JSON.parse(savedTool.features) : savedTool.features) : [],
+      link: savedTool.link || '',
+      isOpenSource: savedTool.isOpenSource || false,
+      isPopular: savedTool.isPopular || false,
+      isNew: savedTool.isNew || false,
+      requiresVerification: savedTool.requiresVerification || false,
+      isSaved: true,
+      savedId: savedTool.$id, // Keep track of the saved_ai_tools document ID
+    }));
   } catch (error) {
     console.error('Error getting saved AI tools:', error);
     throw error;
   }
 }
 
-// Save an AI tool
-export async function saveAITool(userId: string, toolId: string) {
+// Save an AI tool for a user with full tool data
+export async function saveAITool(userId: string, toolData: AIToolData) {
   try {
     // Check if already saved
     try {
@@ -360,7 +374,7 @@ export async function saveAITool(userId: string, toolId: string) {
         COLLECTIONS.SAVED_AI_TOOLS,
         [
           Query.equal('userID', userId),
-          Query.equal('toolID', toolId)
+          Query.equal('toolID', toolData.id)
         ]
       );
 
@@ -372,14 +386,27 @@ export async function saveAITool(userId: string, toolId: string) {
       console.warn('Error checking for existing AI tool, proceeding with save:', queryError);
     }
 
-    // Create new saved AI tool record
+    // Create new saved AI tool record with full tool data
     const response = await databases.createDocument(
       databaseId,
       COLLECTIONS.SAVED_AI_TOOLS,
       AppwriteID.unique(),
       {
         userID: userId,
-        toolID: toolId,
+        toolID: toolData.id,
+        name: toolData.name,
+        description: toolData.description,
+        logo: toolData.logo,
+        logo_url: toolData.logo_url || '',
+        logo_source: toolData.logo_source || '',
+        category: JSON.stringify(toolData.category),
+        pricing: toolData.pricing,
+        features: JSON.stringify(toolData.features),
+        link: toolData.link,
+        isOpenSource: toolData.isOpenSource || false,
+        isPopular: toolData.isPopular || false,
+        isNew: toolData.isNew || false,
+        requiresVerification: toolData.requiresVerification || false,
       },
       [
         Permission.read(Role.user(userId)),
@@ -399,7 +426,7 @@ export async function saveAITool(userId: string, toolId: string) {
           COLLECTIONS.SAVED_AI_TOOLS,
           [
             Query.equal('userID', userId),
-            Query.equal('toolID', toolId)
+            Query.equal('toolID', toolData.id)
           ]
         );
         if (existing.documents.length > 0) {

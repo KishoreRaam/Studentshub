@@ -13,6 +13,7 @@ export interface AITool {
   isPopular: boolean;
   isNew: boolean;
   requiresVerification: boolean;
+  savedId?: string; // Document ID in SAVED_AI_TOOLS collection for unsaving
 }
 
 export type SortOption = 'most-popular' | 'recently-added' | 'a-z' | 'best-student-discounts' | 'free-first';
