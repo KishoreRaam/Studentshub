@@ -14,6 +14,8 @@ import {
   getSavedResources,
   getSavedAITools,
   PerkData,
+  ResourceData,
+  AIToolData,
 } from '@/services/saved-items.service';
 import {
   saveEvent,
@@ -95,8 +97,8 @@ export function useSavedItems(itemType: ItemType) {
     return savingStates[itemId] || false;
   }, [savingStates]);
 
-  // Save an item (accepts full item data for perks and events)
-  const saveItem = useCallback(async (itemIdOrData: string | PerkData | EventData) => {
+  // Save an item (accepts full item data for perks, resources, AI tools, and events)
+  const saveItem = useCallback(async (itemIdOrData: string | PerkData | ResourceData | AIToolData | EventData) => {
     if (!user) {
       toast.error('Please sign in to save items');
       return false;
@@ -149,10 +151,41 @@ export function useSavedItems(itemType: ItemType) {
           }
           break;
         case 'resource':
-          response = await saveResource(userId, itemId);
+          // For resources, pass full data if available
+          if (typeof itemIdOrData === 'object') {
+            response = await saveResource(userId, itemIdOrData as ResourceData);
+          } else {
+            // Fallback - convert string ID to minimal ResourceData
+            response = await saveResource(userId, {
+              id: itemIdOrData,
+              provider: 'Unknown',
+              title: 'Unknown Resource',
+              category: 'Other',
+              description: '',
+            });
+          }
           break;
         case 'aiTool':
-          response = await saveAITool(userId, itemId);
+          // For AI tools, pass full data if available
+          if (typeof itemIdOrData === 'object') {
+            response = await saveAITool(userId, itemIdOrData as AIToolData);
+          } else {
+            // Fallback - convert string ID to minimal AIToolData
+            response = await saveAITool(userId, {
+              id: itemIdOrData,
+              name: 'Unknown Tool',
+              description: '',
+              logo: '',
+              category: [],
+              pricing: 'Free',
+              features: [],
+              link: '',
+              isOpenSource: false,
+              isPopular: false,
+              isNew: false,
+              requiresVerification: false,
+            });
+          }
           break;
       }
 
