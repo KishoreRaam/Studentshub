@@ -15,6 +15,7 @@ import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import Resources from "./pages/Resources";
 import AITools from "./pages/AITools";
+import BusinessModel from "./pages/BusinessModel";
 
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
             />
             <Route path="/resources" element={<Resources />} />
             <Route path="/tools" element={<AITools />} />
+            <Route path="/business-model" element={<BusinessModel />} />
           </Routes>
 
           <Footer />

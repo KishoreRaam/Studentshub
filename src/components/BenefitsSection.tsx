@@ -291,9 +291,11 @@ export function BenefitsSection() {
             <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
               Verify your student email and start saving thousands on the tools you need for your education and career.
             </p>
-            <button className="bg-white text-blue-600 px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200">
-              Get Started Now
-            </button>
+            <Link to="/business-model">
+              <button className="bg-white text-blue-600 px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200">
+                Get Started Now
+              </button>
+            </Link>
           </div>
         </motion.div>
 
