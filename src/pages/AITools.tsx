@@ -3,6 +3,7 @@ import { Loader2, AlertCircle, X } from 'lucide-react';
 import { AIToolsHero } from '@/components/ai-tools/AIToolsHero';
 import { SearchAndFilters } from '@/components/ai-tools/SearchAndFilters';
 import { ToolCard } from '@/components/ai-tools/ToolCard';
+import { DetailedAIToolCard } from '@/components/DetailedAIToolCard';
 import { parseAIToolsCSV, extractUniqueStreams } from '@/utils/csvParser';
 import type { AITool, SortOption, SecondaryFilter } from '@/types/ai-tools';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ export default function AITools() {
   const [selectedStream, setSelectedStream] = useState('All Tools');
   const [selectedFilters, setSelectedFilters] = useState<SecondaryFilter[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('most-popular');
+  const [selectedTool, setSelectedTool] = useState<AITool | null>(null);
 
   // Use saved items hook for Appwrite integration
   const { isSaved, toggleSave, isSaving, loading: savedItemsLoading } = useSavedItems('aiTool');
@@ -276,17 +278,25 @@ export default function AITools() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAndSortedTools.map(tool => (
-              <ToolCard
-                key={tool.id}
-                tool={tool}
-                onToggleSave={handleToggleSave}
-                isSaved={isSaved(tool.id)}
-                isSaving={isSaving(tool.id)}
-              />
+              <div key={tool.id} onClick={() => setSelectedTool(tool)} className="cursor-pointer">
+                <ToolCard
+                  tool={tool}
+                  onToggleSave={handleToggleSave}
+                  isSaved={isSaved(tool.id)}
+                  isSaving={isSaving(tool.id)}
+                />
+              </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Detailed Tool Modal */}
+      <DetailedAIToolCard
+        tool={selectedTool}
+        isOpen={selectedTool !== null}
+        onClose={() => setSelectedTool(null)}
+      />
     </div>
   );
 }

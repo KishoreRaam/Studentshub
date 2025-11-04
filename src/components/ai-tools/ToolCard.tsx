@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Heart, ExternalLink, Check, Lock, Code, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AITool } from '@/types/ai-tools';
+import gsap from 'gsap';
 
 interface ToolCardProps {
   tool: AITool;
@@ -12,6 +13,7 @@ interface ToolCardProps {
 
 export function ToolCard({ tool, onToggleSave, isSaved, isSaving = false }: ToolCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const heartRef = useRef<SVGSVGElement>(null);
 
   // Get pricing badge color
   const getPricingColor = (pricing: AITool['pricing']) => {
@@ -32,9 +34,17 @@ export function ToolCard({ tool, onToggleSave, isSaved, isSaving = false }: Tool
   const handleSaveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggleSave(tool.id);
+
+    if (heartRef.current) {
+      gsap.fromTo(heartRef.current, 
+        { scale: 1 }, 
+        { scale: 1.2, duration: 0.2, yoyo: true, repeat: 1, ease: "power1.out" }
+      );
+    }
   };
 
-  const handleVisitClick = () => {
+  const handleVisitClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     window.open(tool.link, '_blank', 'noopener,noreferrer');
   };
 
@@ -69,6 +79,7 @@ export function ToolCard({ tool, onToggleSave, isSaved, isSaving = false }: Tool
               <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
             ) : (
               <Heart
+                ref={heartRef}
                 className={`w-5 h-5 transition-all duration-200 ${
                   isSaved
                     ? 'fill-red-500 text-red-500'

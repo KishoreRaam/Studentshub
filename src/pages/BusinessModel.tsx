@@ -1,14 +1,9 @@
 import { motion } from 'motion/react';
-import { Briefcase, IndianRupee, TrendingUp, PieChart, Award, Target } from 'lucide-react';
+import { Briefcase, IndianRupee, TrendingUp } from 'lucide-react';
+import ThreePhaseGrowth from '../components/ThreePhaseGrowth';
+import SalaryAdjustedFinancial from '../components/SalaryAdjustedFinancial';
 
 export default function BusinessModel() {
-  const expenses = [
-    { label: 'Platform Development', amount: '₹5L', percentage: 29 },
-    { label: 'Marketing & Sales', amount: '₹4L', percentage: 23 },
-    { label: 'Operations', amount: '₹3.2L', percentage: 19 },
-    { label: 'Support & Maintenance', amount: '₹3L', percentage: 17 },
-    { label: 'Miscellaneous', amount: '₹2L', percentage: 12 }
-  ];
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-16 px-4 transition-colors duration-300">
@@ -235,159 +230,11 @@ export default function BusinessModel() {
           </div>
         </motion.div>
 
-        {/* Bottom Grid: Expenses and Profit */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Expenses Breakdown */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <div className="border-4 border-orange-500 rounded-3xl p-8 bg-white dark:bg-gray-800 h-full">
-              <div className="flex items-center space-x-3 mb-8">
-                <div className="w-14 h-14 bg-orange-100 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center">
-                  <PieChart className="w-7 h-7 text-orange-600 dark:text-orange-400" />
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
-                  Expenses Breakdown
-                </h2>
-              </div>
+        {/* Salary-Adjusted Financial Projection */}
+        <SalaryAdjustedFinancial />
 
-              <div className="space-y-6">
-                {expenses.map((expense, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
-                    className="bg-orange-50/50 dark:bg-orange-900/10 rounded-xl p-4"
-                  >
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-gray-700 dark:text-gray-300 font-medium">
-                        {expense.label}
-                      </span>
-                      <span className="text-orange-600 dark:text-orange-400 font-bold">
-                        {expense.amount}
-                      </span>
-                    </div>
-                    <div className="w-full bg-orange-100 dark:bg-orange-900/20 rounded-full h-2.5">
-                      <div
-                        className="bg-gradient-to-r from-orange-600 to-orange-400 h-2.5 rounded-full"
-                        style={{ width: `${expense.percentage}%` }}
-                      ></div>
-                    </div>
-                  </motion.div>
-                ))}
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1 }}
-                  className="bg-orange-100 dark:bg-orange-900/30 rounded-xl p-6 mt-6"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="text-orange-900 dark:text-orange-200 font-bold text-xl">
-                      Total Expenses
-                    </span>
-                    <span className="text-3xl font-bold text-orange-600 dark:text-orange-400">
-                      ₹17.2L
-                    </span>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Profit Summary */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-          >
-            <div className="border-4 border-green-500 rounded-3xl p-8 bg-white dark:bg-gray-800 h-full">
-              <div className="flex items-center space-x-3 mb-8">
-                <div className="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center">
-                  <Award className="w-7 h-7 text-green-600 dark:text-green-400" />
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
-                  Profit Summary
-                </h2>
-              </div>
-
-              <div className="space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                  className="border-2 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10 rounded-2xl p-8"
-                >
-                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-3">
-                    Net Profit
-                  </p>
-                  <p className="text-6xl font-bold text-green-600 dark:text-green-400 mb-2">
-                    ₹12.8L
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    First year projected profit
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.7 }}
-                  className="border-2 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10 rounded-2xl p-8"
-                >
-                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-                    Profit Margin
-                  </p>
-                  <div className="flex items-center space-x-3 mb-4">
-                    <p className="text-5xl font-bold text-green-600 dark:text-green-400">
-                      43%
-                    </p>
-                    <span className="px-4 py-2 bg-green-500 text-white text-sm rounded-full font-bold">
-                      Healthy
-                    </span>
-                  </div>
-                  <div className="w-full bg-green-100 dark:bg-green-900/20 rounded-full h-3">
-                    <div
-                      className="bg-gradient-to-r from-green-600 to-green-400 h-3 rounded-full"
-                      style={{ width: '43%' }}
-                    ></div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.8 }}
-                  className="bg-green-50 dark:bg-green-900/10 rounded-2xl p-6"
-                >
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Target className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                      Key Metrics
-                    </h3>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Revenue per College</span>
-                      <span className="font-bold text-gray-800 dark:text-gray-200">₹15,000</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Cost per College</span>
-                      <span className="font-bold text-gray-800 dark:text-gray-200">₹8,600</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Profit per College</span>
-                      <span className="font-bold text-green-600 dark:text-green-400">₹6,400</span>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+        {/* Three Phase Growth Strategy */}
+        <ThreePhaseGrowth />
 
         {/* Footer Note */}
         <motion.p

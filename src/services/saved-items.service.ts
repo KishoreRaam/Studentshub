@@ -61,24 +61,19 @@ export interface PerkData {
 // Save a perk for a user with full perk data
 export async function savePerk(userId: string, perkData: PerkData) {
   try {
-    // Check if already saved
-    try {
-      const existing = await databases.listDocuments(
-        databaseId,
-        COLLECTIONS.SAVED_PERKS,
-        [
-          Query.equal('userID', userId),
-          Query.equal('perkID', perkData.id)
-        ]
-      );
+    // First, always check if already saved to avoid duplicate errors
+    const existing = await databases.listDocuments(
+      databaseId,
+      COLLECTIONS.SAVED_PERKS,
+      [
+        Query.equal('userID', userId),
+        Query.equal('perkID', perkData.id)
+      ]
+    );
 
-      if (existing.documents.length > 0) {
-        console.log('Perk already saved, returning existing:', existing.documents[0].$id);
-        return existing.documents[0]; // Already saved
-      }
-    } catch (queryError) {
-      console.warn('Error checking for existing perk, proceeding with save:', queryError);
-      // Continue to create - might be a permission issue with query
+    if (existing.documents.length > 0) {
+      console.log('Perk already saved, returning existing:', existing.documents[0].$id);
+      return existing.documents[0];
     }
 
     // Create new saved perk record with full perk data
@@ -108,11 +103,12 @@ export async function savePerk(userId: string, perkData: PerkData) {
       ]
     );
 
+    console.log('Successfully saved perk:', response.$id);
     return response;
   } catch (error: any) {
-    // If document already exists, try to fetch and return it
-    if (error.code === 409 || error.message?.includes('already exists')) {
-      console.log('Document already exists, fetching existing document...');
+    // If document already exists (race condition), fetch and return it
+    if (error.code === 409 || error.message?.includes('already exists') || error.message?.includes('Document with the requested ID already exists')) {
+      console.log('Race condition detected: Document already exists, fetching existing document...');
       try {
         const existing = await databases.listDocuments(
           databaseId,
@@ -123,6 +119,7 @@ export async function savePerk(userId: string, perkData: PerkData) {
           ]
         );
         if (existing.documents.length > 0) {
+          console.log('Successfully fetched existing perk:', existing.documents[0].$id);
           return existing.documents[0];
         }
       } catch (fetchError) {
@@ -221,23 +218,19 @@ export async function getSavedResources(userId: string) {
 // Save a resource for a user with full resource data
 export async function saveResource(userId: string, resourceData: ResourceData) {
   try {
-    // Check if already saved
-    try {
-      const existing = await databases.listDocuments(
-        databaseId,
-        COLLECTIONS.SAVED_RESOURCES,
-        [
-          Query.equal('userID', userId),
-          Query.equal('resourceID', resourceData.id)
-        ]
-      );
+    // First, always check if already saved to avoid duplicate errors
+    const existing = await databases.listDocuments(
+      databaseId,
+      COLLECTIONS.SAVED_RESOURCES,
+      [
+        Query.equal('userID', userId),
+        Query.equal('resourceID', resourceData.id)
+      ]
+    );
 
-      if (existing.documents.length > 0) {
-        console.log('Resource already saved, returning existing:', existing.documents[0].$id);
-        return existing.documents[0];
-      }
-    } catch (queryError) {
-      console.warn('Error checking for existing resource, proceeding with save:', queryError);
+    if (existing.documents.length > 0) {
+      console.log('Resource already saved, returning existing:', existing.documents[0].$id);
+      return existing.documents[0];
     }
 
     // Create new saved resource record with full resource data
@@ -265,11 +258,12 @@ export async function saveResource(userId: string, resourceData: ResourceData) {
       ]
     );
 
+    console.log('Successfully saved resource:', response.$id);
     return response;
   } catch (error: any) {
-    // If document already exists, try to fetch and return it
-    if (error.code === 409 || error.message?.includes('already exists')) {
-      console.log('Document already exists, fetching existing document...');
+    // If document already exists (race condition), fetch and return it
+    if (error.code === 409 || error.message?.includes('already exists') || error.message?.includes('Document with the requested ID already exists')) {
+      console.log('Race condition detected: Document already exists, fetching existing document...');
       try {
         const existing = await databases.listDocuments(
           databaseId,
@@ -280,6 +274,7 @@ export async function saveResource(userId: string, resourceData: ResourceData) {
           ]
         );
         if (existing.documents.length > 0) {
+          console.log('Successfully fetched existing resource:', existing.documents[0].$id);
           return existing.documents[0];
         }
       } catch (fetchError) {
@@ -367,23 +362,19 @@ export async function getSavedAITools(userId: string) {
 // Save an AI tool for a user with full tool data
 export async function saveAITool(userId: string, toolData: AIToolData) {
   try {
-    // Check if already saved
-    try {
-      const existing = await databases.listDocuments(
-        databaseId,
-        COLLECTIONS.SAVED_AI_TOOLS,
-        [
-          Query.equal('userID', userId),
-          Query.equal('toolID', toolData.id)
-        ]
-      );
+    // First, always check if already saved to avoid duplicate errors
+    const existing = await databases.listDocuments(
+      databaseId,
+      COLLECTIONS.SAVED_AI_TOOLS,
+      [
+        Query.equal('userID', userId),
+        Query.equal('toolID', toolData.id)
+      ]
+    );
 
-      if (existing.documents.length > 0) {
-        console.log('AI tool already saved, returning existing:', existing.documents[0].$id);
-        return existing.documents[0];
-      }
-    } catch (queryError) {
-      console.warn('Error checking for existing AI tool, proceeding with save:', queryError);
+    if (existing.documents.length > 0) {
+      console.log('AI tool already saved, returning existing:', existing.documents[0].$id);
+      return existing.documents[0];
     }
 
     // Create new saved AI tool record with full tool data
@@ -415,11 +406,12 @@ export async function saveAITool(userId: string, toolData: AIToolData) {
       ]
     );
 
+    console.log('Successfully saved AI tool:', response.$id);
     return response;
   } catch (error: any) {
-    // If document already exists, try to fetch and return it
-    if (error.code === 409 || error.message?.includes('already exists')) {
-      console.log('Document already exists, fetching existing document...');
+    // If document already exists (race condition), fetch and return it
+    if (error.code === 409 || error.message?.includes('already exists') || error.message?.includes('Document with the requested ID already exists')) {
+      console.log('Race condition detected: Document already exists, fetching existing document...');
       try {
         const existing = await databases.listDocuments(
           databaseId,
@@ -430,6 +422,7 @@ export async function saveAITool(userId: string, toolData: AIToolData) {
           ]
         );
         if (existing.documents.length > 0) {
+          console.log('Successfully fetched existing AI tool:', existing.documents[0].$id);
           return existing.documents[0];
         }
       } catch (fetchError) {
