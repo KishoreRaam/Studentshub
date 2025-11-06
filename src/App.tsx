@@ -1,4 +1,6 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import ReactGA from "react-ga4";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -18,6 +20,12 @@ import AITools from "./pages/AITools";
 import BusinessModel from "./pages/BusinessModel";
 
 export default function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location]);
+
   return (
     <ThemeProvider defaultTheme="system" storageKey="edubuzz-theme">
       <SearchProvider>
