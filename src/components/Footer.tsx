@@ -1,6 +1,6 @@
 import { Mail, Phone, MapPin, Github, Twitter, Linkedin, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { CreatorBadge } from './CreatorBadge';
+import { SignatureAnimation } from './SignatureAnimation';
 
 export function Footer() {
   return (
@@ -117,9 +117,9 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Creator Badge - More prominent */}
+          {/* Signature Animation */}
           <div className="flex justify-center pt-6 pb-4">
-            <CreatorBadge />
+            <SignatureAnimation />
           </div>
         </div>
       </div>
