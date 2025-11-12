@@ -76,11 +76,15 @@ export default function SalaryAdjustedFinancial() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.5 + index * 0.05 }}
-                  className="bg-orange-50/50 dark:bg-orange-900/10 rounded-xl p-4"
+                  className="rounded-xl p-4 border-2"
+                  style={{
+                    backgroundColor: '#FFF8F0',
+                    borderColor: '#FED7AA'
+                  }}
                 >
                   <div className="flex justify-between items-center mb-2">
                     <div>
-                      <span className="text-gray-700 dark:text-gray-300 font-medium text-base">
+                      <span className="font-medium text-base" style={{ color: '#8B4513' }}>
                         {expense.label}
                       </span>
                       {expense.description && (
@@ -89,14 +93,17 @@ export default function SalaryAdjustedFinancial() {
                         </p>
                       )}
                     </div>
-                    <span className="text-gray-800 dark:text-gray-200 font-bold text-lg">
+                    <span className="font-bold text-lg" style={{ color: '#7C2D12' }}>
                       {expense.amount}
                     </span>
                   </div>
-                  <div className="w-full bg-orange-200/50 dark:bg-orange-900/30 rounded-full h-2">
+                  <div className="w-full rounded-full h-2" style={{ backgroundColor: '#FFE4CC' }}>
                     <div
-                      className="bg-gradient-to-r from-orange-600 to-orange-400 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${expense.percentage}%` }}
+                      className="h-2 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${expense.percentage}%`,
+                        background: 'linear-gradient(to right, #FF6B35, #FFB088)'
+                      }}
                     ></div>
                   </div>
                 </motion.div>
@@ -107,13 +114,17 @@ export default function SalaryAdjustedFinancial() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.9 }}
-                className="bg-orange-100 dark:bg-orange-900/30 rounded-xl p-5 mt-4"
+                className="rounded-xl p-5 mt-4 border-2"
+                style={{
+                  backgroundColor: '#FFF4E6',
+                  borderColor: '#FED7AA'
+                }}
               >
                 <div className="flex justify-between items-center">
-                  <span className="text-orange-900 dark:text-orange-200 font-bold text-xl">
+                  <span className="font-bold text-xl" style={{ color: '#7C2D12' }}>
                     Total Expenses
                   </span>
-                  <span className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                  <span className="text-3xl font-bold" style={{ color: '#7C2D12' }}>
                     ₹26.2L
                   </span>
                 </div>
@@ -133,15 +144,19 @@ export default function SalaryAdjustedFinancial() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
-                className="bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-800/20 border-2 border-cyan-300 dark:border-cyan-700 rounded-2xl p-6"
+                className="border-2 rounded-2xl p-6"
+                style={{
+                  backgroundColor: '#E6F7FA',
+                  borderColor: '#7DD3FC'
+                }}
               >
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">
+                <p className="text-sm font-medium mb-2" style={{ color: '#64748B' }}>
                   Adjusted Net Profit
                 </p>
-                <p className="text-5xl font-bold text-cyan-700 dark:text-cyan-400 mb-2">
+                <p className="text-5xl font-bold mb-2" style={{ color: '#0369A1' }}>
                   ₹3.8L
                 </p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                <p className="text-sm" style={{ color: '#64748B' }}>
                   After all expenses including salaries
                 </p>
               </motion.div>
@@ -151,23 +166,30 @@ export default function SalaryAdjustedFinancial() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.7 }}
-                className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-2 border-blue-300 dark:border-blue-700 rounded-2xl p-6"
+                className="border-2 rounded-2xl p-6"
+                style={{
+                  backgroundColor: '#E6F7FA',
+                  borderColor: '#7DD3FC'
+                }}
               >
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-3">
+                <p className="text-sm font-medium mb-3" style={{ color: '#64748B' }}>
                   Adjusted Profit Margin
                 </p>
                 <div className="flex items-center space-x-3 mb-4">
-                  <p className="text-5xl font-bold text-blue-700 dark:text-blue-400">
+                  <p className="text-5xl font-bold" style={{ color: '#0369A1' }}>
                     12.6%
                   </p>
-                  <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
+                  <span className="px-3 py-1 text-white text-xs font-bold rounded-full" style={{ backgroundColor: '#3B82F6' }}>
                     Sustainable
                   </span>
                 </div>
-                <div className="w-full bg-blue-200/50 dark:bg-blue-900/30 rounded-full h-2.5 mb-1">
+                <div className="w-full rounded-full h-2.5 mb-1" style={{ backgroundColor: '#BAE6FD' }}>
                   <div
-                    className="bg-gradient-to-r from-blue-600 to-blue-500 h-2.5 rounded-full transition-all duration-500"
-                    style={{ width: '12.6%' }}
+                    className="h-2.5 rounded-full transition-all duration-500"
+                    style={{
+                      width: '12.6%',
+                      backgroundColor: '#22D3EE'
+                    }}
                   ></div>
                 </div>
               </motion.div>
@@ -177,30 +199,34 @@ export default function SalaryAdjustedFinancial() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
-                className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6"
+                className="border-2 rounded-2xl p-6"
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  borderColor: '#CBD5E1'
+                }}
               >
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center pb-3 border-b border-purple-200 dark:border-purple-700">
-                    <span className="text-gray-600 dark:text-gray-400 font-medium">
+                  <div className="flex justify-between items-center pb-3 border-b" style={{ borderColor: '#CBD5E1' }}>
+                    <span className="font-medium" style={{ color: '#64748B' }}>
                       Total Revenue
                     </span>
-                    <span className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                    <span className="text-xl font-bold" style={{ color: '#334155' }}>
                       ₹30L
                     </span>
                   </div>
-                  <div className="flex justify-between items-center pb-3 border-b border-purple-200 dark:border-purple-700">
-                    <span className="text-gray-600 dark:text-gray-400 font-medium">
+                  <div className="flex justify-between items-center pb-3 border-b" style={{ borderColor: '#CBD5E1' }}>
+                    <span className="font-medium" style={{ color: '#64748B' }}>
                       Total Expenses
                     </span>
-                    <span className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                    <span className="text-xl font-bold" style={{ color: '#334155' }}>
                       ₹26.2L
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-gray-700 dark:text-gray-300 font-semibold text-lg">
+                    <span className="font-semibold text-lg" style={{ color: '#0891B2' }}>
                       Net Profit
                     </span>
-                    <span className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                    <span className="text-2xl font-bold" style={{ color: '#0891B2' }}>
                       ₹3.8L
                     </span>
                   </div>

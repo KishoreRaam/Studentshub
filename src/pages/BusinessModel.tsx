@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { Briefcase, IndianRupee, TrendingUp } from 'lucide-react';
 import ThreePhaseGrowth from '../components/ThreePhaseGrowth';
 import SalaryAdjustedFinancial from '../components/SalaryAdjustedFinancial';
+import AlternativeProfitStrategies from '../components/AlternativeProfitStrategies';
 
 export default function BusinessModel() {
 
@@ -212,17 +213,21 @@ export default function BusinessModel() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
-                className="bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-700 dark:to-blue-600 rounded-2xl p-8 flex justify-between items-center"
+                className="rounded-2xl p-8 flex justify-between items-center shadow-xl border-2"
+                style={{
+                  background: 'linear-gradient(to right, #10B981, #34D399)',
+                  borderColor: '#059669'
+                }}
               >
                 <div>
-                  <p className="text-white font-bold text-2xl mb-1">
+                  <p className="text-white font-bold text-2xl mb-1 drop-shadow-md">
                     Total Revenue
                   </p>
-                  <p className="text-blue-100 text-sm">
+                  <p className="text-white text-sm opacity-90">
                     First year projected income
                   </p>
                 </div>
-                <p className="text-5xl font-bold text-white">
+                <p className="text-5xl font-bold text-white drop-shadow-lg">
                   ₹30L
                 </p>
               </motion.div>
@@ -232,6 +237,196 @@ export default function BusinessModel() {
 
         {/* Salary-Adjusted Financial Projection */}
         <SalaryAdjustedFinancial />
+
+        {/* Alternative Profit Strategies */}
+        <AlternativeProfitStrategies />
+
+        {/* Cost Optimization Strategy */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="mb-8"
+        >
+          <div className="border-4 rounded-3xl p-8 bg-white dark:bg-gray-800" style={{ borderColor: '#10B981' }}>
+            <div className="flex items-center space-x-3 mb-8">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#D1FAE5' }}>
+                <svg className="w-7 h-7" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                Cost Optimization Strategy
+              </h2>
+            </div>
+
+            {/* Three Strategy Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              {/* Freelance Roles Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="rounded-2xl p-6 border-2"
+                style={{ backgroundColor: '#FAF5FF', borderColor: '#E9D5FF' }}
+              >
+                <div className="flex items-center space-x-2 mb-4">
+                  <svg className="w-6 h-6" style={{ color: '#9333EA' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold" style={{ color: '#6B21A8' }}>Freelance Roles</h3>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#6B21A8' }}>UI/UX Designer (₹30k/project)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#6B21A8' }}>Content Writer (₹15k/month)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#6B21A8' }}>Digital Marketing (₹25k/month)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#6B21A8' }}>Video Editor (₹20k/project)</span>
+                  </div>
+                </div>
+                <div className="rounded-lg p-3" style={{ backgroundColor: '#EDE9FE' }}>
+                  <p className="text-sm font-semibold" style={{ color: '#7C3AED' }}>Savings: ₹2.5L/year vs full-time</p>
+                </div>
+              </motion.div>
+
+              {/* Automated Functions Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+                className="rounded-2xl p-6 border-2"
+                style={{ backgroundColor: '#F0F9FF', borderColor: '#BAE6FD' }}
+              >
+                <div className="flex items-center space-x-2 mb-4">
+                  <svg className="w-6 h-6" style={{ color: '#0284C7' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold" style={{ color: '#0369A1' }}>Automated Functions</h3>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#0369A1' }}>Email marketing (MailChimp)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#0369A1' }}>Customer support (Chatbot)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#0369A1' }}>Invoicing (Zoho Books)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#0369A1' }}>Social media (Buffer/Hootsuite)</span>
+                  </div>
+                </div>
+                <div className="rounded-lg p-3" style={{ backgroundColor: '#E0F2FE' }}>
+                  <p className="text-sm font-semibold" style={{ color: '#0369A1' }}>Savings: ₹4L/year in FTE costs</p>
+                </div>
+              </motion.div>
+
+              {/* Delayed Hires Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                className="rounded-2xl p-6 border-2"
+                style={{ backgroundColor: '#FFF7ED', borderColor: '#FED7AA' }}
+              >
+                <div className="flex items-center space-x-2 mb-4">
+                  <svg className="w-6 h-6" style={{ color: '#EA580C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
+                  </svg>
+                  <h3 className="text-lg font-semibold" style={{ color: '#C2410C' }}>Delayed Hires</h3>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#EA580C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#C2410C' }}>HR Manager (until 100+ employees)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#EA580C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#C2410C' }}>Finance Manager (use CA)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#EA580C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#C2410C' }}>Legal Counsel (retainer basis)</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#EA580C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#C2410C' }}>Data Analyst (Phase 3)</span>
+                  </div>
+                </div>
+                <div className="rounded-lg p-3" style={{ backgroundColor: '#FFEDD5' }}>
+                  <p className="text-sm font-semibold" style={{ color: '#C2410C' }}>Savings: ₹6L/year in early phase</p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Total Savings Summary */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.9 }}
+              className="rounded-2xl p-6 border-l-4"
+              style={{ backgroundColor: '#ECFDF5', borderColor: '#10B981' }}
+            >
+              <div className="flex items-start space-x-3">
+                <svg className="w-6 h-6 mt-1 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <div>
+                  <p className="font-bold text-lg mb-2" style={{ color: '#065F46' }}>
+                    Total Annual Savings: ₹12.5L
+                  </p>
+                  <p className="text-sm" style={{ color: '#047857' }}>
+                    Through strategic use of freelancers, automation tools, and delayed hiring, StudentPerks reduces operational costs by 30-40% while maintaining productivity and quality standards.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
 
         {/* Three Phase Growth Strategy */}
         <ThreePhaseGrowth />
