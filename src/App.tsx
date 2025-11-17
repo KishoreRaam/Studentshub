@@ -8,6 +8,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { SearchProvider } from "./contexts/SearchContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ProfileButton } from "./components/ProfileButton";
+import { EmailInquiryWidget } from "./components/EmailInquiryWidget";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Perks from "./pages/Perks";
@@ -62,6 +63,9 @@ export default function App() {
             <Route path="/business-model" element={<BusinessModel />} />
             <Route path="/college-portal" element={<CollegePortal />} />
           </Routes>
+
+          {/* Email Inquiry Widget - appears on all pages */}
+          <EmailInquiryWidget />
 
           <Footer />
         </div>
