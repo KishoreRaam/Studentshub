@@ -305,10 +305,7 @@ export function EmailInquiryWidget() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="w-[360px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-blue-100 dark:border-blue-900 p-6 relative"
-              style={{
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%)',
-              }}
+              className="w-[360px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-blue-100 dark:border-gray-700 p-6 relative"
             >
               {/* Close button */}
               <motion.button
@@ -396,10 +393,7 @@ export function EmailInquiryWidget() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="w-[360px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-green-100 dark:border-green-900 p-6 relative overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%)',
-              }}
+              className="w-[360px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-green-100 dark:border-gray-700 p-6 relative overflow-hidden"
             >
               {/* Confetti animation */}
               {showConfetti && <Confetti />}
@@ -475,10 +469,7 @@ export function EmailInquiryWidget() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="w-[360px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-purple-100 dark:border-purple-900 p-6 relative"
-              style={{
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 100%)',
-              }}
+              className="w-[360px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-purple-100 dark:border-gray-700 p-6 relative"
             >
               {/* Close button */}
               <motion.button
