@@ -199,56 +199,63 @@ export function RegistrationForm() {
         </motion.div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
         {/* Institution Details Section */}
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+        <div className="space-y-8">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-3 mb-6">
             Institution Details
           </h3>
 
           {/* Institution Name */}
           <FormField
-            label="Institution Name"
+            label="College/Institution Name"
             name="institutionName"
             error={errors.institutionName?.message}
             required
             showSuccess={dirtyFields.institutionName && !errors.institutionName}
-            helpText="Full legal name of your institution"
+            helpText="As it appears on government records"
           >
-            <Input
-              {...register('institutionName')}
-              placeholder="e.g., PSG College of Technology"
-              disabled={isSubmitting}
-              className="h-11"
-            />
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <Input
+                {...register('institutionName')}
+                placeholder="Enter your institution's official name"
+                disabled={isSubmitting}
+                className="h-12 pl-11 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900"
+              />
+            </div>
           </FormField>
 
-          {/* Institution Type */}
-          <FormField
-            label="Institution Type"
-            name="institutionType"
-            error={errors.institutionType?.message}
-            required
-          >
-            <Select
-              onValueChange={(value) => setValue('institutionType', value, { shouldDirty: true })}
-              disabled={isSubmitting}
-            >
-              <SelectTrigger className="h-11">
-                <SelectValue placeholder="Select institution type" />
-              </SelectTrigger>
-              <SelectContent>
-                {INSTITUTION_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormField>
-
-          {/* State and District */}
+          {/* Institution Type and State Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Institution Type */}
+            <FormField
+              label="Institution Type"
+              name="institutionType"
+              error={errors.institutionType?.message}
+              required
+            >
+              <Select
+                onValueChange={(value) => setValue('institutionType', value, { shouldDirty: true })}
+                disabled={isSubmitting}
+              >
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {INSTITUTION_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+
             {/* State */}
             <FormField
               label="State"
@@ -263,7 +270,7 @@ export function RegistrationForm() {
                 }}
                 disabled={isSubmitting}
               >
-                <SelectTrigger className="h-11">
+                <SelectTrigger className="h-12">
                   <SelectValue placeholder="Select state" />
                 </SelectTrigger>
                 <SelectContent>
@@ -275,77 +282,65 @@ export function RegistrationForm() {
                 </SelectContent>
               </Select>
             </FormField>
-
-            {/* District (conditional) */}
-            {selectedState && (
-              <FormField
-                label="District"
-                name="district"
-                error={errors.district?.message}
-                required
-              >
-                <Select
-                  onValueChange={(value) => setValue('district', value, { shouldDirty: true })}
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger className="h-11">
-                    <SelectValue placeholder="Select district" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(DISTRICTS_BY_STATE[selectedState] || []).map((district) => (
-                      <SelectItem key={district} value={district}>
-                        {district}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-            )}
           </div>
 
           {/* Student Strength and Departments */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
-              label="Student Strength"
+              label="Total Student Strength"
               name="studentStrength"
               error={errors.studentStrength?.message}
               required
-              helpText="Total number of students (100-50,000)"
+              helpText="Total enrolled students across all years"
             >
-              <Input
-                {...register('studentStrength', { valueAsNumber: true })}
-                type="number"
-                placeholder="e.g., 2500"
-                disabled={isSubmitting}
-                className="h-11"
-                min="100"
-                max="50000"
-              />
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <Input
+                  {...register('studentStrength', { valueAsNumber: true })}
+                  type="number"
+                  placeholder="e.g., 2500"
+                  disabled={isSubmitting}
+                  className="h-12 pl-11 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900"
+                  min="100"
+                  max="50000"
+                />
+              </div>
             </FormField>
 
             <FormField
-              label="Number of Departments"
+              label="Number of Departments/Streams"
               name="departments"
               error={errors.departments?.message}
               required
-              helpText="Total departments/courses offered"
+              helpText="Total academic departments"
             >
-              <Input
-                {...register('departments', { valueAsNumber: true })}
-                type="number"
-                placeholder="e.g., 8"
-                disabled={isSubmitting}
-                className="h-11"
-                min="1"
-                max="100"
-              />
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <Input
+                  {...register('departments', { valueAsNumber: true })}
+                  type="number"
+                  placeholder="e.g., 8"
+                  disabled={isSubmitting}
+                  className="h-12 pl-11 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900"
+                  min="1"
+                  max="100"
+                />
+              </div>
             </FormField>
           </div>
         </div>
 
         {/* Contact Information Section */}
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+        <div className="space-y-8">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-3 mb-6">
             Contact Information
           </h3>
 
@@ -357,31 +352,45 @@ export function RegistrationForm() {
             required
             showSuccess={dirtyFields.principalName && !errors.principalName}
           >
-            <Input
-              {...register('principalName')}
-              placeholder="e.g., Dr. Rajesh Kumar"
-              disabled={isSubmitting}
-              className="h-11"
-            />
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <Input
+                {...register('principalName')}
+                placeholder="Full name of institutional head"
+                disabled={isSubmitting}
+                className="h-12 pl-11 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900"
+              />
+            </div>
           </FormField>
 
           {/* Official Email and Phone */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
-              label="Official Email"
+              label="Official Email Address"
               name="officialEmail"
               error={errors.officialEmail?.message}
               required
-              helpText="Use institutional email (.edu, .ac, .org, .gov)"
+              helpText="We'll send verification details here"
               showSuccess={dirtyFields.officialEmail && !errors.officialEmail}
             >
-              <Input
-                {...register('officialEmail')}
-                type="email"
-                placeholder="principal@institution.edu.in"
-                disabled={isSubmitting}
-                className="h-11"
-              />
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <Input
+                  {...register('officialEmail')}
+                  type="email"
+                  placeholder="principal@institution.edu.in"
+                  disabled={isSubmitting}
+                  className="h-12 pl-11 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900"
+                />
+              </div>
             </FormField>
 
             <FormField
@@ -389,17 +398,25 @@ export function RegistrationForm() {
               name="phoneNumber"
               error={errors.phoneNumber?.message}
               required
-              helpText="10-digit Indian mobile number"
+              helpText="10-digit mobile number"
               showSuccess={dirtyFields.phoneNumber && !errors.phoneNumber}
             >
-              <Input
-                {...register('phoneNumber')}
-                type="tel"
-                placeholder="9876543210"
-                disabled={isSubmitting}
-                className="h-11"
-                maxLength={10}
-              />
+              <div className="flex gap-2">
+                <div className="flex items-center justify-center px-4 h-12 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-400 font-semibold">
+                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  +91
+                </div>
+                <Input
+                  {...register('phoneNumber')}
+                  type="tel"
+                  placeholder="10-digit mobile number"
+                  disabled={isSubmitting}
+                  className="h-12 flex-1 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900"
+                  maxLength={10}
+                />
+              </div>
             </FormField>
           </div>
 
@@ -408,31 +425,51 @@ export function RegistrationForm() {
             label="Preferred Domain Name"
             name="preferredDomain"
             error={errors.preferredDomain?.message}
-            helpText="Choose a domain for your institutional emails (e.g., 'psgtech' for psgtech.edu.in)"
+            helpText="Your students will get emails like student@yourcollegename.edu.in"
           >
-            <Input
-              {...register('preferredDomain')}
-              placeholder="yourcollegename"
-              disabled={isSubmitting}
-              className="h-11"
-            />
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                  </svg>
+                </div>
+                <Input
+                  {...register('preferredDomain')}
+                  placeholder="yourcollegename"
+                  disabled={isSubmitting}
+                  className="h-12 pl-11 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900"
+                />
+              </div>
+              <div className="flex items-center justify-center px-4 h-12 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-400 font-semibold whitespace-nowrap">
+                .edu.in
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-12 px-6 font-semibold border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600"
+                disabled={!preferredDomain || isSubmitting}
+              >
+                Check
+              </Button>
+            </div>
             {preferredDomain && <DomainChecker domain={preferredDomain} />}
           </FormField>
         </div>
 
-        {/* Timeline & Current System Section */}
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-            Implementation Details
+        {/* Timeline Section */}
+        <div className="space-y-8">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-3 mb-6">
+            Timeline
           </h3>
 
           {/* Timeline */}
-          <FormField
-            label="When do you need this setup?"
-            name="timeline"
-            error={errors.timeline?.message}
-            required
-          >
+          <div className="space-y-3">
+            <Label className="text-base font-semibold text-gray-900 dark:text-white">
+              When do you need this?
+              <span className="text-red-500 ml-1.5">*</span>
+            </Label>
+
             <RadioGroup
               onValueChange={(value) => setValue('timeline', value as any, { shouldDirty: true })}
               disabled={isSubmitting}
@@ -441,35 +478,48 @@ export function RegistrationForm() {
               {TIMELINE_OPTIONS.map((option) => (
                 <div
                   key={option.value}
-                  className="flex items-start space-x-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                  className="relative flex items-center gap-4 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer bg-white dark:bg-gray-900"
                 >
-                  <RadioGroupItem value={option.value} id={option.value} className="mt-0.5" />
-                  <Label htmlFor={option.value} className="flex-1 cursor-pointer">
-                    <div className="font-medium text-gray-900 dark:text-white">
+                  <RadioGroupItem value={option.value} id={option.value} className="shrink-0" />
+                  <Label htmlFor={option.value} className="flex-1 cursor-pointer flex items-baseline gap-2">
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       {option.label}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {option.description}
-                    </div>
+                    </span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {option.sublabel}
+                    </span>
                   </Label>
                 </div>
               ))}
             </RadioGroup>
-          </FormField>
+
+            {errors.timeline && (
+              <div className="flex items-start space-x-2 text-red-600 dark:text-red-400">
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span className="text-sm font-medium">{errors.timeline.message}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Additional Information Section */}
+        <div className="space-y-8">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-3 mb-6">
+            Additional Information
+          </h3>
 
           {/* Current Email System */}
           <FormField
-            label="Current Email System (if any)"
+            label="Current Email System"
             name="currentEmailSystem"
             error={errors.currentEmailSystem?.message}
-            helpText="Let us know what you're currently using"
           >
             <Select
               onValueChange={(value) => setValue('currentEmailSystem', value, { shouldDirty: true })}
               disabled={isSubmitting}
             >
-              <SelectTrigger className="h-11">
-                <SelectValue placeholder="Select current system" />
+              <SelectTrigger className="h-12">
+                <SelectValue placeholder="Select current system (optional)" />
               </SelectTrigger>
               <SelectContent>
                 {CURRENT_EMAIL_SYSTEMS.map((system) => (
@@ -483,30 +533,29 @@ export function RegistrationForm() {
 
           {/* Additional Comments */}
           <FormField
-            label="Additional Comments or Requirements"
+            label="Comments/Requirements"
             name="comments"
             error={errors.comments?.message}
-            helpText="Any specific requirements or questions (max 500 characters)"
           >
             <Textarea
               {...register('comments')}
-              placeholder="Tell us about any specific needs or questions..."
+              placeholder="Any specific requirements or questions?"
               disabled={isSubmitting}
-              className="min-h-[100px] resize-y"
+              className="min-h-[120px] resize-y"
               maxLength={500}
             />
-            <div className="text-xs text-gray-400 text-right mt-1">
-              {watch('comments')?.length || 0} / 500
+            <div className="text-xs text-gray-400 text-right mt-2">
+              {watch('comments')?.length || 0}/500
             </div>
           </FormField>
         </div>
 
         {/* Submit Button */}
-        <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="pt-8 border-t-2 border-gray-200 dark:border-gray-700">
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-14 bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+            className="w-full h-14 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
           >
             {isSubmitting ? (
               <>
@@ -516,15 +565,20 @@ export function RegistrationForm() {
             ) : (
               <>
                 <Send className="w-5 h-5 mr-2" />
-                Submit Registration
+                Request Free Consultation
               </>
             )}
           </Button>
 
-          <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-3">
-            By submitting this form, you agree to our terms of service and privacy policy.
-            <br />
-            Form is auto-saved every 2 seconds.
+          <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
+            Our team will contact you within 24 hours
+          </p>
+
+          <p className="text-xs text-center text-gray-500 dark:text-gray-500 mt-3 flex items-center justify-center gap-1">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Your information is secure and confidential
           </p>
         </div>
       </form>

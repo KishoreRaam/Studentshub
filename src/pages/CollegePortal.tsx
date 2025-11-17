@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { useEffect } from 'react';
 import { HeroSection } from '../components/college-portal/HeroSection';
+import { WorkflowSection } from '../components/college-portal/workflow/WorkflowSection';
 import { RegistrationForm } from '../components/college-portal/RegistrationForm';
 import { TestimonialCard } from '../components/college-portal/TestimonialCard';
 import { FAQAccordion } from '../components/college-portal/FAQAccordion';
@@ -22,6 +23,9 @@ export default function CollegePortal() {
       {/* Hero Section */}
       <HeroSection />
 
+      {/* Workflow Section - How It Works */}
+      <WorkflowSection />
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Registration Section with Sidebar Layout */}
@@ -35,14 +39,13 @@ export default function CollegePortal() {
             id="registration-form"
           >
             <Card className="border-0 shadow-xl">
-              <CardContent className="p-6 md:p-8">
-                <div className="mb-6">
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <CardContent className="p-8 md:p-10">
+                <div className="mb-8">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
                     Register Your Institution
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Fill out the form below to get started with institutional email services.
-                    All fields marked with <span className="text-red-500">*</span> are required.
+                  <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Fill out the form below and our team will contact you within 24 hours
                   </p>
                 </div>
 

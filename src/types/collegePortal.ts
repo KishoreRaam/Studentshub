@@ -145,9 +145,9 @@ export const CURRENT_EMAIL_SYSTEMS = [
 ] as const;
 
 export const TIMELINE_OPTIONS = [
-  { value: 'immediate', label: 'Immediate (Within 1 month)', description: 'Need setup as soon as possible' },
-  { value: 'semester', label: 'Next Semester', description: 'Planning for upcoming semester' },
-  { value: 'planning', label: 'Future Planning', description: 'Exploring options for later' }
+  { value: 'immediate', label: 'Immediate', sublabel: 'Within 2 weeks', description: 'Need setup as soon as possible' },
+  { value: 'semester', label: 'This Semester', sublabel: 'Within 2 months', description: 'Planning for upcoming semester' },
+  { value: 'planning', label: 'Planning Ahead', sublabel: '3+ months', description: 'Exploring options for later' }
 ] as const;
 
 // Trust indicators for hero section
