@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import Resources from "./pages/Resources";
 import AITools from "./pages/AITools";
 import BusinessModel from "./pages/BusinessModel";
+import CollegePortal from "./pages/CollegePortal";
 
 export default function App() {
   const location = useLocation();
@@ -59,6 +60,7 @@ export default function App() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/tools" element={<AITools />} />
             <Route path="/business-model" element={<BusinessModel />} />
+            <Route path="/college-portal" element={<CollegePortal />} />
           </Routes>
 
           <Footer />

@@ -30,6 +30,7 @@ export const COLLECTIONS = {
   SAVED_AI_TOOLS: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_AI_TOOLS || '',
   EVENTS: import.meta.env.VITE_APPWRITE_COLLECTION_EVENTS || '',
   SAVED_EVENTS: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_EVENTS || '',
+  COLLEGE_REGISTRATIONS: import.meta.env.VITE_APPWRITE_COLLECTION_COLLEGE_REGISTRATIONS || 'college_registrations',
 };
 
 // OAuth Configuration
