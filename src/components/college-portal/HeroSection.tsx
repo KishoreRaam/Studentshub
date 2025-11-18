@@ -17,6 +17,7 @@ export function HeroSection() {
     'Setup completed in 48 hours',
     'Full Google Workspace integration',
     '24/7 technical support',
+    'Our Aim For Next 5 years',
   ];
 
   return (
