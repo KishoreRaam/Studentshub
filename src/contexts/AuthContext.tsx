@@ -34,7 +34,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const currentUser = await account.get();
       setUser(currentUser);
     } catch (error) {
-      // No active session
+      // No active session - this is normal when user is not logged in
+      // 401 Unauthorized is expected here
+      console.log('No active session found');
       setUser(null);
     } finally {
       setLoading(false);
