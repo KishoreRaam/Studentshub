@@ -15,6 +15,10 @@ import Perks from "./pages/Perks";
 import Events from "./pages/Events";
 import Login from "./pages/Login/index";
 import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
+import VerificationFailed from "./pages/VerificationFailed";
 import Profile from "./pages/Profile";
 import Resources from "./pages/Resources";
 import AITools from "./pages/AITools";
@@ -50,6 +54,10 @@ export default function App() {
             <Route path="/events" element={<Events />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/verification-failed" element={<VerificationFailed />} />
             <Route
               path="/profile"
               element={

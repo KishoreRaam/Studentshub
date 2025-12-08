@@ -1,0 +1,13 @@
+{
+  "name": "sendVerificationCustom",
+  "version": "1.0.0",
+  "description": "Send custom verification emails via SendGrid",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^11.0.0",
+    "node-fetch": "^2.6.7"
+  },
+  "keywords": ["appwrite", "sendgrid", "verification"],
+  "author": "StudentPerks",
+  "license": "MIT"
+}

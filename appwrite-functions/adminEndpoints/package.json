@@ -1,0 +1,12 @@
+{
+  "name": "adminEndpoints",
+  "version": "1.0.0",
+  "description": "Admin-only endpoints for user management",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^11.0.0"
+  },
+  "keywords": ["appwrite", "admin", "management"],
+  "author": "StudentPerks",
+  "license": "MIT"
+}

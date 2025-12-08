@@ -104,7 +104,7 @@ const SignInPage = () => {
             <button type="submit" className="btn-login">Sign In →</button>
           </div>
           <div className="alt-actions">
-            <div><a href="#">Forgot password?</a></div>
+            <div><a href="/forgot-password">Forgot password?</a></div>
             <div>Don't have an account? <a href="/signup">Create one</a></div>
           </div>
         </form>

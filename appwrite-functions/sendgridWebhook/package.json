@@ -1,0 +1,12 @@
+{
+  "name": "sendgridWebhook",
+  "version": "1.0.0",
+  "description": "Handle SendGrid webhook events",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^11.0.0"
+  },
+  "keywords": ["sendgrid", "webhook", "email"],
+  "author": "StudentPerks",
+  "license": "MIT"
+}

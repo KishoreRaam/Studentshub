@@ -1,0 +1,12 @@
+{
+  "name": "resendVerification",
+  "version": "1.0.0",
+  "description": "Appwrite function to resend verification emails with rate limiting",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^11.0.0"
+  },
+  "keywords": ["appwrite", "verification", "rate-limit"],
+  "author": "StudentPerks",
+  "license": "MIT"
+}
