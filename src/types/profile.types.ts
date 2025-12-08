@@ -4,6 +4,8 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  state?: string;
+  district?: string;
   university: string;
   stream: string;
   avatar?: string;

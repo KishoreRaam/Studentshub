@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Signup with Email & Password
-  const signupWithEmail = async (email: string, password: string, name: string) => {
+  const signupWithEmail = async (email: string, password: string, name: string, state?: string, district?: string, institution?: string) => {
     try {
       setLoading(true);
       // Create account with Appwrite's unique ID generator
@@ -88,6 +88,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Auto-login after signup
       await account.createEmailPasswordSession(email, password);
+      
+      // Store additional profile data in preferences
+      if (state || district || institution) {
+        await account.updatePrefs({
+          state: state || '',
+          district: district || '',
+          institution: institution || ''
+        });
+      }
       
       // Send verification email
       const verificationUrl = `${window.location.origin}/verify-email`;

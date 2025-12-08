@@ -20,6 +20,7 @@ import {
   updateUserProfile,
   uploadAvatar,
 } from '../services/profile.service';
+import { account } from '../lib/appwrite';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -239,6 +240,14 @@ export default function ProfilePage() {
         university: updates.university,
         stream: updates.stream,
         avatar: avatarUrl,
+      });
+
+      // Update user preferences (state, district)
+      await account.updatePrefs({
+        ...(authUser.prefs || {}),
+        state: updates.state || '',
+        district: updates.district || '',
+        institution: updates.university || ''
       });
 
       setUserProfile(updatedProfile);

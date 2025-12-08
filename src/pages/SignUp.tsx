@@ -1,23 +1,113 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { GoogleIcon, SheerIDIcon } from './Login/AuthIcons';
 import './Login/AuthStyles.css';
+import { 
+  fetchColleges, 
+  getUniqueStates, 
+  getDistrictsByState,
+  filterByStateAndDistrict,
+  searchCollegesByName,
+  type College 
+} from '../utils/collegeUtils';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
   const { loginWithGoogle, signupWithEmail, user, loading } = useAuth();
+  
+  // Form data state
   const [formData, setFormData] = React.useState({
     firstName: '',
     lastName: '',
+    state: '',
+    district: '',
     institution: '',
     email: '',
     password: '',
     confirm: '',
     terms: false
   });
+  
+  // College data state
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [states, setStates] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
+  const [filteredColleges, setFilteredColleges] = useState<College[]>([]);
+  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
+  const [collegesLoading, setCollegesLoading] = useState(true);
+  
   const [error, setError] = React.useState('');
   const [submitting, setSubmitting] = React.useState(false);
+
+  // Load colleges data on mount
+  useEffect(() => {
+    const loadColleges = async () => {
+      setCollegesLoading(true);
+      const data = await fetchColleges();
+      setColleges(data);
+      const uniqueStates = getUniqueStates(data);
+      setStates(uniqueStates);
+      setCollegesLoading(false);
+    };
+    loadColleges();
+  }, []);
+
+  // Update districts when state changes
+  useEffect(() => {
+    if (formData.state && colleges.length > 0) {
+      const stateDistricts = getDistrictsByState(colleges, formData.state);
+      setDistricts(stateDistricts);
+    } else {
+      setDistricts([]);
+    }
+  }, [formData.state, colleges]);
+
+  // Update filtered colleges when state or district changes
+  useEffect(() => {
+    if (formData.state && formData.district && colleges.length > 0) {
+      const filtered = filterByStateAndDistrict(
+        colleges,
+        formData.state,
+        formData.district
+      );
+      setFilteredColleges(filtered);
+    } else {
+      setFilteredColleges([]);
+    }
+  }, [formData.state, formData.district, colleges]);
+
+  // Filter colleges based on search term
+  const handleInstitutionSearch = (value: string) => {
+    setFormData(prev => ({ ...prev, institution: value }));
+    
+    if (value.length > 0 && formData.state && formData.district) {
+      const baseFiltered = filterByStateAndDistrict(
+        colleges,
+        formData.state,
+        formData.district
+      );
+      const searched = searchCollegesByName(baseFiltered, value);
+      setFilteredColleges(searched);
+      setShowCollegeDropdown(true);
+    } else if (formData.state && formData.district) {
+      const filtered = filterByStateAndDistrict(
+        colleges,
+        formData.state,
+        formData.district
+      );
+      setFilteredColleges(filtered);
+      setShowCollegeDropdown(value.length > 0);
+    } else {
+      setShowCollegeDropdown(false);
+    }
+  };
+
+  // Select college from dropdown
+  const selectCollege = (collegeName: string) => {
+    setFormData(prev => ({ ...prev, institution: collegeName }));
+    setShowCollegeDropdown(false);
+  };
 
   // Redirect if user is already logged in
   useEffect(() => {
@@ -71,12 +161,32 @@ const SignUpPage = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    
+    if (name === 'state') {
+      // Reset district and institution when state changes
+      setFormData(prev => ({
+        ...prev,
+        state: value,
+        district: '',
+        institution: ''
+      }));
+    } else if (name === 'district') {
+      // Reset institution when district changes
+      setFormData(prev => ({
+        ...prev,
+        district: value,
+        institution: ''
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
+    
     setError(''); // Clear error on input change
   };
 
@@ -87,6 +197,18 @@ const SignUpPage = () => {
     // Validation
     if (!formData.firstName || !formData.lastName) {
       setError('Please enter your full name');
+      return;
+    }
+    if (!formData.state) {
+      setError('Please select your state');
+      return;
+    }
+    if (!formData.district) {
+      setError('Please select your district');
+      return;
+    }
+    if (!formData.institution) {
+      setError('Please enter your institution');
       return;
     }
     if (!formData.email.includes('@')) {
@@ -109,7 +231,14 @@ const SignUpPage = () => {
     try {
       setSubmitting(true);
       const fullName = `${formData.firstName} ${formData.lastName}`;
-      await signupWithEmail(formData.email, formData.password, fullName);
+      await signupWithEmail(
+        formData.email, 
+        formData.password, 
+        fullName,
+        formData.state,
+        formData.district,
+        formData.institution
+      );
       
       // Redirect to verify email page
       navigate('/verify-email');
@@ -191,17 +320,142 @@ const SignUpPage = () => {
                 />
               </div>
             </div>
-            <div className="field">
-              <label htmlFor="institution">Institution</label>
+
+            {/* State and District Row */}
+            <div className="field-row">
+              <div className="field">
+                <label htmlFor="state">State</label>
+                <select
+                  id="state"
+                  name="state"
+                  required
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  disabled={collegesLoading}
+                >
+                  <option value="">Select State</option>
+                  {states.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="district">District</label>
+                <select
+                  id="district"
+                  name="district"
+                  required
+                  value={formData.district}
+                  onChange={handleInputChange}
+                  disabled={!formData.state || collegesLoading}
+                >
+                  <option value="">Select District</option>
+                  {districts.map((district) => (
+                    <option key={district} value={district}>
+                      {district}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Institution Field with Autocomplete */}
+            <div className="field" style={{ position: 'relative' }}>
+              <label htmlFor="institution">
+                Institution
+                {formData.state && formData.district && filteredColleges.length > 0 && (
+                  <span style={{ 
+                    marginLeft: '8px', 
+                    fontSize: '12px', 
+                    color: '#666',
+                    fontWeight: 'normal'
+                  }}>
+                    ({filteredColleges.length} colleges found)
+                  </span>
+                )}
+              </label>
               <input 
                 id="institution" 
                 name="institution" 
                 required 
-                placeholder="University / College" 
-                autoComplete="organization"
+                placeholder={
+                  !formData.state 
+                    ? "Select state first" 
+                    : !formData.district 
+                    ? "Select district first" 
+                    : "Search or type your institution"
+                }
+                autoComplete="off"
                 value={formData.institution}
-                onChange={handleInputChange}
+                onChange={(e) => handleInstitutionSearch(e.target.value)}
+                onFocus={() => {
+                  if (formData.state && formData.district && filteredColleges.length > 0) {
+                    setShowCollegeDropdown(true);
+                  }
+                }}
+                onBlur={() => {
+                  // Delay to allow click on dropdown
+                  setTimeout(() => setShowCollegeDropdown(false), 200);
+                }}
+                disabled={!formData.state || !formData.district}
               />
+              
+              {/* College Dropdown */}
+              {showCollegeDropdown && filteredColleges.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  backgroundColor: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  marginTop: '4px',
+                  zIndex: 1000,
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                }}>
+                  {filteredColleges.slice(0, 50).map((college, index) => (
+                    <div
+                      key={index}
+                      onMouseDown={() => selectCollege(college.name)}
+                      style={{
+                        padding: '10px 12px',
+                        cursor: 'pointer',
+                        borderBottom: index < filteredColleges.length - 1 ? '1px solid #eee' : 'none',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                      }}
+                    >
+                      <div style={{ fontWeight: '500', color: '#333' }}>
+                        {college.name}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                        {college.type} • {college.district}
+                      </div>
+                    </div>
+                  ))}
+                  {filteredColleges.length > 50 && (
+                    <div style={{
+                      padding: '10px 12px',
+                      fontSize: '12px',
+                      color: '#666',
+                      textAlign: 'center',
+                      fontStyle: 'italic'
+                    }}>
+                      Showing first 50 results. Type to narrow down...
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className="field">
               <label htmlFor="email">Academic Email</label>

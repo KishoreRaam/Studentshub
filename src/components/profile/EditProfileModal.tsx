@@ -1,7 +1,15 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Upload, Loader2, AlertCircle } from 'lucide-react';
 import { UserProfile } from '../../types/profile.types';
+import { 
+  fetchColleges, 
+  getUniqueStates, 
+  getDistrictsByState,
+  filterByStateAndDistrict,
+  searchCollegesByName,
+  type College 
+} from '../../utils/collegeUtils';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -12,6 +20,8 @@ interface EditProfileModalProps {
 
 export interface ProfileUpdateData {
   name: string;
+  state: string;
+  district: string;
   university: string;
   stream: string;
   avatar?: File | string;
@@ -19,14 +29,26 @@ export interface ProfileUpdateData {
 
 interface ValidationErrors {
   name?: string;
+  state?: string;
+  district?: string;
   university?: string;
   stream?: string;
   avatar?: string;
 }
 
 export default function EditProfileModal({ isOpen, onClose, user, onSave }: EditProfileModalProps) {
+  // College data state
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [states, setStates] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
+  const [filteredColleges, setFilteredColleges] = useState<College[]>([]);
+  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
+  const [collegesLoading, setCollegesLoading] = useState(true);
+  
   const [formData, setFormData] = useState<ProfileUpdateData>({
     name: user.name,
+    state: (user as any).prefs?.state || '',
+    district: (user as any).prefs?.district || '',
     university: user.university,
     stream: user.stream || '',
     avatar: user.avatar,
@@ -38,7 +60,76 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
   const [uploadError, setUploadError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const validateForm = (): boolean => {
+  // Load colleges data on mount
+  useEffect(() => {
+    const loadColleges = async () => {
+      setCollegesLoading(true);
+      const data = await fetchColleges();
+      setColleges(data);
+      const uniqueStates = getUniqueStates(data);
+      setStates(uniqueStates);
+      setCollegesLoading(false);
+    };
+    loadColleges();
+  }, []);
+
+  // Update districts when state changes
+  useEffect(() => {
+    if (formData.state && colleges.length > 0) {
+      const stateDistricts = getDistrictsByState(colleges, formData.state);
+      setDistricts(stateDistricts);
+    } else {
+      setDistricts([]);
+    }
+  }, [formData.state, colleges]);
+
+  // Update filtered colleges when state or district changes
+  useEffect(() => {
+    if (formData.state && formData.district && colleges.length > 0) {
+      const filtered = filterByStateAndDistrict(
+        colleges,
+        formData.state,
+        formData.district
+      );
+      setFilteredColleges(filtered);
+    } else {
+      setFilteredColleges([]);
+    }
+  }, [formData.state, formData.district, colleges]);
+
+  // Filter colleges based on search term
+  const handleUniversitySearch = (value: string) => {
+    setFormData(prev => ({ ...prev, university: value }));
+    
+    if (value.length > 0 && formData.state && formData.district) {
+      const baseFiltered = filterByStateAndDistrict(
+        colleges,
+        formData.state,
+        formData.district
+      );
+      const searched = searchCollegesByName(baseFiltered, value);
+      setFilteredColleges(searched);
+      setShowCollegeDropdown(true);
+    } else if (formData.state && formData.district) {
+      const filtered = filterByStateAndDistrict(
+        colleges,
+        formData.state,
+        formData.district
+      );
+      setFilteredColleges(filtered);
+      setShowCollegeDropdown(value.length > 0);
+    } else {
+      setShowCollegeDropdown(false);
+    }
+  };
+
+  // Select college from dropdown
+  const selectCollege = (collegeName: string) => {
+    setFormData(prev => ({ ...prev, university: collegeName }));
+    setShowCollegeDropdown(false);
+  };
+
+  const validateForm = () => {
     const newErrors: ValidationErrors = {};
 
     // Validate name
@@ -46,6 +137,16 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
       newErrors.name = 'Name is required';
     } else if (formData.name.length > 200) {
       newErrors.name = 'Name must be 200 characters or less';
+    }
+
+    // Validate state
+    if (!formData.state.trim()) {
+      newErrors.state = 'State is required';
+    }
+
+    // Validate district
+    if (!formData.district.trim()) {
+      newErrors.district = 'District is required';
     }
 
     // Validate university
@@ -224,26 +325,159 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
                     )}
                   </div>
 
-                  {/* University Field */}
+                  {/* State Field */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      State <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.state}
+                      onChange={(e) => {
+                        setFormData({ 
+                          ...formData, 
+                          state: e.target.value,
+                          district: '',
+                          university: ''
+                        });
+                      }}
+                      disabled={collegesLoading || isSaving}
+                      className={`w-full px-4 py-2.5 rounded-lg border ${
+                        errors.state
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
+                      } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-colors`}
+                    >
+                      <option value="">Select State</option>
+                      {states.map((state) => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.state && (
+                      <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.state}</p>
+                    )}
+                  </div>
+
+                  {/* District Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      District <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.district}
+                      onChange={(e) => {
+                        setFormData({ 
+                          ...formData, 
+                          district: e.target.value,
+                          university: ''
+                        });
+                      }}
+                      disabled={!formData.state || collegesLoading || isSaving}
+                      className={`w-full px-4 py-2.5 rounded-lg border ${
+                        errors.district
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
+                      } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-colors`}
+                    >
+                      <option value="">Select District</option>
+                      {districts.map((district) => (
+                        <option key={district} value={district}>
+                          {district}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.district && (
+                      <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.district}</p>
+                    )}
+                  </div>
+
+                  {/* University Field with Autocomplete */}
+                  <div style={{ position: 'relative' }}>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       University <span className="text-red-500">*</span>
+                      {formData.state && formData.district && filteredColleges.length > 0 && (
+                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 font-normal">
+                          ({filteredColleges.length} colleges found)
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
                       value={formData.university}
-                      onChange={(e) => setFormData({ ...formData, university: e.target.value })}
+                      onChange={(e) => handleUniversitySearch(e.target.value)}
+                      onFocus={() => {
+                        if (formData.state && formData.district && filteredColleges.length > 0) {
+                          setShowCollegeDropdown(true);
+                        }
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => setShowCollegeDropdown(false), 200);
+                      }}
+                      disabled={!formData.state || !formData.district || isSaving}
                       className={`w-full px-4 py-2.5 rounded-lg border ${
                         errors.university
                           ? 'border-red-500 focus:ring-red-500'
                           : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
                       } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-colors`}
-                      placeholder="Enter your university"
+                      placeholder={
+                        !formData.state 
+                          ? "Select state first" 
+                          : !formData.district 
+                          ? "Select district first" 
+                          : "Search or type your university"
+                      }
                       maxLength={200}
-                      disabled={isSaving}
+                      autoComplete="off"
                     />
                     {errors.university && (
                       <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.university}</p>
+                    )}
+                    
+                    {/* College Dropdown */}
+                    {showCollegeDropdown && filteredColleges.length > 0 && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        maxHeight: '200px',
+                        overflowY: 'auto',
+                        backgroundColor: 'white',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        marginTop: '4px',
+                        zIndex: 1000,
+                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                      }}
+                      className="dark:bg-gray-800 dark:border-gray-600"
+                      >
+                        {filteredColleges.slice(0, 50).map((college, index) => (
+                          <div
+                            key={index}
+                            onMouseDown={() => selectCollege(college.name)}
+                            style={{
+                              padding: '10px 12px',
+                              cursor: 'pointer',
+                              borderBottom: index < filteredColleges.length - 1 ? '1px solid #eee' : 'none',
+                              transition: 'background-color 0.2s'
+                            }}
+                            className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              {college.name}
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                              {college.type} • {college.district}
+                            </div>
+                          </div>
+                        ))}
+                        {filteredColleges.length > 50 && (
+                          <div className="p-2 text-xs text-gray-500 dark:text-gray-400 text-center italic">
+                            Showing first 50 results. Type to narrow down...
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
 
