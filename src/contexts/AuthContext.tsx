@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { account, OAUTH_CONFIG } from '../lib/appwrite.js';
+import { account, OAUTH_CONFIG, AppwriteID } from '../lib/appwrite.js';
 
 interface AuthContextType {
   user: any | null;
   loading: boolean;
   loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  signupWithEmail: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 }
@@ -51,14 +53,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loginWithGoogle = async () => {
     try {
       account.createOAuth2Session(
-        'google',
-        OAUTH_CONFIG.successUrl,
-        OAUTH_CONFIG.failureUrl
+        'google' as any,
+        OAUTH_CONFIG.SUCCESS_URL,
+        OAUTH_CONFIG.FAILURE_URL
       );
       // The page will redirect to Google, so no need to update state here
     } catch (error) {
       console.error('Google OAuth error:', error);
       throw error;
+    }
+  };
+
+  // Login with Email & Password
+  const loginWithEmail = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      await account.createEmailPasswordSession(email, password);
+      const currentUser = await account.get();
+      setUser(currentUser);
+    } catch (error: any) {
+      console.error('Email login error:', error);
+      throw new Error(error.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Signup with Email & Password
+  const signupWithEmail = async (email: string, password: string, name: string) => {
+    try {
+      setLoading(true);
+      // Create account with Appwrite's unique ID generator
+      await account.create(AppwriteID.unique(), email, password, name);
+      
+      // Auto-login after signup
+      await account.createEmailPasswordSession(email, password);
+      
+      // Send verification email
+      const verificationUrl = `${window.location.origin}/verify-email`;
+      await account.createVerification(verificationUrl);
+      
+      // Get user data
+      const currentUser = await account.get();
+      setUser(currentUser);
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      throw new Error(error.message || 'Signup failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,6 +119,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     loading,
     loginWithGoogle,
+    loginWithEmail,
+    signupWithEmail,
     logout,
     checkSession,
   };

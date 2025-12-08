@@ -34,8 +34,8 @@ const COLLECTIONS = {
 // Lightweight oauth config object for frontend usage only
 const OAUTH_CONFIG = {
   provider: "google",
-  successUrl: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : "/dashboard",
-  failureUrl: typeof window !== "undefined" ? `${window.location.origin}/login?error=oauth_failed` : "/login?error=oauth_failed",
+  SUCCESS_URL: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : "/dashboard",
+  FAILURE_URL: typeof window !== "undefined" ? `${window.location.origin}/login?error=oauth_failed` : "/login?error=oauth_failed",
 };
 
 // Export named ESM bindings

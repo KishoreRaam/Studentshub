@@ -6,7 +6,11 @@ import './AuthStyles.css';
 
 const SignInPage = () => {
   const navigate = useNavigate();
-  const { loginWithGoogle, user, loading } = useAuth();
+  const { loginWithGoogle, loginWithEmail, user, loading } = useAuth();
+  const [formData, setFormData] = React.useState({ email: '', password: '' });
+  const [error, setError] = React.useState('');
+  const [submitting, setSubmitting] = React.useState(false);
+
   // Redirect if user is already logged in
   useEffect(() => {
     if (!loading && user) {
@@ -59,6 +63,33 @@ const SignInPage = () => {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!formData.email || !formData.password) {
+      setError('Please enter both email and password');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await loginWithEmail(formData.email, formData.password);
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Login failed:', error);
+      setError(error.message || 'Invalid email or password');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="login-shell pt-16">
       <div className="login-bg-layer" data-auth-bg aria-hidden="true">
@@ -91,17 +122,51 @@ const SignInPage = () => {
           <span>Or sign in with email</span>
         </div>
 
-        <form className="login-form" noValidate>
+        {error && (
+          <div className="error-message" style={{ 
+            padding: '12px', 
+            background: '#fee', 
+            border: '1px solid #fcc', 
+            borderRadius: '8px', 
+            color: '#c33',
+            marginBottom: '16px',
+            fontSize: '14px'
+          }}>
+            {error}
+          </div>
+        )}
+
+        <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="field">
             <label htmlFor="email">Email</label>
-            <input id="email" name="email" type="email" placeholder="you@university.edu" autoComplete="email" required />
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              placeholder="you@university.edu" 
+              autoComplete="email" 
+              required
+              value={formData.email}
+              onChange={handleInputChange}
+            />
           </div>
           <div className="field">
             <label htmlFor="password">Password</label>
-            <input id="password" name="password" type="password" placeholder="••••••••" autoComplete="current-password" required />
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              placeholder="••••••••" 
+              autoComplete="current-password" 
+              required
+              value={formData.password}
+              onChange={handleInputChange}
+            />
           </div>
           <div className="actions">
-            <button type="submit" className="btn-login">Sign In →</button>
+            <button type="submit" className="btn-login" disabled={submitting || loading}>
+              {submitting ? 'Signing In...' : 'Sign In →'}
+            </button>
           </div>
           <div className="alt-actions">
             <div><a href="/forgot-password">Forgot password?</a></div>

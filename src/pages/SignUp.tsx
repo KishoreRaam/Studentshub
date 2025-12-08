@@ -6,7 +6,19 @@ import './Login/AuthStyles.css';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
-  const { loginWithGoogle, user, loading } = useAuth();
+  const { loginWithGoogle, signupWithEmail, user, loading } = useAuth();
+  const [formData, setFormData] = React.useState({
+    firstName: '',
+    lastName: '',
+    institution: '',
+    email: '',
+    password: '',
+    confirm: '',
+    terms: false
+  });
+  const [error, setError] = React.useState('');
+  const [submitting, setSubmitting] = React.useState(false);
+
   // Redirect if user is already logged in
   useEffect(() => {
     if (!loading && user) {
@@ -59,6 +71,56 @@ const SignUpPage = () => {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    setError(''); // Clear error on input change
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    // Validation
+    if (!formData.firstName || !formData.lastName) {
+      setError('Please enter your full name');
+      return;
+    }
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+    if (formData.password !== formData.confirm) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (!formData.terms) {
+      setError('You must agree to the Terms & Privacy Policy');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const fullName = `${formData.firstName} ${formData.lastName}`;
+      await signupWithEmail(formData.email, formData.password, fullName);
+      
+      // Redirect to verify email page
+      navigate('/verify-email');
+    } catch (error: any) {
+      console.error('Signup failed:', error);
+      setError(error.message || 'Signup failed. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="auth-layout pt-16">
       <div className="auth-left">
@@ -88,41 +150,117 @@ const SignUpPage = () => {
             <span>Or sign up with email</span>
           </div>
 
-          <form id="signupForm" className="signup-form" noValidate>
+          {error && (
+            <div className="error-message" style={{ 
+              padding: '12px', 
+              background: '#fee', 
+              border: '1px solid #fcc', 
+              borderRadius: '8px', 
+              color: '#c33',
+              marginBottom: '16px',
+              fontSize: '14px'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <form id="signupForm" className="signup-form" onSubmit={handleSubmit} noValidate>
             <div className="field-row">
               <div className="field">
                 <label htmlFor="firstName">First Name</label>
-                <input id="firstName" name="firstName" required placeholder="Jane" autoComplete="given-name" />
+                <input 
+                  id="firstName" 
+                  name="firstName" 
+                  required 
+                  placeholder="Jane" 
+                  autoComplete="given-name"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="field">
                 <label htmlFor="lastName">Last Name</label>
-                <input id="lastName" name="lastName" required placeholder="Doe" autoComplete="family-name" />
+                <input 
+                  id="lastName" 
+                  name="lastName" 
+                  required 
+                  placeholder="Doe" 
+                  autoComplete="family-name"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
               </div>
             </div>
             <div className="field">
               <label htmlFor="institution">Institution</label>
-              <input id="institution" name="institution" required placeholder="University / College" autoComplete="organization" />
+              <input 
+                id="institution" 
+                name="institution" 
+                required 
+                placeholder="University / College" 
+                autoComplete="organization"
+                value={formData.institution}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="field">
               <label htmlFor="email">Academic Email</label>
-              <input id="email" name="email" type="email" required placeholder="you@university.edu" autoComplete="email" />
+              <input 
+                id="email" 
+                name="email" 
+                type="email" 
+                required 
+                placeholder="you@university.edu" 
+                autoComplete="email"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="field-row">
               <div className="field">
                 <label htmlFor="password">Password</label>
-                <input id="password" name="password" type="password" required minLength={6} placeholder="••••••••" autoComplete="new-password" />
+                <input 
+                  id="password" 
+                  name="password" 
+                  type="password" 
+                  required 
+                  minLength={8} 
+                  placeholder="••••••••" 
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="field">
                 <label htmlFor="confirm">Confirm Password</label>
-                <input id="confirm" name="confirm" type="password" required minLength={6} placeholder="••••••••" autoComplete="new-password" />
+                <input 
+                  id="confirm" 
+                  name="confirm" 
+                  type="password" 
+                  required 
+                  minLength={8} 
+                  placeholder="••••••••" 
+                  autoComplete="new-password"
+                  value={formData.confirm}
+                  onChange={handleInputChange}
+                />
               </div>
             </div>
             <label className="inline">
-              <input type="checkbox" id="terms" required />
+              <input 
+                type="checkbox" 
+                id="terms" 
+                name="terms"
+                required
+                checked={formData.terms}
+                onChange={handleInputChange}
+              />
               <span>I agree to the <a href="#">Terms</a> & <a href="#">Privacy Policy</a>.</span>
             </label>
             <div className="actions">
-              <button type="submit" className="btn-create">Create Account →</button>
+              <button type="submit" className="btn-create" disabled={submitting || loading}>
+                {submitting ? 'Creating Account...' : 'Create Account →'}
+              </button>
             </div>
             <div className="alt-actions">
               Already have an account? <a href="/login">Sign in</a>
