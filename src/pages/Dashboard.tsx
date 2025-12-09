@@ -12,6 +12,7 @@ import type { Perk } from "@/pages/benfits/Perks";
 import { useAuth } from "@/contexts/AuthContext";
 import { getOrCreateProfile } from "@/services/profile.service";
 import { getSavedPerks, getSavedResources, getSavedAITools, unsavePerk, unsaveResource, unsaveAITool } from "@/services/saved-items.service";
+import { getStreamLabel } from "@/utils/streamUtils";
 
 // Helper function to get user initials
 function getInitials(name: string): string {
@@ -119,7 +120,7 @@ export default function Dashboard() {
         const profile = await getOrCreateProfile(authUser);
         setUserProfile({
           name: profile.name,
-          stream: profile.stream || 'Not specified',
+          stream: getStreamLabel(profile.stream) || 'Not specified',
           initials: getInitials(profile.name),
         });
       } catch (error) {
@@ -318,7 +319,7 @@ export default function Dashboard() {
                 <p className="font-semibold text-gray-900 dark:text-white">
                   {userProfile.name}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                   {userProfile.stream}
                 </p>
               </div>

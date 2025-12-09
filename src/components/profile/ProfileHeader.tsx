@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { UserProfile } from '../../types/profile.types';
+import { getStreamLabel } from '../../utils/streamUtils';
 
 interface ProfileHeaderProps {
   user: UserProfile;
@@ -48,7 +49,7 @@ export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps)
 
         {/* User Info */}
         <div className="flex-1 text-center md:text-left">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 drop-shadow-sm">
             {user.name}
           </h1>
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-3">
@@ -64,12 +65,12 @@ export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps)
               </span>
             )}
           </div>
-          <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+          <p className="text-lg font-semibold text-gray-800 dark:text-gray-100 drop-shadow-sm">
             {user.university}
           </p>
           {user.stream && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {user.stream}
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mt-1.5">
+              {getStreamLabel(user.stream)}
             </p>
           )}
         </div>

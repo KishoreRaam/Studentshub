@@ -1,13 +1,13 @@
 // Profile service for Appwrite database operations
 // Uses client-side SDK with user session - NO API KEYS
 
-import { databases, account, storage, databaseId, COLLECTIONS, AppwriteID, avatarsBucket } from '../lib/appwrite';
+import { databases, account, storage, databaseId, COLLECTIONS, AppwriteID, profilePicturesBucket } from '../lib/appwrite';
 import { UserProfile } from '../types/profile.types';
 import { Permission, Role } from 'appwrite';
 
 // Use environment variables for database and collection IDs
 const USERS_COLLECTION = COLLECTIONS.USERS;
-const STORAGE_BUCKET_ID = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || avatarsBucket;
+const PROFILE_PICTURES_BUCKET = import.meta.env.VITE_APPWRITE_BUCKET_PROFILE_PICTURES || profilePicturesBucket;
 
 // Get current user from session
 export async function getCurrentUser() {
@@ -43,7 +43,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
       // Map database fields to profile fields
       university: response.institution || response.university || '',
       stream: response.stream || '',
-      avatar: response.profilePicture || response.avatar || '',
+      avatar: getProfilePictureUrl(response.profilePicture || response.avatar || ''),
       verificationStatus: response.sheeridstatus || response.verificationStatus || 'pending',
       accountStatus: response.accountStatus || 'active',
       createdAt: new Date(response.$createdAt),
@@ -111,7 +111,7 @@ export async function createUserProfile(userId: string, data: {
       email: response.email || '',
       university: response.institution || '',
       stream: response.stream || '',
-      avatar: response.profilePicture || '',
+      avatar: getProfilePictureUrl(response.profilePicture || ''),
       verificationStatus: response.sheeridstatus || 'pending',
       accountStatus: 'active',
       createdAt: new Date(response.$createdAt),
@@ -144,10 +144,26 @@ export async function updateUserProfile(
     if (updates.name !== undefined) docUpdates.name = updates.name;
     if (updates.university !== undefined) docUpdates.institution = updates.university;
     if (updates.stream !== undefined) docUpdates.stream = updates.stream;
-    if (updates.avatar !== undefined) docUpdates.profilePicture = updates.avatar;
+    
+    // CRITICAL: Only store file ID in profilePicture (must be < 500 chars)
+    if (updates.avatar !== undefined) {
+      // Validate that we're only storing a file ID, not base64 or large data
+      if (typeof updates.avatar === 'string') {
+        if (updates.avatar.length > 500) {
+          console.error('Avatar string too long (likely base64). Length:', updates.avatar.length);
+          throw new Error('Invalid avatar data. Please upload a new image.');
+        }
+        docUpdates.profilePicture = updates.avatar;
+      } else {
+        console.error('Avatar must be a string (file ID), received:', typeof updates.avatar);
+        throw new Error('Invalid avatar format. Expected file ID string.');
+      }
+    }
 
     // Mark onboarding as complete when user updates profile
     docUpdates.onboardingComplete = true;
+
+    console.log('Updating user profile with:', docUpdates);
 
     const response = await databases.updateDocument(
       databaseId,
@@ -162,7 +178,7 @@ export async function updateUserProfile(
       email: response.email || '',
       university: response.institution || '',
       stream: response.stream || '',
-      avatar: response.profilePicture || '',
+      avatar: getProfilePictureUrl(response.profilePicture || ''),
       verificationStatus: response.sheeridstatus || 'pending',
       accountStatus: 'active',
       createdAt: new Date(response.$createdAt),
@@ -180,49 +196,56 @@ export async function updateUserProfile(
 }
 
 // Upload avatar image to Appwrite Storage
-export async function uploadAvatar(file: File): Promise<string> {
+export async function uploadAvatar(file: File, userId?: string): Promise<string> {
   try {
-    // If no storage bucket is configured, fall back to base64
-    if (!STORAGE_BUCKET_ID || STORAGE_BUCKET_ID === 'avatars') {
-      console.warn('Storage bucket not configured, using base64 fallback');
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+    const bucketId = import.meta.env.VITE_APPWRITE_BUCKET_PROFILE_PICTURES || PROFILE_PICTURES_BUCKET;
+    
+    if (!bucketId) {
+      throw new Error('Profile pictures bucket not configured. Please set VITE_APPWRITE_BUCKET_PROFILE_PICTURES in your .env file.');
     }
 
+    // Generate a unique file ID with timestamp for uniqueness
+    const timestamp = Date.now();
+    const fileId = userId ? `profile_${userId}_${timestamp}` : `profile_${timestamp}_${AppwriteID.unique()}`;
+    
+    console.log('Uploading file to bucket:', bucketId, 'with ID:', fileId);
+
     // Upload file to Appwrite Storage
-    const fileId = AppwriteID.unique();
     const response = await storage.createFile(
-      STORAGE_BUCKET_ID,
+      bucketId,
       fileId,
       file,
       [
-        Permission.read(Role.any()), // Anyone can view avatars
+        Permission.read(Role.any()), // Anyone can view profile pictures
       ]
     );
 
-    // Get the file view URL
-    const fileUrl = storage.getFileView(STORAGE_BUCKET_ID, response.$id);
-    return fileUrl.href;
+    console.log('File uploaded successfully. File ID:', response.$id);
+
+    // Return only the file ID (NOT base64, NOT File object, NOT full URL)
+    // This ID string should be < 500 characters
+    return response.$id;
   } catch (error: any) {
     console.error('Error uploading avatar:', error);
-
-    // If storage upload fails, fall back to base64
-    if (error.code === 404 || error.message?.includes('bucket')) {
-      console.warn('Storage bucket not found, falling back to base64');
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    throw error;
+    throw new Error(`Failed to upload profile picture: ${error.message || 'Unknown error'}`);
   }
+}
+
+// Get profile picture URL from file ID
+export function getProfilePictureUrl(fileId: string): string {
+  if (!fileId) return '';
+  
+  // If it's already a full URL (legacy data), return as is
+  if (fileId.startsWith('http://') || fileId.startsWith('https://') || fileId.startsWith('data:')) {
+    return fileId;
+  }
+
+  // Generate view URL from file ID
+  const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT;
+  const projectId = import.meta.env.VITE_APPWRITE_PROJECT;
+  const bucket = PROFILE_PICTURES_BUCKET;
+
+  return `${endpoint}/storage/buckets/${bucket}/files/${fileId}/view?project=${projectId}`;
 }
 
 // Get or create user profile (useful for new users)

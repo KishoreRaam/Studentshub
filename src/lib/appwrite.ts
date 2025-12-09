@@ -19,6 +19,7 @@ export { client };
 // Database and collection IDs
 export const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID || '';
 export const avatarsBucket = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || 'avatars';
+export const profilePicturesBucket = import.meta.env.VITE_APPWRITE_BUCKET_PROFILE_PICTURES || '';
 export const DATABASE_ID = databaseId; // Legacy export for compatibility
 export const COLLECTIONS = {
   USERS: import.meta.env.VITE_APPWRITE_COLLECTION_USERS || '',

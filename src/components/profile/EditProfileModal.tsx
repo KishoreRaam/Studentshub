@@ -10,6 +10,7 @@ import {
   searchCollegesByName,
   type College 
 } from '../../utils/collegeUtils';
+import { STREAM_OPTIONS } from '../../utils/streamUtils';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -54,11 +55,22 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
     avatar: user.avatar,
   });
 
+  // Separate state for the selected file (not stored in formData)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatar || null);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSaving, setIsSaving] = useState(false);
   const [uploadError, setUploadError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Clean up object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (avatarPreview && avatarPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+    };
+  }, [avatarPreview]);
 
   // Load colleges data on mount
   useEffect(() => {
@@ -182,14 +194,18 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
     }
 
     setUploadError('');
-    setFormData({ ...formData, avatar: file });
+    
+    // Store the file separately (not in formData)
+    setSelectedFile(file);
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatarPreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    // Clean up previous preview URL if it exists
+    if (avatarPreview && avatarPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(avatarPreview);
+    }
+
+    // Create temporary preview using createObjectURL
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -200,8 +216,32 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
     }
 
     setIsSaving(true);
+    setUploadError('');
+    
     try {
-      await onSave(formData);
+      // Prepare the update data
+      const updates: ProfileUpdateData = {
+        name: formData.name,
+        state: formData.state,
+        district: formData.district,
+        university: formData.university,
+        stream: formData.stream,
+        avatar: formData.avatar, // Keep existing avatar by default
+      };
+
+      // If a new file was selected, we need to handle it
+      // The onSave callback will handle the upload
+      if (selectedFile) {
+        updates.avatar = selectedFile;
+      }
+
+      await onSave(updates);
+      
+      // Clean up preview URL
+      if (avatarPreview && avatarPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+      
       onClose();
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -239,7 +279,7 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -256,13 +296,13 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(90vh-140px)]">
-                <div className="p-6 space-y-5">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                <div className="overflow-y-auto flex-1 px-6 py-6 space-y-5">
                   {/* Avatar Upload */}
                   <div className="flex flex-col items-center">
                     <div className="relative group">
                       <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-green-500 p-[3px] shadow-lg">
-                        <div className="w-full h-full rounded-full bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                        <div className="w-full h-full rounded-full bg-white dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                           {avatarPreview ? (
                             <img
                               src={avatarPreview}
@@ -486,19 +526,23 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Stream/Major
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.stream}
                       onChange={(e) => setFormData({ ...formData, stream: e.target.value })}
+                      disabled={isSaving}
                       className={`w-full px-4 py-2.5 rounded-lg border ${
                         errors.stream
                           ? 'border-red-500 focus:ring-red-500'
                           : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
                       } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-colors`}
-                      placeholder="e.g., Computer Science"
-                      maxLength={200}
-                      disabled={isSaving}
-                    />
+                    >
+                      <option value="">Select Stream</option>
+                      {Object.entries(STREAM_OPTIONS).map(([key, label]) => (
+                        <option key={key} value={key}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
                     {errors.stream && (
                       <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.stream}</p>
                     )}
@@ -506,7 +550,7 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }: Edit
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700 flex gap-3">
+                <div className="flex-shrink-0 px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700 flex gap-3">
                   <button
                     type="button"
                     onClick={handleClose}

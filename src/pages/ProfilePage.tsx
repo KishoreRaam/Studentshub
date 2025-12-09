@@ -226,20 +226,26 @@ export default function ProfilePage() {
     if (!authUser || !userProfile) return;
 
     try {
-      let avatarUrl = userProfile.avatar;
+      let avatarFileId: string | undefined = undefined;
 
       // Upload avatar if it's a file
       if (updates.avatar instanceof File) {
         toast.info('Uploading profile picture...');
-        avatarUrl = await uploadAvatar(updates.avatar);
+        // Upload and get file ID (NOT full URL)
+        avatarFileId = await uploadAvatar(updates.avatar, authUser.$id);
+        console.log('Received file ID from upload:', avatarFileId);
+      } else if (typeof updates.avatar === 'string' && updates.avatar) {
+        // If avatar is already a string (existing file ID or URL), extract just the ID
+        const urlMatch = updates.avatar.match(/files\/([^\/\?]+)/);
+        avatarFileId = urlMatch ? urlMatch[1] : updates.avatar;
       }
 
-      // Update profile in database
+      // Update profile in database with ONLY the file ID
       const updatedProfile = await updateUserProfile(authUser.$id, {
         name: updates.name,
         university: updates.university,
         stream: updates.stream,
-        avatar: avatarUrl,
+        avatar: avatarFileId, // This will be just the file ID string
       });
 
       // Update user preferences (state, district)
