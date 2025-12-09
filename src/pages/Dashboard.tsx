@@ -24,80 +24,7 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-const statsData: Stat[] = [
-  {
-    title: "Active Subscriptions",
-    value: 5,
-    subtitle: "Currently active perks",
-    icon: CheckCircle,
-  },
-  {
-    title: "Expiring Soon",
-    value: 2,
-    subtitle: "Require attention",
-    icon: Clock,
-  },
-  {
-    title: "Total Savings",
-    value: "₹26,000",
-    subtitle: "This academic year",
-    icon: DollarSign,
-  },
-];
 
-const subscriptionsData: Subscription[] = [
-  {
-    id: "1",
-    title: "Spotify Premium",
-    category: "Entertainment",
-    icon: "🎵",
-    expiryDate: "Dec 20, 2024",
-    status: "expiring-soon",
-  },
-  {
-    id: "2",
-    title: "Adobe Creative Cloud",
-    category: "Design",
-    icon: "🎨",
-    expiryDate: "Aug 15, 2025",
-    status: "active",
-  },
-];
-
-const updatesData: Update[] = [
-  {
-    id: "1",
-    type: "expiring-soon",
-    title: "Expiring Soon",
-    message: "Your Spotify Premium perk expires in 5 days. Renew now to continue enjoying ad-free music.",
-    timestamp: "2 hours ago",
-    icon: AlertTriangle,
-  },
-  {
-    id: "2",
-    type: "new-perk",
-    title: "New Perk Added",
-    message: "Notion Pro is now available for students. Get unlimited blocks and advanced features.",
-    timestamp: "1 day ago",
-    icon: Plus,
-  },
-  {
-    id: "3",
-    type: "renewal-reminder",
-    title: "Renewal Reminder",
-    message: "GitHub Student Pack expires next week. Make sure to verify your student status.",
-    timestamp: "2 days ago",
-    icon: AlertTriangle,
-  },
-  {
-    id: "4",
-    type: "account-update",
-    title: "Account Update",
-    message: "Your student verification has been renewed successfully. Valid until June 2025.",
-    timestamp: "3 days ago",
-    icon: Bell,
-  },
-];
 
 export default function Dashboard() {
   const { user: authUser } = useAuth();
@@ -107,6 +34,9 @@ export default function Dashboard() {
   const [savedResources, setSavedResources] = useState<SavedResource[]>([]);
   const [savedAITools, setSavedAITools] = useState<SavedAITool[]>([]);
   const [selectedPerk, setSelectedPerk] = useState<Perk | null>(null);
+  const [statsData, setStatsData] = useState<Stat[]>([]);
+  const [subscriptionsData, setSubscriptionsData] = useState<Subscription[]>([]);
+  const [updatesData, setUpdatesData] = useState<Update[]>([]);
 
   // Load user profile on mount
   useEffect(() => {
@@ -157,6 +87,80 @@ export default function Dashboard() {
         setSavedPerks(perks as any[]);
         setSavedResources(resources as any[]);
         setSavedAITools(aiTools as any[]);
+        
+        // Calculate live stats
+        const totalSaved = perks.length + resources.length + aiTools.length;
+        const claimedPerks = perks.filter((p: any) => p.claimed).length;
+        
+        const calculatedStats: Stat[] = [
+          {
+            title: "Total Saved Items",
+            value: totalSaved,
+            subtitle: "Perks, Resources & AI Tools",
+            icon: CheckCircle,
+          },
+          {
+            title: "Saved Perks",
+            value: perks.length,
+            subtitle: `${claimedPerks} claimed`,
+            icon: Star,
+          },
+          {
+            title: "Resources & Tools",
+            value: resources.length + aiTools.length,
+            subtitle: "Available for access",
+            icon: BookOpen,
+          },
+        ];
+        setStatsData(calculatedStats);
+        
+        // Generate subscriptions from claimed perks
+        const subs: Subscription[] = perks
+          .filter((p: any) => p.claimed)
+          .slice(0, 5)
+          .map((p: any) => ({
+            id: p.id,
+            title: p.title,
+            category: p.category,
+            icon: p.icon || '💎',
+            expiryDate: p.validity || 'N/A',
+            status: 'active' as const,
+          }));
+        setSubscriptionsData(subs);
+        
+        // Generate updates
+        const updates: Update[] = [];
+        if (perks.some((p: any) => !p.claimed)) {
+          updates.push({
+            id: "1",
+            type: "new-perk",
+            title: "Perks Available",
+            message: "You have saved perks ready to be claimed. Check them out!",
+            timestamp: "Recent",
+            icon: Plus,
+          });
+        }
+        if (totalSaved > 0) {
+          updates.push({
+            id: "2",
+            type: "account-update",
+            title: "Dashboard Updated",
+            message: `You have ${totalSaved} saved items in your collection.`,
+            timestamp: "Today",
+            icon: Bell,
+          });
+        }
+        if (resources.length > 0) {
+          updates.push({
+            id: "3",
+            type: "new-perk",
+            title: "Resources Available",
+            message: `Access ${resources.length} learning resources anytime.`,
+            timestamp: "Today",
+            icon: BookOpen,
+          });
+        }
+        setUpdatesData(updates);
       } catch (error) {
         console.error('Error loading saved items:', error);
       }

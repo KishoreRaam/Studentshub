@@ -23,172 +23,7 @@ import {
 import { account } from '../lib/appwrite';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-// Mock data - Replace with actual Appwrite data later
-const mockUser: UserProfile = {
-  id: '1',
-  name: 'Sarah Johnson',
-  email: 'sarah.johnson@university.edu',
-  university: 'University of California, Berkeley',
-  stream: 'Computer Science',
-  verificationStatus: 'approved',
-  accountStatus: 'active',
-  createdAt: new Date('2024-08-15'),
-  lastLogin: new Date(),
-  validityPeriod: {
-    start: new Date('2024-08-01'),
-    end: new Date('2028-05-31'),
-  },
-  linkedAccounts: [
-    {
-      provider: 'google',
-      email: 'sarah.johnson@gmail.com',
-      connectedAt: new Date('2024-08-15'),
-    },
-    {
-      provider: 'microsoft',
-      email: 'sarah.johnson@outlook.com',
-      connectedAt: new Date('2024-09-01'),
-    },
-  ],
-};
-
-const mockBenefits: ClaimedPerk[] = [
-  {
-    id: '1',
-    perkId: 'notion',
-    userId: '1',
-    perkName: 'Notion',
-    perkLogo: '/assets/logos/notion.png',
-    category: 'Productivity',
-    claimedAt: new Date('2024-09-01'),
-    validity: '1 year',
-    status: 'active',
-  },
-  {
-    id: '2',
-    perkId: 'canva',
-    userId: '1',
-    perkName: 'Canva',
-    perkLogo: '/assets/logos/canva.png',
-    category: 'Design',
-    claimedAt: new Date('2024-09-05'),
-    validity: '1 year',
-    status: 'active',
-  },
-  {
-    id: '3',
-    perkId: 'jetbrains',
-    userId: '1',
-    perkName: 'JetBrains',
-    perkLogo: '/assets/logos/jetbrains.png',
-    category: 'Development',
-    claimedAt: new Date('2024-09-10'),
-    validity: '1 year',
-    status: 'active',
-  },
-  {
-    id: '4',
-    perkId: 'figma',
-    userId: '1',
-    perkName: 'Figma',
-    perkLogo: '/assets/logos/figma.png',
-    category: 'Design',
-    claimedAt: new Date('2024-09-15'),
-    validity: '1 year',
-    status: 'active',
-  },
-  {
-    id: '5',
-    perkId: 'coursera',
-    userId: '1',
-    perkName: 'Coursera',
-    perkLogo: '/assets/logos/coursera.png',
-    category: 'Education',
-    claimedAt: new Date('2024-10-01'),
-    validity: '6 months',
-    status: 'pending',
-  },
-  {
-    id: '6',
-    perkId: 'slack',
-    userId: '1',
-    perkName: 'Slack',
-    perkLogo: '/assets/logos/slack.png',
-    category: 'Communication',
-    claimedAt: new Date('2024-10-10'),
-    validity: '1 year',
-    status: 'active',
-  },
-];
-
-const mockActivities: RecentActivity[] = [
-  {
-    id: '1',
-    perkId: 'notion',
-    perkName: 'Notion',
-    perkLogo: '/assets/logos/notion.png',
-    accessedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    action: 'accessed',
-  },
-  {
-    id: '2',
-    perkId: 'figma',
-    perkName: 'Figma',
-    perkLogo: '/assets/logos/figma.png',
-    accessedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-    action: 'accessed',
-  },
-  {
-    id: '3',
-    perkId: 'coursera',
-    perkName: 'Coursera',
-    perkLogo: '/assets/logos/coursera.png',
-    accessedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-    action: 'pending',
-  },
-  {
-    id: '4',
-    perkId: 'canva',
-    perkName: 'Canva',
-    perkLogo: '/assets/logos/canva.png',
-    accessedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-    action: 'accessed',
-  },
-];
-
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'success',
-    title: 'New benefit available',
-    description: 'Adobe Creative Suite has been added to your account',
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    read: false,
-  },
-  {
-    id: '2',
-    type: 'warning',
-    title: 'Verification pending',
-    description: 'Your Coursera benefit is awaiting verification',
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    read: false,
-  },
-  {
-    id: '3',
-    type: 'info',
-    title: 'Account updated',
-    description: 'Your profile information has been successfully updated',
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    read: true,
-  },
-];
-
-const mockStats: BenefitsStatsType = {
-  activated: 12,
-  total: 20,
-  available: 8,
-};
+import { getSavedPerks, getSavedResources, getSavedAITools } from '../services/saved-items.service';
 
 export default function ProfilePage() {
   const { user: authUser } = useAuth();
@@ -196,6 +31,10 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [error, setError] = useState<string>('');
+  const [savedBenefits, setSavedBenefits] = useState<ClaimedPerk[]>([]);
+  const [activities, setActivities] = useState<RecentActivity[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [stats, setStats] = useState<BenefitsStatsType>({ activated: 0, total: 0, available: 0 });
 
   // Load user profile on mount
   useEffect(() => {
@@ -209,6 +48,75 @@ export default function ProfilePage() {
         setLoading(true);
         const profile = await getOrCreateProfile(authUser);
         setUserProfile(profile);
+        
+        // Load saved items in parallel
+        const [perks, resources, aiTools] = await Promise.all([
+          getSavedPerks(authUser.$id),
+          getSavedResources(authUser.$id),
+          getSavedAITools(authUser.$id),
+        ]);
+        
+        // Convert to ClaimedPerk format
+        const benefits: ClaimedPerk[] = perks.map((perk: any) => ({
+          id: perk.savedId,
+          perkId: perk.id,
+          userId: authUser.$id,
+          perkName: perk.title,
+          perkLogo: perk.logo || perk.icon,
+          category: perk.category,
+          claimedAt: perk.claimedDate ? new Date(perk.claimedDate) : new Date(),
+          validity: perk.validity || 'N/A',
+          status: perk.claimed ? 'active' : 'pending',
+        }));
+        
+        setSavedBenefits(benefits);
+        
+        // Calculate stats
+        const totalSaved = perks.length + resources.length + aiTools.length;
+        const activatedCount = perks.filter((p: any) => p.claimed).length;
+        setStats({
+          activated: activatedCount,
+          total: totalSaved,
+          available: totalSaved - activatedCount,
+        });
+        
+        // Generate recent activities from saved items
+        const recentActivities: RecentActivity[] = [
+          ...perks.slice(0, 3).map((perk: any, idx: number) => ({
+            id: perk.savedId,
+            perkId: perk.id,
+            perkName: perk.title,
+            perkLogo: perk.logo || perk.icon,
+            accessedAt: new Date(Date.now() - (idx + 1) * 2 * 24 * 60 * 60 * 1000),
+            action: perk.claimed ? 'accessed' : 'pending',
+          })),
+        ];
+        setActivities(recentActivities);
+        
+        // Generate notifications
+        const newNotifications: Notification[] = [];
+        if (perks.some((p: any) => !p.claimed)) {
+          newNotifications.push({
+            id: '1',
+            type: 'warning',
+            title: 'Perks awaiting activation',
+            description: 'You have saved perks that haven\'t been claimed yet',
+            createdAt: new Date(),
+            read: false,
+          });
+        }
+        if (totalSaved > 0) {
+          newNotifications.push({
+            id: '2',
+            type: 'success',
+            title: 'Great progress!',
+            description: `You have ${totalSaved} saved items in your dashboard`,
+            createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+            read: false,
+          });
+        }
+        setNotifications(newNotifications);
+        
         setError('');
       } catch (err) {
         console.error('Error loading profile:', err);
@@ -339,22 +247,22 @@ export default function ProfilePage() {
             />
 
             {/* Available Benefits Grid */}
-            <BenefitsGrid benefits={mockBenefits} />
+            <BenefitsGrid benefits={savedBenefits} />
           </div>
 
           {/* Right Column - 1/3 width on desktop */}
           <div className="space-y-6">
             {/* Benefits Stats Card */}
-            <BenefitsStats stats={mockStats} />
+            <BenefitsStats stats={stats} />
 
             {/* Activity & Usage Card */}
             <ActivityCard
-              activities={mockActivities}
+              activities={activities}
               lastLogin={userProfile.lastLogin}
             />
 
             {/* Notifications Card */}
-            <NotificationsCard notifications={mockNotifications} />
+            <NotificationsCard notifications={notifications} />
           </div>
         </div>
       </div>

@@ -5,39 +5,89 @@ import { Progress } from './ui/progress';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Calendar, Mail, AlertCircle, CheckCircle, TrendingUp, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useEffect, useState } from 'react';
+import { getSavedPerks, getSavedResources, getSavedAITools } from '../services/saved-items.service';
 
-const lineChartData = [
-  { month: 'Jan', active: 45, expired: 5 },
-  { month: 'Feb', active: 52, expired: 3 },
-  { month: 'Mar', active: 48, expired: 7 },
-  { month: 'Apr', active: 61, expired: 2 },
-  { month: 'May', active: 55, expired: 6 },
-  { month: 'Jun', active: 67, expired: 4 },
-];
-
-const barChartData = [
-  { category: 'GitHub', count: 1249 },
-  { category: 'Office365', count: 980 },
-  { category: 'Adobe', count: 756 },
-  { category: 'Spotify', count: 654 },
-  { category: 'Canva', count: 543 },
-];
-
-const pieChartData = [
-  { name: 'Active', value: 78, color: '#10B981' },
-  { name: 'Expiring Soon', value: 15, color: '#F59E0B' },
-  { name: 'Expired', value: 7, color: '#EF4444' },
-];
-
-const recentActivity = [
-  { id: 1, action: 'GitHub Student Pack activated', time: '2 hours ago', status: 'success' },
-  { id: 2, action: 'Office365 expiring in 30 days', time: '1 day ago', status: 'warning' },
-  { id: 3, action: 'Canva Pro renewed', time: '3 days ago', status: 'success' },
-  { id: 4, action: 'Adobe Creative expired', time: '1 week ago', status: 'error' },
-];
+interface DashboardStats {
+  totalSaved: number;
+  perks: number;
+  resources: number;
+  aiTools: number;
+  claimed: number;
+}
 
 export function DashboardPreview() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [stats, setStats] = useState<DashboardStats>({
+    totalSaved: 0,
+    perks: 0,
+    resources: 0,
+    aiTools: 0,
+    claimed: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadStats() {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const [perks, resources, aiTools] = await Promise.all([
+          getSavedPerks(user.$id),
+          getSavedResources(user.$id),
+          getSavedAITools(user.$id),
+        ]);
+
+        const claimed = perks.filter((p: any) => p.claimed).length;
+
+        setStats({
+          totalSaved: perks.length + resources.length + aiTools.length,
+          perks: perks.length,
+          resources: resources.length,
+          aiTools: aiTools.length,
+          claimed,
+        });
+      } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadStats();
+  }, [user]);
+
+  // Calculate dynamic data based on real stats
+  const activeBenefits = stats.claimed;
+  const totalItems = stats.totalSaved;
+  const pendingClaims = stats.perks - stats.claimed;
+
+  const pieChartData = [
+    { name: 'Claimed', value: stats.claimed || 0, color: '#10B981' },
+    { name: 'Pending', value: pendingClaims || 0, color: '#F59E0B' },
+    { name: 'Resources', value: (stats.resources + stats.aiTools) || 0, color: '#3B82F6' },
+  ];
+
+  const barChartData = [
+    { category: 'Perks', count: stats.perks },
+    { category: 'Resources', count: stats.resources },
+    { category: 'AI Tools', count: stats.aiTools },
+    { category: 'Claimed', count: stats.claimed },
+  ];
+
+  const recentActivity = user ? [
+    { id: 1, action: `${stats.perks} perks saved`, time: 'Active', status: 'success' },
+    { id: 2, action: `${pendingClaims} pending claims`, time: user ? 'Your account' : 'Login to see', status: pendingClaims > 0 ? 'warning' : 'success' },
+    { id: 3, action: `${stats.resources} resources available`, time: 'Ready to use', status: 'success' },
+    { id: 4, action: `${stats.aiTools} AI tools saved`, time: 'Available', status: 'success' },
+  ] : [
+    { id: 1, action: 'Login to see your activity', time: 'Sign in required', status: 'warning' },
+  ];
 
   return (
     <section className="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -75,16 +125,24 @@ export function DashboardPreview() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-2xl text-gray-900 dark:text-white">EduBuzz Dashboard</h3>
-                <p className="text-gray-600 dark:text-gray-300">Welcome back, Alex! 👋</p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {user ? `Welcome back, ${user.name || 'Student'}! 👋` : 'Sign in to track your benefits 👋'}
+                </p>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="text-right">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Total Savings</div>
-                  <div className="text-2xl text-green-600">₹4 Lakh</div>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white">A</span>
-                </div>
+                {user && (
+                  <>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Total Saved</div>
+                      <div className="text-2xl text-green-600">{totalItems} items</div>
+                    </div>
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold">
+                        {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             
@@ -94,7 +152,7 @@ export function DashboardPreview() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-blue-600 dark:text-blue-400 text-sm">Active Benefits</p>
-                    <p className="text-2xl text-blue-900 dark:text-blue-100">23</p>
+                    <p className="text-2xl text-blue-900 dark:text-blue-100">{loading ? '...' : activeBenefits}</p>
                   </div>
                   <CheckCircle className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                 </div>
@@ -103,28 +161,28 @@ export function DashboardPreview() {
               <div className="bg-yellow-50 dark:bg-yellow-900/30 rounded-xl p-4 border border-yellow-100 dark:border-yellow-800">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-yellow-600 dark:text-yellow-400 text-sm">Expiring Soon</p>
-                    <p className="text-2xl text-yellow-900 dark:text-yellow-100">4</p>
+                    <p className="text-yellow-600 dark:text-yellow-400 text-sm">Pending Claims</p>
+                    <p className="text-2xl text-yellow-900 dark:text-yellow-100">{loading ? '...' : pendingClaims}</p>
                   </div>
                   <AlertCircle className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
                 </div>
               </div>
               
-              <div className="bg-red-50 dark:bg-red-900/30 rounded-xl p-4 border border-red-100 dark:border-red-800">
+              <div className="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-4 border border-purple-100 dark:border-purple-800">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-red-600 dark:text-red-400 text-sm">Expired</p>
-                    <p className="text-2xl text-red-900 dark:text-red-100">2</p>
+                    <p className="text-purple-600 dark:text-purple-400 text-sm">Resources</p>
+                    <p className="text-2xl text-purple-900 dark:text-purple-100">{loading ? '...' : stats.resources}</p>
                   </div>
-                  <Mail className="w-8 h-8 text-red-600 dark:text-red-400" />
+                  <Mail className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
               
               <div className="bg-green-50 dark:bg-green-900/30 rounded-xl p-4 border border-green-100 dark:border-green-800">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-green-600 dark:text-green-400 text-sm">This Month</p>
-                    <p className="text-2xl text-green-900 dark:text-green-100">+6</p>
+                    <p className="text-green-600 dark:text-green-400 text-sm">AI Tools</p>
+                    <p className="text-2xl text-green-900 dark:text-green-100">{loading ? '...' : stats.aiTools}</p>
                   </div>
                   <TrendingUp className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
@@ -134,63 +192,76 @@ export function DashboardPreview() {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Line Chart */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                  <span>Benefits Trend</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={lineChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="month" stroke="#666" />
-                    <YAxis stroke="#666" />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="active" stroke="#3B82F6" strokeWidth={3} />
-                    <Line type="monotone" dataKey="expired" stroke="#EF4444" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
             {/* Pie Chart */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="w-5 h-5 text-green-600" />
-                  <span>Status Distribution</span>
+                  <span>Your Items Distribution</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={pieChartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {pieChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
+                {totalItems > 0 ? (
+                  <>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={pieChartData.filter(d => d.value > 0)}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={40}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {pieChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="flex justify-center space-x-4 mt-4">
+                      {pieChartData.filter(d => d.value > 0).map((entry) => (
+                        <div key={entry.name} className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: entry.color }} />
+                          <span className="text-sm text-gray-600 dark:text-gray-300">{entry.name}: {entry.value}</span>
+                        </div>
                       ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex justify-center space-x-4 mt-4">
-                  {pieChartData.map((entry) => (
-                    <div key={entry.name} className="flex items-center space-x-2">
-                      <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: entry.color }} />
-                      <span className="text-sm text-gray-600 dark:text-gray-300">{entry.name}</span>
                     </div>
-                  ))}
-                </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    {user ? 'No saved items yet. Start exploring!' : 'Login to see your stats'}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Bar Chart */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <TrendingUp className="w-5 h-5 text-blue-600" />
+                  <span>Your Collection</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {totalItems > 0 ? (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={barChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="category" stroke="#666" />
+                      <YAxis stroke="#666" />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    {user ? 'Save items to see your collection grow!' : 'Login to track your progress'}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -27,8 +27,8 @@ export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps)
     >
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
         {/* Avatar */}
-        <div className="relative group">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-green-500 p-[3px] shadow-lg">
+        <div className="relative group flex-shrink-0">
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-blue-500 to-green-500 p-[3px] shadow-lg">
             <div className="w-full h-full rounded-full bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden">
               {user.avatar ? (
                 <img
@@ -37,14 +37,14 @@ export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps)
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-2xl font-bold bg-gradient-to-br from-blue-600 to-green-600 bg-clip-text text-transparent">
+                <span className="text-3xl md:text-4xl font-bold bg-gradient-to-br from-blue-600 to-green-600 bg-clip-text text-transparent">
                   {getInitials(user.name)}
                 </span>
               )}
             </div>
           </div>
           {/* Active status indicator */}
-          <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-4 border-white dark:border-gray-800 rounded-full shadow-md"></div>
+          <div className="absolute bottom-0 right-0 w-7 h-7 md:w-8 md:h-8 bg-green-500 border-4 border-white dark:border-gray-800 rounded-full shadow-md"></div>
         </div>
 
         {/* User Info */}
