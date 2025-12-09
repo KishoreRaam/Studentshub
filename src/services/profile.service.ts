@@ -204,16 +204,13 @@ export async function uploadAvatar(file: File, userId?: string): Promise<string>
       throw new Error('Profile pictures bucket not configured. Please set VITE_APPWRITE_BUCKET_PROFILE_PICTURES in your .env file.');
     }
 
-    // Generate a unique file ID with timestamp for uniqueness
-    const timestamp = Date.now();
-    const fileId = userId ? `profile_${userId}_${timestamp}` : `profile_${timestamp}_${AppwriteID.unique()}`;
-    
-    console.log('Uploading file to bucket:', bucketId, 'with ID:', fileId);
+    // Let Appwrite generate a safe ID automatically using "unique()" literal
+    console.log('Uploading file to bucket:', bucketId, 'with auto-generated ID');
 
     // Upload file to Appwrite Storage
     const response = await storage.createFile(
       bucketId,
-      fileId,
+      "unique()",
       file,
       [
         Permission.read(Role.any()), // Anyone can view profile pictures

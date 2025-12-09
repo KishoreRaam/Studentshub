@@ -23,7 +23,7 @@ const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID || "68d3d183000b014
 const DATABASE_ID = databaseId; // Alias for compatibility
 
 // Storage bucket IDs
-const avatarsBucket = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || "avatars";
+//const avatarsBucket = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || "avatars";
 const profilePicturesBucket = import.meta.env.VITE_APPWRITE_BUCKET_PROFILE_PICTURES || "69376d25000b39c8273e";
 
 // Collections configuration
