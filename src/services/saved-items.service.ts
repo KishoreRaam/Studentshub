@@ -77,6 +77,7 @@ export async function savePerk(userId: string, perkData: PerkData) {
     }
 
     // Create new saved perk record with full perk data
+    // Permissions handled by collection-level settings
     const response = await databases.createDocument(
       databaseId,
       COLLECTIONS.SAVED_PERKS,
@@ -95,12 +96,7 @@ export async function savePerk(userId: string, perkData: PerkData) {
         claimLink: perkData.claimLink || '',
         claimed: false,
         claimedDate: null,
-      },
-      [
-        Permission.read(Role.user(userId)),
-        Permission.update(Role.user(userId)),
-        Permission.delete(Role.user(userId)),
-      ]
+      }
     );
 
     console.log('Successfully saved perk:', response.$id);
@@ -234,6 +230,7 @@ export async function saveResource(userId: string, resourceData: ResourceData) {
     }
 
     // Create new saved resource record with full resource data
+    // Permissions handled by collection-level settings
     const response = await databases.createDocument(
       databaseId,
       COLLECTIONS.SAVED_RESOURCES,
@@ -250,12 +247,7 @@ export async function saveResource(userId: string, resourceData: ResourceData) {
         verificationMethod: resourceData.verificationMethod || '',
         claimLink: resourceData.claimLink || '',
         badge: resourceData.badge || '',
-      },
-      [
-        Permission.read(Role.user(userId)),
-        Permission.update(Role.user(userId)),
-        Permission.delete(Role.user(userId)),
-      ]
+      }
     );
 
     console.log('Successfully saved resource:', response.$id);
@@ -378,6 +370,7 @@ export async function saveAITool(userId: string, toolData: AIToolData) {
     }
 
     // Create new saved AI tool record with full tool data
+    // Permissions handled by collection-level settings
     const response = await databases.createDocument(
       databaseId,
       COLLECTIONS.SAVED_AI_TOOLS,
@@ -398,12 +391,7 @@ export async function saveAITool(userId: string, toolData: AIToolData) {
         isPopular: toolData.isPopular || false,
         isNew: toolData.isNew || false,
         requiresVerification: toolData.requiresVerification || false,
-      },
-      [
-        Permission.read(Role.user(userId)),
-        Permission.update(Role.user(userId)),
-        Permission.delete(Role.user(userId)),
-      ]
+      }
     );
 
     console.log('Successfully saved AI tool:', response.$id);
