@@ -56,7 +56,6 @@ export {
   AppwriteID, 
   databaseId, 
   DATABASE_ID,
-  avatarsBucket, 
   profilePicturesBucket,
   COLLECTIONS, 
   OAUTH_CONFIG 
