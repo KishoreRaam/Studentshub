@@ -13,11 +13,11 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-// Configuration from environment variables
+// Configuration from environment variables (populated from .env file)
 const APPWRITE_ENDPOINT = process.env.VITE_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1';
-const APPWRITE_PROJECT_ID = process.env.VITE_APPWRITE_PROJECT || '';
-const APPWRITE_API_KEY = process.env.APPWRITE_API_KEY || ''; // Server API key needed for migration
-const DATABASE_ID = process.env.VITE_APPWRITE_DATABASE_ID || '';
+const APPWRITE_PROJECT_ID = process.env.VITE_APPWRITE_PROJECT || '68d29c8100366fc856a6';
+const APPWRITE_API_KEY = process.env.APPWRITE_API_KEY || 'standard_6ccc3227ab0e4b9f93c131effd4980ef61a0964070d99640c457a29254d5444c52366aa0d55f6112cf85d455ca2964a9b8521c1599c67216a8e4c0fd38177e1bc906630c1547c0d645d94a0d05cbbc697448bea7b4b1a219adb708efc94d1f5acc8554366162eb09a7361d859b67d9074bbd35fe80b69a3e7050b59c0d9e45b3'; // Server API key needed for migration (get from Appwrite Console)
+const DATABASE_ID = process.env.VITE_APPWRITE_DATABASE_ID || '68d3d183000b0146b221';
 const USERS_COLLECTION = process.env.VITE_APPWRITE_COLLECTION_USERS || 'users';
 
 // Safety mode: just clear invalid data (set to null)
