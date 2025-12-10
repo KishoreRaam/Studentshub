@@ -354,7 +354,8 @@ export async function getSavedAITools(userId: string) {
 // Save an AI tool for a user with full tool data
 export async function saveAITool(userId: string, toolData: AIToolData) {
   try {
-    // First, always check if already saved to avoid duplicate errors
+    console.log('[saveAITool] Attempting save', { userId, toolId: toolData.id });
+    // First, check if already saved - if so, delete it first (toggle behavior)
     const existing = await databases.listDocuments(
       databaseId,
       COLLECTIONS.SAVED_AI_TOOLS,
@@ -365,8 +366,14 @@ export async function saveAITool(userId: string, toolData: AIToolData) {
     );
 
     if (existing.documents.length > 0) {
-      console.log('AI tool already saved, returning existing:', existing.documents[0].$id);
-      return existing.documents[0];
+      console.log('[saveAITool] AI tool already exists, deleting before re-save:', existing.documents[0].$id);
+      // Delete the existing document first
+      await databases.deleteDocument(
+        databaseId,
+        COLLECTIONS.SAVED_AI_TOOLS,
+        existing.documents[0].$id
+      );
+      console.log('[saveAITool] Deleted existing document, proceeding with fresh save');
     }
 
     // Create new saved AI tool record with full tool data
@@ -394,12 +401,12 @@ export async function saveAITool(userId: string, toolData: AIToolData) {
       }
     );
 
-    console.log('Successfully saved AI tool:', response.$id);
+    console.log('[saveAITool] Successfully saved AI tool:', response.$id);
     return response;
   } catch (error: any) {
     // If document already exists (race condition), fetch and return it
     if (error.code === 409 || error.message?.includes('already exists') || error.message?.includes('Document with the requested ID already exists')) {
-      console.log('Race condition detected: Document already exists, fetching existing document...');
+      console.warn('[saveAITool] 409 conflict: document exists. Fetching existing...');
       try {
         const existing = await databases.listDocuments(
           databaseId,
@@ -409,15 +416,28 @@ export async function saveAITool(userId: string, toolData: AIToolData) {
             Query.equal('toolID', toolData.id)
           ]
         );
+        if (existing.documents.length === 0) {
+          const existingByUser = await databases.listDocuments(
+            databaseId,
+            COLLECTIONS.SAVED_AI_TOOLS,
+            [Query.equal('userID', userId)]
+          );
+          console.warn('[saveAITool] No doc found by user+tool after 409.', {
+            docsForUser: existingByUser.documents.length,
+            toolIdAttempted: toolData.id,
+            existingToolIds: existingByUser.documents.map(doc => doc.toolID),
+            rawDocs: existingByUser.documents
+          });
+        }
         if (existing.documents.length > 0) {
-          console.log('Successfully fetched existing AI tool:', existing.documents[0].$id);
+          console.log('[saveAITool] Fetched existing AI tool:', existing.documents[0].$id);
           return existing.documents[0];
         }
       } catch (fetchError) {
-        console.error('Error fetching existing document:', fetchError);
+        console.error('[saveAITool] Error fetching existing document:', fetchError);
       }
     }
-    console.error('Error saving AI tool:', error);
+    console.error('[saveAITool] Error saving AI tool:', error);
     throw error;
   }
 }
@@ -430,8 +450,9 @@ export async function unsaveAITool(savedToolId: string) {
       COLLECTIONS.SAVED_AI_TOOLS,
       savedToolId
     );
+    console.log('[unsaveAITool] Deleted saved AI tool document:', savedToolId);
   } catch (error) {
-    console.error('Error unsaving AI tool:', error);
+    console.error('[unsaveAITool] Error unsaving AI tool:', error);
     throw error;
   }
 }

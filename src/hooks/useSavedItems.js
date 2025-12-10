@@ -8,6 +8,11 @@ import { Query, Permission, Role } from 'appwrite';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
+// Ensure compatibility: re-export the TS hook so consumers importing
+// from useSavedItems.js can access `useSavedItems` as expected.
+// This avoids changing other pages while keeping a single source of truth.
+export { useSavedItems } from './useSavedItems.ts';
+
 /**
  * Helper function to get the current authenticated user
  * Redirects to login if session is invalid (401 error)
