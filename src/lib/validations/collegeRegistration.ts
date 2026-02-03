@@ -54,8 +54,8 @@ export const collegeRegistrationSchema = z.object({
     .string()
     .email('Please enter a valid email address')
     .regex(
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(edu|ac|org|gov)(\.[a-z]{2})?$/i,
-      'Please use an official institutional email address (.edu, .ac, .org, or .gov domain)'
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(edu|ac|org|gov|in)(\.[a-z]{2})?$/i,
+      'Please use an official institutional email address (.edu, .ac, .org, .gov, or .in domain)'
     ),
 
   phoneNumber: z

@@ -26,6 +26,35 @@ export default function CollegePortal() {
       {/* Workflow Section - How It Works */}
       <WorkflowSection />
 
+      {/* Conversation Visual Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+      >
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+            Understanding Institutional Email Adoption
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            See how colleges in Tamil Nadu are embracing .edu.in and .ac.in domains for enhanced credibility
+          </p>
+        </div>
+
+        <Card className="border-0 shadow-xl overflow-hidden">
+          <CardContent className="p-0">
+            <img
+              src="/assets/Institutional Email Adoption in Tamil Nadu Colleges, 2025 - visual selection.png"
+              alt="Institutional Email Adoption in Tamil Nadu Colleges - Conversation about registering .edu.in or .ac.in domains"
+              className="w-full h-auto"
+              loading="lazy"
+            />
+          </CardContent>
+        </Card>
+      </motion.section>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Registration Section with Sidebar Layout */}
@@ -103,7 +132,7 @@ export default function CollegePortal() {
                         href="mailto:support@studentperks.in"
                         className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                       >
-                        support@studentperks.in
+                        studentperkss@gmail.com
                       </a>
                     </div>
                     <div>
@@ -112,7 +141,7 @@ export default function CollegePortal() {
                         href="tel:+918012345678"
                         className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                       >
-                        +91 80123 45678
+                        +91 7904734217
                       </a>
                     </div>
                     <div className="text-gray-500 dark:text-gray-400">

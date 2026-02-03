@@ -42,6 +42,10 @@ export function RegistrationForm() {
   const [showDraftBanner, setShowDraftBanner] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<string>('');
   const [submitError, setSubmitError] = useState<string>('');
+  const [triggerDomainCheck, setTriggerDomainCheck] = useState(false);
+  const [domainCheckStatus, setDomainCheckStatus] = useState<'idle' | 'available' | 'taken'>('idle');
+  const [inputGlowClass, setInputGlowClass] = useState<string>('');
+  const [domainExtension, setDomainExtension] = useState<string>('.edu.in');
 
   const {
     register,
@@ -81,6 +85,17 @@ export function RegistrationForm() {
   const preferredDomain = watch('preferredDomain');
   const formData = watch();
 
+  // Debug: Log when preferredDomain changes
+  console.log('Preferred Domain:', preferredDomain);
+
+  // Reset domain check status when extension changes
+  useEffect(() => {
+    if (domainCheckStatus !== 'idle') {
+      setDomainCheckStatus('idle');
+      setInputGlowClass('');
+    }
+  }, [domainExtension]);
+
   // Load draft on mount
   useEffect(() => {
     if (hasDraft(STORAGE_KEY)) {
@@ -109,6 +124,33 @@ export function RegistrationForm() {
   const dismissDraft = () => {
     clearDraft();
     setShowDraftBanner(false);
+  };
+
+  // Handle domain check button click
+  const handleCheckDomain = () => {
+    if (preferredDomain) {
+      setTriggerDomainCheck(true);
+      setDomainCheckStatus('idle');
+      setInputGlowClass('');
+    }
+  };
+
+  // Handle domain check completion
+  const handleDomainCheckComplete = (status: 'available' | 'taken') => {
+    setTriggerDomainCheck(false);
+    setDomainCheckStatus(status);
+    
+    // Apply glow effect
+    if (status === 'available') {
+      setInputGlowClass('input-glow-green');
+    } else {
+      setInputGlowClass('input-glow-red');
+    }
+    
+    // Remove glow class after animation completes
+    setTimeout(() => {
+      setInputGlowClass('');
+    }, 1200);
   };
 
   // Handle form submission
@@ -425,7 +467,11 @@ export function RegistrationForm() {
             label="Preferred Domain Name"
             name="preferredDomain"
             error={errors.preferredDomain?.message}
-            helpText="Your students will get emails like student@yourcollegename.edu.in"
+            helpText={
+              preferredDomain?.trim()
+                ? `Your students will get emails like student@${preferredDomain.trim()}${domainExtension}`
+                : `Your students will get emails like student@yourcollegename${domainExtension}`
+            }
           >
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
@@ -438,22 +484,50 @@ export function RegistrationForm() {
                   {...register('preferredDomain')}
                   placeholder="yourcollegename"
                   disabled={isSubmitting}
-                  className="h-12 pl-11 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900"
+                  className={`h-12 pl-11 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-900 transition-all ${
+                    inputGlowClass
+                  } ${
+                    domainCheckStatus === 'available' ? 'border-green-500 dark:border-green-600' : 
+                    domainCheckStatus === 'taken' ? 'border-red-500 dark:border-red-600' : ''
+                  }`}
                 />
               </div>
-              <div className="flex items-center justify-center px-4 h-12 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-400 font-semibold whitespace-nowrap">
-                .edu.in
-              </div>
+              <Select
+                value={domainExtension}
+                onValueChange={setDomainExtension}
+                disabled={isSubmitting}
+              >
+                <SelectTrigger className="h-12 w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value=".edu.in">.edu.in</SelectItem>
+                  <SelectItem value=".ac.in">.ac.in</SelectItem>
+                  <SelectItem value=".edu">.edu</SelectItem>
+                  <SelectItem value=".org">.org</SelectItem>
+                  <SelectItem value=".in">.in</SelectItem>
+                </SelectContent>
+              </Select>
               <Button
                 type="button"
                 variant="outline"
-                className="h-12 px-6 font-semibold border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600"
-                disabled={!preferredDomain || isSubmitting}
+                onClick={handleCheckDomain}
+                className="h-12 px-6 font-semibold border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!preferredDomain?.trim() || isSubmitting}
               >
                 Check
               </Button>
             </div>
-            {preferredDomain && <DomainChecker domain={preferredDomain} />}
+            {preferredDomain && (
+              <DomainChecker 
+                domain={preferredDomain}
+                extension={domainExtension}
+                triggerCheck={triggerDomainCheck}
+                onCheckComplete={(status) => {
+                  handleDomainCheckComplete(status);
+                }}
+              />
+            )}
           </FormField>
         </div>
 

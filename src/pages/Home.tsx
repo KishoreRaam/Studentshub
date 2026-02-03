@@ -12,16 +12,24 @@ import { PartnerLogos } from "../components/PartnerLogos";
 export default function Home() {
   return (
     <main>
-      <HeroSection />
+      <section id="home">
+        <HeroSection />
+      </section>
       <FreeResourcesSection />
       <AIToolsSection />
-      <BenefitsSection />
-      <DashboardPreview />
+      <section id="benefits">
+        <BenefitsSection />
+      </section>
+      <section id="dashboard">
+        <DashboardPreview />
+      </section>
       <NewsletterSignup />
       <FeatureHighlights />
       <StudentTestimonials />
       <FAQ />
-      <PartnerLogos />
+      <section id="contact">
+        <PartnerLogos />
+      </section>
     </main>
   );
 }

@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { AuthButtons } from './AuthButtons';
 import { ThemeToggle } from './ThemeToggle';
 import { GlobalSearchModal } from './search/GlobalSearchModal';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useScrollTracking } from '../hooks/useScrollTracking';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +15,18 @@ export function Header() {
   const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Define sections for scroll tracking
+  const sections = [
+    { id: 'home', path: '/', elementId: 'home' },
+    { id: 'benefits', path: '#benefits', elementId: 'benefits' },
+    { id: 'dashboard', path: '#dashboard', elementId: 'dashboard' },
+    { id: 'contact', path: '#contact', elementId: 'contact' },
+  ];
+
+  // Use scroll tracking hook
+  const activeSection = useScrollTracking(sections);
 
   // Auto-close mobile menu when route changes
   useEffect(() => {
@@ -29,13 +42,30 @@ export function Header() {
   }, [isMobileSearchExpanded]);
 
   const navLinks = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
-    { name: 'Perks', path: '/perks', icon: Gift },
-    { name: 'Events', path: '/events', icon: Calendar },
-    { name: 'Resources', path: '/resources', icon: Star },
-    { name: 'Tools', path: '/tools', icon: Settings },
+    { name: 'Home', path: '/', icon: Home, scrollTo: 'home' },
+    { name: 'Benefits', path: '#benefits', icon: Gift, scrollTo: 'benefits' },
+    { name: 'Dashboard', path: '#dashboard', icon: BarChart3, scrollTo: 'dashboard' },
+    { name: 'Contact', path: '#contact', icon: Settings, scrollTo: 'contact' },
+    { name: 'AI Tools', path: '/tools', icon: Star, isPage: true },
   ];
+
+  // Handle navigation with smooth scrolling
+  const handleNavClick = (link: typeof navLinks[0]) => {
+    if (link.isPage) {
+      navigate(link.path);
+    } else if (link.scrollTo) {
+      if (location.pathname !== '/') {
+        navigate('/');
+        setTimeout(() => {
+          const element = document.getElementById(link.scrollTo!);
+          element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } else {
+        const element = document.getElementById(link.scrollTo);
+        element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
 
   return (
     <header className="fixed top-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-blue-100 dark:border-gray-800 z-50">
@@ -55,15 +85,49 @@ export function Header() {
           <nav className="hidden md:flex space-x-1">
             {navLinks.map((link) => {
               const Icon = link.icon;
+              const isActive = location.pathname === link.path || activeSection === link.path;
               return (
-                <Link
+                <button
                   key={link.path}
-                  to={link.path}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800"
+                  onClick={() => handleNavClick(link)}
+                  className="relative flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-gray-800/50"
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{link.name}</span>
-                </Link>
+                  <Icon className="w-4 h-4 relative z-10" />
+                  <span className="relative z-10">{link.name}</span>
+                  
+                  {/* Three-Layer Lighting Effect */}
+                  {isActive && (
+                    <>
+                      {/* Layer 1: Bottom Line Indicator */}
+                      <motion.div
+                        layoutId="activeNavLine"
+                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-gradient-to-r from-blue-400 via-green-400 to-blue-400 rounded-full"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                      
+                      {/* Layer 2: Animated Glow (Breathing Effect) */}
+                      <motion.div
+                        className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-400/20 via-green-400/20 to-blue-400/20 blur-lg"
+                        animate={{
+                          opacity: [0.3, 0.6, 0.3],
+                          scale: [1, 1.05, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      />
+                      
+                      {/* Layer 3: Background Highlight */}
+                      <motion.div
+                        layoutId="activeNavBg"
+                        className="absolute inset-0 bg-gradient-to-r from-blue-50 via-green-50 to-blue-50 dark:from-blue-900/20 dark:via-green-900/20 dark:to-blue-900/20 rounded-lg"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    </>
+                  )}
+                </button>
               );
             })}
           </nav>
@@ -167,6 +231,7 @@ export function Header() {
 
                 {navLinks.map((link, index) => {
                   const Icon = link.icon;
+                  const isActive = location.pathname === link.path || activeSection === link.path;
                   return (
                     <motion.div
                       key={link.path}
@@ -174,14 +239,48 @@ export function Header() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.2, delay: (index + 1) * 0.1 }}
                     >
-                      <Link
-                        to={link.path}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center space-x-3 py-3 px-4 rounded-lg text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200"
+                      <button
+                        onClick={() => {
+                          handleNavClick(link);
+                          setIsMenuOpen(false);
+                        }}
+                        className="relative flex items-center space-x-3 py-3 px-4 rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 w-full overflow-hidden"
                       >
-                        <Icon className="w-5 h-5" />
-                        <span>{link.name}</span>
-                      </Link>
+                        <Icon className="w-5 h-5 relative z-10" />
+                        <span className="relative z-10">{link.name}</span>
+                        
+                        {/* Three-Layer Lighting Effect for Mobile */}
+                        {isActive && (
+                          <>
+                            {/* Layer 1: Right Side Indicator */}
+                            <motion.div
+                              layoutId="activeMobileLine"
+                              className="absolute right-2 w-1 h-8 bg-gradient-to-b from-blue-400 via-green-400 to-blue-400 rounded-full"
+                              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                            />
+                            
+                            {/* Layer 2: Animated Glow */}
+                            <motion.div
+                              className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-400/20 via-green-400/20 to-blue-400/20 blur-md"
+                              animate={{
+                                opacity: [0.3, 0.6, 0.3],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
+                            />
+                            
+                            {/* Layer 3: Background Highlight */}
+                            <motion.div
+                              layoutId="activeMobileBg"
+                              className="absolute inset-0 bg-gradient-to-r from-blue-50 via-green-50 to-blue-50 dark:from-blue-900/20 dark:via-green-900/20 dark:to-blue-900/20 rounded-lg"
+                              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                            />
+                          </>
+                        )}
+                      </button>
                     </motion.div>
                   );
                 })}

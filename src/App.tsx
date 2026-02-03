@@ -20,7 +20,8 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import VerificationFailed from "./pages/VerificationFailed";
 import Profile from "./pages/Profile";
-import Resources from "./pages/Resources";
+import ResourcesPage from "./pages/ResourcesPage";
+import CoursesPage from "./pages/courses";
 import AITools from "./pages/AITools";
 import BusinessModel from "./pages/BusinessModel";
 import CollegePortal from "./pages/CollegePortal";
@@ -66,7 +67,8 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/resources" element={<Resources />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/courses" element={<CoursesPage />} />
             <Route path="/tools" element={<AITools />} />
             <Route path="/business-model" element={<BusinessModel />} />
             <Route path="/college-portal" element={<CollegePortal />} />

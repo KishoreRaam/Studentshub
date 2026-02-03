@@ -65,11 +65,11 @@ export function Footer() {
           <div>
             <h4 className="text-lg mb-6">Resources</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Help Center</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Student Guide</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">API Documentation</a></li>
+              <li><Link to="/resources" className="text-gray-400 hover:text-white transition-colors duration-200">Help Center</Link></li>
+              <li><Link to="/resources" className="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</Link></li>
+              <li><Link to="/resources" className="text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</Link></li>
+              <li><Link to="/resources" className="text-gray-400 hover:text-white transition-colors duration-200">Student Guide</Link></li>
+              <li><Link to="/resources" className="text-gray-400 hover:text-white transition-colors duration-200">API Documentation</Link></li>
             </ul>
           </div>
 
@@ -81,7 +81,9 @@ export function Footer() {
                 <Mail className="w-5 h-5 text-blue-400 mt-1" />
                 <div>
                   <p className="text-gray-400">Email</p>
-                  <p className="text-white">support@edubuzz.com</p>
+                  <a href="mailto:studentperkss@gmail.com" className="text-white hover:text-blue-300 transition-colors duration-200">
+                    studentperkss@gmail.com
+                  </a>
                 </div>
               </div>
               

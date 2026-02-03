@@ -340,7 +340,7 @@ Error → Show error alert, keep form data
 CSV (existing perks data)
     ↓
 User navigates to homepage
-    ↓
+    ↓  
 Clicks "Get Started Now" in Benefits section
     ↓
 Routed to /college-portal

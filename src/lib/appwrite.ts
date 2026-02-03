@@ -54,6 +54,10 @@ export const COLLECTIONS = {
 
 // OAuth Configuration
 export const OAUTH_CONFIG = {
-  SUCCESS_URL: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : '/dashboard',
-  FAILURE_URL: typeof window !== 'undefined' ? `${window.location.origin}/login?error=oauth_failed` : '/login?error=oauth_failed',
+  SUCCESS_URL: typeof window !== 'undefined' 
+    ? `${window.location.protocol}//${window.location.host}/dashboard`
+    : 'https://studentperks.in/dashboard',
+  FAILURE_URL: typeof window !== 'undefined' 
+    ? `${window.location.protocol}//${window.location.host}/login?error=oauth_failed`
+    : 'https://studentperks.in/login?error=oauth_failed',
 };
