@@ -22,7 +22,6 @@ export function Header() {
     { id: 'home', path: '/', elementId: 'home' },
     { id: 'benefits', path: '#benefits', elementId: 'benefits' },
     { id: 'dashboard', path: '#dashboard', elementId: 'dashboard' },
-    { id: 'contact', path: '#contact', elementId: 'contact' },
   ];
 
   // Use scroll tracking hook
@@ -45,7 +44,7 @@ export function Header() {
     { name: 'Home', path: '/', icon: Home, scrollTo: 'home' },
     { name: 'Benefits', path: '#benefits', icon: Gift, scrollTo: 'benefits' },
     { name: 'Dashboard', path: '#dashboard', icon: BarChart3, scrollTo: 'dashboard' },
-    { name: 'Contact', path: '#contact', icon: Settings, scrollTo: 'contact' },
+    { name: 'Register', path: '/college-portal', icon: BookOpen, isPage: true },
     { name: 'AI Tools', path: '/tools', icon: Star, isPage: true },
   ];
 

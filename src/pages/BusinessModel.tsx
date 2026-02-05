@@ -3,6 +3,7 @@ import { Briefcase, IndianRupee, TrendingUp } from 'lucide-react';
 import ThreePhaseGrowth from '../components/ThreePhaseGrowth';
 import SalaryAdjustedFinancial from '../components/SalaryAdjustedFinancial';
 import AlternativeProfitStrategies from '../components/AlternativeProfitStrategies';
+import FinancialModelCalculator from '../components/FinancialModelCalculator';
 
 export default function BusinessModel() {
 
@@ -24,6 +25,9 @@ export default function BusinessModel() {
             for Tamil Nadu's college ecosystem
           </p>
         </motion.div>
+
+        {/* Financial Model Calculator */}
+        <FinancialModelCalculator />
 
         {/* Market Overview Section */}
         <motion.div
@@ -50,7 +54,7 @@ export default function BusinessModel() {
                 className="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-8 text-center"
               >
                 <p className="text-5xl font-bold text-indigo-600 dark:text-indigo-400 mb-3">
-                  2,000
+                  2,807
                 </p>
                 <p className="text-gray-600 dark:text-gray-300 font-medium">
                   Total Colleges in Tamil Nadu
@@ -78,7 +82,7 @@ export default function BusinessModel() {
                 className="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-8 text-center"
               >
                 <p className="text-5xl font-bold text-indigo-600 dark:text-indigo-400 mb-3">
-                  200
+                  280
                 </p>
                 <p className="text-gray-600 dark:text-gray-300 font-medium">
                   Target Colleges
