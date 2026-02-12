@@ -1,3 +1,82 @@
+/* Mapbox overrides */
+.mapboxgl-ctrl-attrib {
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 10px !important;
+  color: #9ca3af !important;
+}
+
+/* Custom scrollbar for control panel */
+.deals-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.deals-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+/* Deal marker animation */
+.deal-marker {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.deal-marker:hover {
+  transform: scale(1.1);
+}
+
+/* Hide scrollbar for horizontal scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ── Map page responsive layout ── */
+
+/* Mobile: flex column, map partial height, bottom sheet fills rest */
+.map-page-content {
+  margin-top: 64px;
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.map-page-map-area {
+  position: relative;
+  height: 52vh;
+  flex-shrink: 0;
+}
+.map-page-bottom-sheet {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Desktop (768px+): block layout, map fills entire content area */
+@media (min-width: 768px) {
+  .map-page-content {
+    margin-top: 64px;
+    height: calc(100vh - 64px);
+    display: block;
+    position: relative;
+    flex-direction: unset;
+  }
+  .map-page-map-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: auto;
+    flex-shrink: unset;
+  }
+  .map-page-bottom-sheet {
+    display: none !important;
+  }
+}
+
 /* Conversation SVG animation styles */
 .conversation-svg-wrapper svg {
   width: 100%;

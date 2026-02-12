@@ -8,6 +8,7 @@ import { FeatureHighlights } from "../components/FeatureHighlights";
 import { StudentTestimonials } from "../components/StudentTestimonials";
 import { FAQ } from "../components/FAQ";
 import { PartnerLogos } from "../components/PartnerLogos";
+import StudentMapSection from "../components/home/StudentMapSection";
 
 export default function Home() {
   return (
@@ -23,6 +24,7 @@ export default function Home() {
       <section id="dashboard">
         <DashboardPreview />
       </section>
+      <StudentMapSection />
       <NewsletterSignup />
       <FeatureHighlights />
       <StudentTestimonials />

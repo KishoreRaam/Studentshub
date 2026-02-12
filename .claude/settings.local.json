@@ -13,7 +13,12 @@
       "Bash(node test_domains.js:*)",
       "Bash(del test_domains.js)",
       "WebFetch(domain:www.figma.com)",
-      "Bash(timeout /t 10 /nobreak)"
+      "Bash(timeout /t 10 /nobreak)",
+      "Bash(claude mcp add:*)",
+      "mcp__claude_ai_Figma__get_screenshot",
+      "mcp__claude_ai_Figma__get_metadata",
+      "mcp__claude_ai_Figma__get_design_context",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

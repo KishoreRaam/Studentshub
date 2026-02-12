@@ -6,12 +6,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { AuthButtons } from './AuthButtons';
 import { ThemeToggle } from './ThemeToggle';
 import { GlobalSearchModal } from './search/GlobalSearchModal';
+import { OnboardingModal } from './onboarding/OnboardingModal';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useScrollTracking } from '../hooks/useScrollTracking';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
@@ -67,6 +69,7 @@ export function Header() {
   };
 
   return (
+    <>
     <header className="fixed top-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-blue-100 dark:border-gray-800 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -302,5 +305,23 @@ export function Header() {
       {/* Global Search Modal */}
       <GlobalSearchModal open={isSearchOpen} onOpenChange={setIsSearchOpen} />
     </header>
+
+    {/* Start Onboarding - fixed below header, far right */}
+    {location.pathname === '/' && (
+      <motion.button
+        initial={{ opacity: 0, x: 10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+        onClick={() => setIsOnboardingOpen(true)}
+        className="fixed top-20 right-8 z-40 text-white font-semibold px-7 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-sm whitespace-nowrap"
+        style={{ background: 'linear-gradient(135deg, #22c55e, #0ea5e9, #2563eb)' }}
+      >
+        Start Onboarding
+      </motion.button>
+    )}
+
+    {/* Onboarding Modal */}
+    <OnboardingModal isOpen={isOnboardingOpen} onClose={() => setIsOnboardingOpen(false)} />
+    </>
   );
 }

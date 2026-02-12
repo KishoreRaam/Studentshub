@@ -25,9 +25,11 @@ import CoursesPage from "./pages/courses";
 import AITools from "./pages/AITools";
 import BusinessModel from "./pages/BusinessModel";
 import CollegePortal from "./pages/CollegePortal";
+import MapPage from "./pages/MapPage";
 
 export default function App() {
   const location = useLocation();
+  const isMapPage = location.pathname === "/map";
 
   useEffect(() => {
     ReactGA.send({ hitType: "pageview", page: location.pathname });
@@ -36,49 +38,62 @@ export default function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="edubuzz-theme">
       <SearchProvider>
-        <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-          <ScrollToTop />
-          <Header />
-          <ProfileButton />
+        <ScrollToTop />
 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/perks" element={<Perks />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/verification-failed" element={<VerificationFailed />} />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/resources" element={<ResourcesPage />} />
-            <Route path="/courses" element={<CoursesPage />} />
-            <Route path="/tools" element={<AITools />} />
-            <Route path="/business-model" element={<BusinessModel />} />
-            <Route path="/college-portal" element={<CollegePortal />} />
-          </Routes>
+        {isMapPage ? (
+          <>
+            {/* Show main Header on mobile for map page */}
+            <div className="md:hidden">
+              <Header />
+            </div>
+            <Routes>
+              <Route path="/map" element={<MapPage />} />
+            </Routes>
+          </>
+        ) : (
+          <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+            <Header />
+            <ProfileButton />
 
-          {/* Email Inquiry Widget - appears on all pages */}
-          <EmailInquiryWidget />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/perks" element={<Perks />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/verification-failed" element={<VerificationFailed />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/resources" element={<ResourcesPage />} />
+              <Route path="/courses" element={<CoursesPage />} />
+              <Route path="/tools" element={<AITools />} />
+              <Route path="/business-model" element={<BusinessModel />} />
+              <Route path="/college-portal" element={<CollegePortal />} />
+            </Routes>
 
-          <Footer />
-        </div>
+            {/* Email Inquiry Widget - appears on all pages */}
+            <EmailInquiryWidget />
+
+            <Footer />
+          </div>
+        )}
       </SearchProvider>
     </ThemeProvider>
   );
