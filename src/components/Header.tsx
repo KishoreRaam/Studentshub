@@ -48,6 +48,7 @@ export function Header() {
     { name: 'Dashboard', path: '#dashboard', icon: BarChart3, scrollTo: 'dashboard' },
     { name: 'Register', path: '/college-portal', icon: BookOpen, isPage: true },
     { name: 'AI Tools', path: '/tools', icon: Star, isPage: true },
+    { name: 'Events', path: '/events', icon: Calendar, isPage: true },
   ];
   const mobileNavLinks = [
     ...navLinks,
