@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Menu, X, Home, Gift, BarChart3, Settings, Star, Search, BookOpen, Calendar } from 'lucide-react';
+import { Menu, X, Home, Gift, BarChart3, Settings, Star, Search, BookOpen, Calendar, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthButtons } from './AuthButtons';
 import { ThemeToggle } from './ThemeToggle';
@@ -48,6 +48,10 @@ export function Header() {
     { name: 'Dashboard', path: '#dashboard', icon: BarChart3, scrollTo: 'dashboard' },
     { name: 'Register', path: '/college-portal', icon: BookOpen, isPage: true },
     { name: 'AI Tools', path: '/tools', icon: Star, isPage: true },
+  ];
+  const mobileNavLinks = [
+    ...navLinks,
+    { name: 'Maps', path: '/map', icon: MapPin, isPage: true },
   ];
 
   // Handle navigation with smooth scrolling
@@ -231,7 +235,7 @@ export function Header() {
                   </button>
                 </motion.div>
 
-                {navLinks.map((link, index) => {
+                {mobileNavLinks.map((link, index) => {
                   const Icon = link.icon;
                   const isActive = location.pathname === link.path || activeSection === link.path;
                   return (
@@ -291,7 +295,7 @@ export function Header() {
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.2, delay: navLinks.length * 0.1 }}
+                  transition={{ duration: 0.2, delay: mobileNavLinks.length * 0.1 }}
                   className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4"
                 >
                   <AuthButtons />
