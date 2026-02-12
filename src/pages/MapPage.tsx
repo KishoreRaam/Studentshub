@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type mapboxgl from "mapbox-gl";
 import { useMapState } from "../hooks/useMapState";
 import { MapNavBar } from "../components/map/MapNavBar";
@@ -6,16 +6,45 @@ import { ControlPanel } from "../components/map/ControlPanel";
 import { MobileBottomSheet } from "../components/map/MobileBottomSheet";
 import { MapCanvas } from "../components/map/MapCanvas";
 import { InfoCard } from "../components/map/InfoCard";
+import { dealsData } from "../data/discountLocations";
 
 export default function MapPage() {
   const state = useMapState();
   const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
   const [isMobileLayersOpen, setIsMobileLayersOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const filteredDeals = useMemo(() => {
+    const normalizedQuery = debouncedSearchQuery.trim().toLowerCase();
+
+    const categoryFilteredDeals =
+      state.activeCategory === "All"
+        ? dealsData
+        : dealsData.filter((deal) => deal.category === state.activeCategory);
+
+    if (!normalizedQuery) {
+      return categoryFilteredDeals;
+    }
+
+    return categoryFilteredDeals.filter((deal) => {
+      const searchableText = `${deal.name} ${deal.category}`.toLowerCase();
+      return searchableText.includes(normalizedQuery);
+    });
+  }, [debouncedSearchQuery, state.activeCategory]);
 
   return (
     <div className="h-screen w-screen overflow-hidden" style={{ background: "#eceef1" }}>
       {/* Desktop nav (hides itself on mobile via hidden md:flex) */}
-      <MapNavBar />
+      <MapNavBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {/* Content area — responsive via CSS classes defined in index.css */}
       <div className="map-page-content">
@@ -25,7 +54,7 @@ export default function MapPage() {
             showHeatmap={state.showHeatmap}
             showDiscounts={state.showDiscounts}
             activeTime={state.activeTime}
-            activeCategory={state.activeCategory}
+            filteredDeals={filteredDeals}
             onMarkerClick={state.setSelectedDeal}
             onMapReady={(map) => {
               mapInstanceRef.current = map;
@@ -153,6 +182,7 @@ export default function MapPage() {
           setActiveTime={state.setActiveTime}
           activeCategory={state.activeCategory}
           setActiveCategory={state.setActiveCategory}
+          filteredDeals={filteredDeals}
           onSelectDeal={state.setSelectedDeal}
         />
 
@@ -163,6 +193,7 @@ export default function MapPage() {
             setActiveTime={state.setActiveTime}
             activeCategory={state.activeCategory}
             setActiveCategory={state.setActiveCategory}
+            filteredDeals={filteredDeals}
             onSelectDeal={state.setSelectedDeal}
           />
         </div>

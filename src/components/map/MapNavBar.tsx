@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 
 const navLinks = [
   { label: "Map", to: "/map", active: true },
@@ -9,7 +10,27 @@ const navLinks = [
   { label: "AI Tools", to: "/tools", active: false },
 ];
 
-export const MapNavBar = React.memo(function MapNavBar() {
+interface MapNavBarProps {
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+}
+
+export const MapNavBar = React.memo(function MapNavBar({
+  searchQuery,
+  onSearchChange,
+}: MapNavBarProps) {
+  const { user, loading } = useAuth();
+
+  const userName = user?.name?.trim() || "";
+  const userInitials = userName
+    ? userName
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part: string) => part.charAt(0).toUpperCase())
+        .join("")
+    : "";
+
   return (
     <nav
       className="fixed top-0 left-0 right-0 z-50 hidden md:flex items-center px-6"
@@ -61,16 +82,19 @@ export const MapNavBar = React.memo(function MapNavBar() {
           }}
         >
           <Search size={18} color="rgba(10,10,10,0.4)" />
-          <span
-            className="flex-1"
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search shops, cafes, print services near you..."
+            className="flex-1 bg-transparent border-none outline-none"
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: 14,
-              color: "rgba(10,10,10,0.5)",
+              color: "#0a0a0a",
             }}
-          >
-            Search shops, cafés, print services near you…
-          </span>
+            aria-label="Search nearby deals"
+          />
           <span
             className="flex items-center justify-center"
             style={{
@@ -175,21 +199,61 @@ export const MapNavBar = React.memo(function MapNavBar() {
           </span>
         </div>
 
-        {/* Avatar */}
-        <div
-          className="flex items-center justify-center rounded-full ml-3"
-          style={{
-            width: 36,
-            height: 36,
-            background: "#ebf2ff",
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: 14,
-            fontWeight: 600,
-            color: "#1a56db",
-          }}
-        >
-          AK
-        </div>
+        {user ? (
+          <>
+            <span
+              className="ml-3"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 14,
+                fontWeight: 500,
+                color: "#111827",
+                maxWidth: 140,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+              title={userName}
+            >
+              {userName}
+            </span>
+            <div
+              className="flex items-center justify-center rounded-full ml-2"
+              style={{
+                width: 36,
+                height: 36,
+                background: "#ebf2ff",
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 14,
+                fontWeight: 600,
+                color: "#1a56db",
+              }}
+              aria-label={`${userName} profile`}
+              title={userName}
+            >
+              {userInitials || "U"}
+            </div>
+          </>
+        ) : (
+          <Link
+            to="/login"
+            className="ml-3 no-underline"
+            style={{
+              padding: "8px 14px",
+              borderRadius: 9999,
+              border: "0.8px solid #e5e7eb",
+              background: "#fff",
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 14,
+              fontWeight: 600,
+              color: "#1a56db",
+              opacity: loading ? 0.7 : 1,
+            }}
+            aria-label="Login"
+          >
+            Login
+          </Link>
+        )}
       </div>
     </nav>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 import type { TimeOfDay } from "../../hooks/useMapState";
-import { dealsData, categories, type Deal } from "../../data/discountLocations";
+import { categories, type Deal } from "../../data/discountLocations";
 
 interface ControlPanelProps {
   showHeatmap: boolean;
@@ -13,6 +13,7 @@ interface ControlPanelProps {
   setActiveTime: (v: TimeOfDay) => void;
   activeCategory: string;
   setActiveCategory: (v: string) => void;
+  filteredDeals: Deal[];
   onSelectDeal: (deal: Deal) => void;
 }
 
@@ -22,15 +23,15 @@ const toggleRows: {
   label: string;
   onColor: string;
 }[] = [
-  { key: "showHeatmap", emoji: "🔥", label: "Show Heatmap", onColor: "#1a56db" },
-  { key: "showDiscounts", emoji: "📍", label: "Show Discounts", onColor: "#f59e0b" },
-  { key: "showColleges", emoji: "🏫", label: "Show Colleges", onColor: "#d1d5db" },
+  { key: "showHeatmap", emoji: "\uD83D\uDD25", label: "Show Heatmap", onColor: "#1a56db" },
+  { key: "showDiscounts", emoji: "\uD83D\uDCCD", label: "Show Discounts", onColor: "#f59e0b" },
+  { key: "showColleges", emoji: "\uD83C\uDFEB", label: "Show Colleges", onColor: "#d1d5db" },
 ];
 
 const timeOptions: { value: TimeOfDay; emoji: string }[] = [
-  { value: "Morning", emoji: "🌅" },
-  { value: "Afternoon", emoji: "☀️" },
-  { value: "Evening", emoji: "🌆" },
+  { value: "Morning", emoji: "\uD83C\uDF05" },
+  { value: "Afternoon", emoji: "\u2600\uFE0F" },
+  { value: "Evening", emoji: "\uD83C\uDF06" },
 ];
 
 export const ControlPanel = React.memo(function ControlPanel(
@@ -47,6 +48,7 @@ export const ControlPanel = React.memo(function ControlPanel(
     setActiveTime,
     activeCategory,
     setActiveCategory,
+    filteredDeals,
     onSelectDeal,
   } = props;
 
@@ -55,16 +57,12 @@ export const ControlPanel = React.memo(function ControlPanel(
     showDiscounts,
     showColleges,
   };
+
   const toggleSetters: Record<string, (v: boolean) => void> = {
     showHeatmap: setShowHeatmap,
     showDiscounts: setShowDiscounts,
     showColleges: setShowColleges,
   };
-
-  const filteredDeals =
-    activeCategory === "All"
-      ? dealsData
-      : dealsData.filter((d) => d.category === activeCategory);
 
   return (
     <div
@@ -79,9 +77,7 @@ export const ControlPanel = React.memo(function ControlPanel(
         boxShadow: "4px 0px 24px rgba(0,0,0,0.06)",
       }}
     >
-      {/* Fixed header */}
       <div style={{ padding: "20px 16px 0 16px" }}>
-        {/* Title */}
         <h2
           style={{
             fontFamily: "'Playfair Display', serif",
@@ -101,7 +97,7 @@ export const ControlPanel = React.memo(function ControlPanel(
               color: "#6b7280",
             }}
           >
-            Tamil Nadu · 12 locations found
+            Tamil Nadu - {filteredDeals.length} locations found
           </span>
           <span
             style={{
@@ -115,12 +111,10 @@ export const ControlPanel = React.memo(function ControlPanel(
         </div>
       </div>
 
-      {/* Scrollable content */}
       <div
         className="flex-1 overflow-y-auto deals-scroll"
         style={{ padding: "20px 16px 16px 16px" }}
       >
-        {/* LAYERS */}
         <div style={{ marginBottom: 20 }}>
           <span
             style={{
@@ -180,7 +174,6 @@ export const ControlPanel = React.memo(function ControlPanel(
           </div>
         </div>
 
-        {/* TIME OF DAY */}
         <div style={{ marginBottom: 20 }}>
           <span
             style={{
@@ -234,7 +227,6 @@ export const ControlPanel = React.memo(function ControlPanel(
           </div>
         </div>
 
-        {/* CATEGORY */}
         <div style={{ marginBottom: 20 }}>
           <span
             style={{
@@ -248,10 +240,7 @@ export const ControlPanel = React.memo(function ControlPanel(
           >
             CATEGORY
           </span>
-          <div
-            className="flex flex-wrap"
-            style={{ marginTop: 12, gap: 8 }}
-          >
+          <div className="flex flex-wrap" style={{ marginTop: 12, gap: 8 }}>
             {categories.map((cat) => {
               const isActive = activeCategory === cat.value;
               return (
@@ -272,9 +261,7 @@ export const ControlPanel = React.memo(function ControlPanel(
                     transition: "all 0.15s",
                   }}
                 >
-                  {cat.emoji && (
-                    <span style={{ fontSize: 13 }}>{cat.emoji}</span>
-                  )}
+                  {cat.emoji && <span style={{ fontSize: 13 }}>{cat.emoji}</span>}
                   {cat.label}
                 </button>
               );
@@ -282,7 +269,6 @@ export const ControlPanel = React.memo(function ControlPanel(
           </div>
         </div>
 
-        {/* NEARBY */}
         <div>
           <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
             <span
@@ -328,7 +314,6 @@ export const ControlPanel = React.memo(function ControlPanel(
                   padding: 0,
                 }}
               >
-                {/* Emoji circle */}
                 <div
                   className="flex items-center justify-center shrink-0 rounded-full"
                   style={{
@@ -341,7 +326,6 @@ export const ControlPanel = React.memo(function ControlPanel(
                   {deal.emoji}
                 </div>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div
                     className="truncate"
@@ -365,7 +349,6 @@ export const ControlPanel = React.memo(function ControlPanel(
                   </div>
                 </div>
 
-                {/* Discount + distance */}
                 <div className="flex flex-col items-end shrink-0">
                   <span
                     className="rounded-full"

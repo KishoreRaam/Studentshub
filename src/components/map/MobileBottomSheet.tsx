@@ -1,12 +1,13 @@
 import React from "react";
 import type { TimeOfDay } from "../../hooks/useMapState";
-import { dealsData, categories, type Deal } from "../../data/discountLocations";
+import { categories, type Deal } from "../../data/discountLocations";
 
 interface MobileBottomSheetProps {
   activeTime: TimeOfDay;
   setActiveTime: (v: TimeOfDay) => void;
   activeCategory: string;
   setActiveCategory: (v: string) => void;
+  filteredDeals: Deal[];
   onSelectDeal: (deal: Deal) => void;
 }
 
@@ -24,13 +25,9 @@ export const MobileBottomSheet = React.memo(function MobileBottomSheet(
     setActiveTime,
     activeCategory,
     setActiveCategory,
+    filteredDeals,
     onSelectDeal,
   } = props;
-
-  const filteredDeals =
-    activeCategory === "All"
-      ? dealsData
-      : dealsData.filter((d) => d.category === activeCategory);
 
   return (
     <div

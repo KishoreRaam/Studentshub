@@ -36,10 +36,10 @@ export const categories = [
   { label: "Transport", emoji: "🚌", value: "Transport" },
 ];
 
-export function toGeoJSON(): GeoJSON.FeatureCollection {
+export function toGeoJSON(data: Deal[] = dealsData): GeoJSON.FeatureCollection {
   return {
     type: "FeatureCollection",
-    features: dealsData.map((deal) => ({
+    features: data.map((deal) => ({
       type: "Feature",
       properties: {
         id: deal.id,

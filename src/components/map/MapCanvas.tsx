@@ -1,14 +1,14 @@
 import { useEffect, useRef, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { dealsData, toGeoJSON, type Deal } from "../../data/discountLocations";
+import { toGeoJSON, type Deal } from "../../data/discountLocations";
 import type { TimeOfDay } from "../../hooks/useMapState";
 
 interface MapCanvasProps {
   showHeatmap: boolean;
   showDiscounts: boolean;
   activeTime: TimeOfDay;
-  activeCategory: string;
+  filteredDeals: Deal[];
   onMarkerClick: (deal: Deal) => void;
   onMapReady: (map: mapboxgl.Map) => void;
 }
@@ -23,13 +23,18 @@ export function MapCanvas({
   showHeatmap,
   showDiscounts,
   activeTime,
-  activeCategory,
+  filteredDeals,
   onMarkerClick,
   onMapReady,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const filteredDealsRef = useRef<Deal[]>(filteredDeals);
+
+  useEffect(() => {
+    filteredDealsRef.current = filteredDeals;
+  }, [filteredDeals]);
 
   const clearMarkers = useCallback(() => {
     markersRef.current.forEach((m) => m.remove());
@@ -40,13 +45,7 @@ export function MapCanvas({
     (map: mapboxgl.Map) => {
       clearMarkers();
       if (!showDiscounts) return;
-
-      const filtered =
-        activeCategory === "All"
-          ? dealsData
-          : dealsData.filter((d) => d.category === activeCategory);
-
-      filtered.forEach((deal) => {
+      filteredDeals.forEach((deal) => {
         const el = document.createElement("div");
         el.className = "deal-marker";
         el.innerHTML = `
@@ -79,7 +78,7 @@ export function MapCanvas({
         markersRef.current.push(marker);
       });
     },
-    [activeCategory, showDiscounts, onMarkerClick, clearMarkers]
+    [filteredDeals, showDiscounts, onMarkerClick, clearMarkers]
   );
 
   // Initialize map
@@ -113,7 +112,7 @@ export function MapCanvas({
       // Add GeoJSON source
       map.addSource("deals-heat", {
         type: "geojson",
-        data: toGeoJSON(),
+        data: toGeoJSON(filteredDealsRef.current),
       });
 
       // Add heatmap layer
@@ -180,6 +179,17 @@ export function MapCanvas({
     if (!mapRef.current) return;
     addMarkers(mapRef.current);
   }, [addMarkers]);
+
+  // Update GeoJSON source when filtered deals change (without reinitializing the map)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+
+    const source = map.getSource("deals-heat") as mapboxgl.GeoJSONSource | undefined;
+    if (!source) return;
+
+    source.setData(toGeoJSON(filteredDeals));
+  }, [filteredDeals]);
 
   // Toggle heatmap visibility
   useEffect(() => {
