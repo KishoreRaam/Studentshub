@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
 /* Mapbox overrides */
 .mapboxgl-ctrl-attrib {
   font-family: 'DM Sans', sans-serif !important;

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Menu, X, Home, Gift, BarChart3, Settings, Star, Search, BookOpen, Calendar, MapPin } from 'lucide-react';
+import { Menu, X, Home, Gift, BarChart3, Settings, Star, Search, BookOpen, MapPin, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthButtons } from './AuthButtons';
 import { ThemeToggle } from './ThemeToggle';

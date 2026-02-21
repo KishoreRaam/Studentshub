@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, Store } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 
 const navLinks = [
@@ -160,6 +160,33 @@ export const MapNavBar = React.memo(function MapNavBar({
             </div>
           ))}
         </div>
+
+        {/* Vendor CTA */}
+        <Link
+          to="/vendors"
+          className="ml-3 no-underline flex items-center gap-1.5 transition-all"
+          style={{
+            padding: "6px 14px",
+            borderRadius: 9999,
+            background: "linear-gradient(135deg, #0a0a0a 0%, #1e293b 100%)",
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
+            color: "#fff",
+            letterSpacing: "0.2px",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "linear-gradient(135deg, #1e293b 0%, #334155 100%)";
+            e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.15)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "linear-gradient(135deg, #0a0a0a 0%, #1e293b 100%)";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          <Store size={14} />
+          For Vendors
+        </Link>
 
         {/* Separator */}
         <div

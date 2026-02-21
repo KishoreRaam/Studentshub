@@ -12,7 +12,6 @@ import { EmailInquiryWidget } from "./components/EmailInquiryWidget";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Perks from "./pages/Perks";
-import Events from "./pages/Events";
 import Login from "./pages/Login/index";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -26,10 +25,12 @@ import AITools from "./pages/AITools";
 import BusinessModel from "./pages/BusinessModel";
 import CollegePortal from "./pages/CollegePortal";
 import MapPage from "./pages/MapPage";
+import VendorLanding from "./pages/VendorLanding";
 
 export default function App() {
   const location = useLocation();
   const isMapPage = location.pathname === "/map";
+  const isVendorPage = location.pathname === "/vendors";
 
   useEffect(() => {
     ReactGA.send({ hitType: "pageview", page: location.pathname });
@@ -40,7 +41,11 @@ export default function App() {
       <SearchProvider>
         <ScrollToTop />
 
-        {isMapPage ? (
+        {isVendorPage ? (
+          <Routes>
+            <Route path="/vendors" element={<VendorLanding />} />
+          </Routes>
+        ) : isMapPage ? (
           <>
             {/* Show main Header on mobile for map page */}
             <div className="md:hidden">
@@ -66,7 +71,6 @@ export default function App() {
                 }
               />
               <Route path="/perks" element={<Perks />} />
-              <Route path="/events" element={<Events />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
