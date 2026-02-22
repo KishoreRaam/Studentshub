@@ -9,6 +9,7 @@ import { StudentTestimonials } from "../components/StudentTestimonials";
 import { FAQ } from "../components/FAQ";
 import { PartnerLogos } from "../components/PartnerLogos";
 import StudentMapSection from "../components/home/StudentMapSection";
+import { EventsPreviewSection } from "../components/home/EventsPreviewSection";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       <section id="home">
         <HeroSection />
       </section>
+      <EventsPreviewSection />
       <FreeResourcesSection />
       <AIToolsSection />
       <section id="benefits">

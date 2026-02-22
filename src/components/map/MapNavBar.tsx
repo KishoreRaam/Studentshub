@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Store } from "lucide-react";
+import { Search, Store, Menu, X, Map, Gift, BookOpen, Wrench } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 
 const navLinks = [
@@ -20,6 +20,7 @@ export const MapNavBar = React.memo(function MapNavBar({
   onSearchChange,
 }: MapNavBarProps) {
   const { user, loading } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const userName = user?.name?.trim() || "";
   const userInitials = userName
@@ -31,7 +32,157 @@ export const MapNavBar = React.memo(function MapNavBar({
         .join("")
     : "";
 
+  const mobileNavLinks = [
+    { label: "Map", to: "/map", icon: Map },
+    { label: "Perks", to: "/perks", icon: Gift },
+    { label: "Resources", to: "/resources", icon: BookOpen },
+    { label: "AI Tools", to: "/tools", icon: Wrench },
+  ];
+
   return (
+    <>
+    {/* Mobile navbar */}
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 md:hidden flex items-center gap-2 px-4"
+      style={{
+        height: 56,
+        background: "#fff",
+        borderBottom: "0.8px solid #e5e7eb",
+      }}
+    >
+      {/* Logo */}
+      <Link to="/" className="flex items-center gap-1 no-underline shrink-0">
+        <span
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontWeight: 700,
+            fontSize: 18,
+            color: "#0a0a0a",
+          }}
+        >
+          StudentPerks
+        </span>
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            background: "#1a56db",
+            display: "inline-block",
+            marginLeft: 2,
+            marginBottom: 6,
+          }}
+        />
+      </Link>
+
+      {/* Search bar — fills middle space, but doesn't overflow */}
+      <div
+        className="flex items-center gap-2 px-3"
+        style={{
+          flex: "1 1 0",
+          minWidth: 0,
+          maxWidth: 160,
+          height: 36,
+          borderRadius: 9999,
+          background: "#f9fafb",
+          border: "0.8px solid #e5e7eb",
+        }}
+      >
+        <Search size={14} color="rgba(10,10,10,0.4)" style={{ flexShrink: 0 }} />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search..."
+          className="bg-transparent border-none outline-none"
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: 13,
+            color: "#0a0a0a",
+            minWidth: 0,
+            width: "100%",
+          }}
+        />
+      </div>
+
+      {/* Right side: For Vendors + hamburger */}
+      <div className="flex items-center gap-2 shrink-0">
+        <Link
+          to="/vendors"
+          className="no-underline flex items-center gap-1"
+          style={{
+            padding: "6px 10px",
+            borderRadius: 9999,
+            background: "linear-gradient(135deg, #0a0a0a 0%, #1e293b 100%)",
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            color: "#fff",
+            letterSpacing: "0.2px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <Store size={12} />
+          For Vendors
+        </Link>
+
+        <button
+          onClick={() => setMobileMenuOpen((v) => !v)}
+          style={{
+            width: 34,
+            height: 34,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "none",
+            border: "0.8px solid #e5e7eb",
+            borderRadius: 8,
+            cursor: "pointer",
+          }}
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X size={17} color="#374151" /> : <Menu size={17} color="#374151" />}
+        </button>
+      </div>
+
+      {/* Mobile dropdown menu */}
+      {mobileMenuOpen && (
+        <div
+          className="absolute left-0 right-0 flex flex-col"
+          style={{
+            top: 56,
+            background: "#fff",
+            borderBottom: "0.8px solid #e5e7eb",
+            padding: "8px 16px 12px",
+            gap: 2,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+          }}
+        >
+          {mobileNavLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className="no-underline flex items-center gap-3 px-3 py-2.5 rounded-lg"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "#374151",
+                }}
+              >
+                <Icon size={16} color="#6b7280" />
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </nav>
+
+    {/* Desktop navbar */}
     <nav
       className="fixed top-0 left-0 right-0 z-50 hidden md:flex items-center px-6"
       style={{
@@ -114,9 +265,9 @@ export const MapNavBar = React.memo(function MapNavBar({
       </div>
 
       {/* Right section */}
-      <div className="flex items-center gap-0 shrink-0">
+      <div className="flex items-center gap-3 shrink-0">
         {/* Nav links */}
-        <div className="flex items-center gap-0">
+        <div className="flex items-center gap-1">
           {navLinks.map((link) => (
             <div key={link.label} className="relative flex flex-col items-center">
               {link.active ? (
@@ -164,7 +315,7 @@ export const MapNavBar = React.memo(function MapNavBar({
         {/* Vendor CTA */}
         <Link
           to="/vendors"
-          className="ml-3 no-underline flex items-center gap-1.5 transition-all"
+          className="no-underline flex items-center gap-1.5 transition-all"
           style={{
             padding: "6px 14px",
             borderRadius: 9999,
@@ -190,11 +341,11 @@ export const MapNavBar = React.memo(function MapNavBar({
 
         {/* Separator */}
         <div
-          className="mx-4"
           style={{
             width: 1,
             height: 24,
             background: "#e5e7eb",
+            flexShrink: 0,
           }}
         />
 
@@ -283,5 +434,6 @@ export const MapNavBar = React.memo(function MapNavBar({
         )}
       </div>
     </nav>
+    </>
   );
 });

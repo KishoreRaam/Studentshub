@@ -26,11 +26,13 @@ import BusinessModel from "./pages/BusinessModel";
 import CollegePortal from "./pages/CollegePortal";
 import MapPage from "./pages/MapPage";
 import VendorLanding from "./pages/VendorLanding";
+import EventsLanding from "./pages/EventsLanding";
 
 export default function App() {
   const location = useLocation();
   const isMapPage = location.pathname === "/map";
   const isVendorPage = location.pathname === "/vendors";
+  const isEventsPage = location.pathname === "/events";
 
   useEffect(() => {
     ReactGA.send({ hitType: "pageview", page: location.pathname });
@@ -41,20 +43,18 @@ export default function App() {
       <SearchProvider>
         <ScrollToTop />
 
-        {isVendorPage ? (
+        {isEventsPage ? (
+          <Routes>
+            <Route path="/events" element={<EventsLanding />} />
+          </Routes>
+        ) : isVendorPage ? (
           <Routes>
             <Route path="/vendors" element={<VendorLanding />} />
           </Routes>
         ) : isMapPage ? (
-          <>
-            {/* Show main Header on mobile for map page */}
-            <div className="md:hidden">
-              <Header />
-            </div>
-            <Routes>
-              <Route path="/map" element={<MapPage />} />
-            </Routes>
-          </>
+          <Routes>
+            <Route path="/map" element={<MapPage />} />
+          </Routes>
         ) : (
           <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
             <Header />
