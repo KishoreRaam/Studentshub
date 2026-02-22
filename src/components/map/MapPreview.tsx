@@ -35,5 +35,5 @@ export function MapPreview() {
     };
   }, []);
 
-  return <div ref={containerRef} className="h-full w-full" />;
+  return <div ref={containerRef} className="absolute inset-0 w-full h-full rounded-2xl" />;
 }
