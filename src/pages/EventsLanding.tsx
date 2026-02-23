@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'motion/react';
 import { Link } from 'react-router-dom';
+import { ThemeToggle } from '../components/ThemeToggle';
 import {
   Search, Filter, MapPin, Calendar, Clock, Users, ChevronDown,
   Zap, Palette, Trophy, BookOpen, Monitor, ArrowRight, Upload,
@@ -18,23 +19,23 @@ gsap.registerPlugin(ScrollTrigger);
 
 // ── Design Tokens ─────────────────────────────────────────────────────────────
 const C = {
-  blue:        '#1A56DB',
-  blueDark:    '#1548c7',
-  dark:        '#0A0A0A',
-  body:        '#374151',
-  muted:       '#6B7280',
-  border:      '#E5E7EB',
-  blueLight:   '#EBF2FF',
-  white:       '#FFFFFF',
-  grayBg:      '#F9FAFB',
-  green:       '#10B981',
-  greenLight:  '#ECFDF5',
-  amber:       '#D97706',
-  amberLight:  '#FFFBEB',
-  purple:      '#7C3AED',
-  purpleLight: '#F3E8FF',
-  red:         '#EF4444',
-  redLight:    '#FEF2F2',
+  blue:        'var(--el-blue, #1A56DB)',
+  blueDark:    'var(--el-blueDark, #1548c7)',
+  dark:        'var(--el-dark, #0A0A0A)',
+  body:        'var(--el-body, #374151)',
+  muted:       'var(--el-muted, #6B7280)',
+  border:      'var(--el-border, #E5E7EB)',
+  blueLight:   'var(--el-blueLight, #EBF2FF)',
+  white:       'var(--el-white, #FFFFFF)',
+  grayBg:      'var(--el-grayBg, #F9FAFB)',
+  green:       'var(--el-green, #10B981)',
+  greenLight:  'var(--el-greenLight, #ECFDF5)',
+  amber:       'var(--el-amber, #D97706)',
+  amberLight:  'var(--el-amberLight, #FFFBEB)',
+  purple:      'var(--el-purple, #7C3AED)',
+  purpleLight: 'var(--el-purpleLight, #F3E8FF)',
+  red:         'var(--el-red, #EF4444)',
+  redLight:    'var(--el-redLight, #FEF2F2)',
 };
 
 // ── Font helpers ──────────────────────────────────────────────────────────────
@@ -135,7 +136,7 @@ function FloatingCard({ title, date, color, icon, style }: {
       background: C.white,
       border: `0.8px solid ${C.border}`,
       borderRadius: 14,
-      boxShadow: '0px 8px 24px rgba(0,0,0,0.08)',
+      boxShadow: '0px 8px 24px var(--el-shadow-1)',
       padding: '12px 16px',
       display: 'flex',
       alignItems: 'center',
@@ -282,6 +283,55 @@ export default function EventsLanding() {
     <>
       {/* ─ Responsive CSS ─ */}
       <style>{`
+        :root {
+          --el-white-rgb: 255, 255, 255;
+          --el-blue: #1A56DB;
+          --el-blueDark: #1548c7;
+          --el-dark: #0A0A0A;
+          --el-body: #374151;
+          --el-muted: #6B7280;
+          --el-border: #E5E7EB;
+          --el-blueLight: #EBF2FF;
+          --el-white: #FFFFFF;
+          --el-grayBg: #F9FAFB;
+          --el-green: #10B981;
+          --el-greenLight: #ECFDF5;
+          --el-amber: #D97706;
+          --el-amberLight: #FFFBEB;
+          --el-purple: #7C3AED;
+          --el-purpleLight: #F3E8FF;
+          --el-red: #EF4444;
+          --el-redLight: #FEF2F2;
+          --el-bg-overlay: rgba(255,255,255,0.92);
+          --el-bg-card: rgba(255,255,255,0.25);
+          --el-shadow-1: rgba(0,0,0,0.08);
+          --el-shadow-2: rgba(0,0,0,0.12);
+        }
+        .dark {
+          --el-white-rgb: 10, 10, 10;
+          --el-blue: #1A56DB;
+          --el-blueDark: #1548c7;
+          --el-dark: #FFFFFF;
+          --el-body: #D1D5DB;
+          --el-muted: #9CA3AF;
+          --el-border: #374151;
+          --el-blueLight: rgba(26,86,219,0.15);
+          --el-white: #0A0A0A;
+          --el-grayBg: #111827;
+          --el-green: #10B981;
+          --el-greenLight: rgba(16,185,129,0.15);
+          --el-amber: #D97706;
+          --el-amberLight: rgba(217,119,6,0.15);
+          --el-purple: #7C3AED;
+          --el-purpleLight: rgba(124,58,237,0.15);
+          --el-red: #EF4444;
+          --el-redLight: rgba(239,68,68,0.15);
+          --el-bg-overlay: rgba(10,10,10,0.92);
+          --el-bg-card: rgba(10,10,10,0.4);
+          --el-shadow-1: rgba(0,0,0,0.4);
+          --el-shadow-2: rgba(0,0,0,0.5);
+        }
+      
         .el-hero-cards { display:block; }
         .el-cat-grid { display:flex; gap:20px; overflow-x:auto; padding-bottom:16px; scroll-snap-type:x mandatory; }
         .el-cat-grid::-webkit-scrollbar { display:none; }
@@ -329,7 +379,7 @@ export default function EventsLanding() {
         ══════════════════════════════════════════════════════════════════ */}
         <nav style={{
           position: 'sticky', top: 0, zIndex: 50,
-          background: 'rgba(255,255,255,0.92)',
+          background: 'var(--el-bg-overlay)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: `0.8px solid ${C.border}`,
@@ -368,6 +418,7 @@ export default function EventsLanding() {
                     }}>{label}</button>
                 );
               })}
+              <ThemeToggle />
               <button onClick={() => scrollTo('organizers')}
                 className="el-cta-btn"
                 style={{
@@ -395,6 +446,7 @@ export default function EventsLanding() {
               <span style={{ ...Fb, fontWeight: 700, fontSize: 16, color: C.dark }}>StudentsHub</span>
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              <ThemeToggle />
               <button onClick={() => scrollTo('organizers')}
                 className="el-cta-btn"
                 style={{
@@ -422,7 +474,7 @@ export default function EventsLanding() {
               padding: '8px 16px 14px',
               borderTop: `0.8px solid ${C.border}`,
               gap: 2, background: C.white,
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+              boxShadow: '0 4px 16px var(--el-shadow-1)',
             }}>
               {['Categories', 'This Week', 'For Organizers'].map((label, i) => {
                 const ids = ['categories', 'this-week', 'organizers'];
@@ -635,22 +687,22 @@ export default function EventsLanding() {
               }}>
                 <div style={{ textAlign: 'center', color: C.white, padding: 40 }}>
                   <div style={{
-                    ...Fm, fontSize: 14, background: 'rgba(255,255,255,0.2)',
+                    ...Fm, fontSize: 14, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)',
                     padding: '6px 16px', borderRadius: 8, display: 'inline-block', marginBottom: 16,
                   }}>FEATURED</div>
                   <h3 style={{ ...Fd, fontSize: 32, margin: '0 0 8px' }}>TechnoVanza 2026</h3>
                   <p style={{ ...Fb, fontSize: 16, opacity: 0.9 }}>Innovation Summit & Hackathon</p>
                   <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
-                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 9999 }}>Hackathon</span>
-                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 9999 }}>Workshops</span>
-                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 9999 }}>Prizes Worth ₹5L</span>
+                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)', padding: '4px 12px', borderRadius: 9999 }}>Hackathon</span>
+                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)', padding: '4px 12px', borderRadius: 9999 }}>Workshops</span>
+                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)', padding: '4px 12px', borderRadius: 9999 }}>Prizes Worth ₹5L</span>
                   </div>
                 </div>
                 {/* Play button overlay */}
                 <div style={{
                   position: 'absolute', bottom: 20, right: 20,
                   width: 48, height: 48, borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.25)',
+                  background: 'var(--el-bg-card)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer',
                 }}>
@@ -1109,7 +1161,7 @@ export default function EventsLanding() {
                 background: C.white,
                 border: `0.8px solid ${C.border}`,
                 borderRadius: 16,
-                boxShadow: '0px 12px 40px rgba(0,0,0,0.08)',
+                boxShadow: '0px 12px 40px var(--el-shadow-1)',
                 padding: 32,
               }}>
                 <h3 style={{ ...Fb, fontWeight: 600, fontSize: 18, color: C.dark, margin: '0 0 24px' }}>Create Event</h3>
@@ -1349,7 +1401,7 @@ export default function EventsLanding() {
                   <Tooltip
                     contentStyle={{
                       ...Fb, fontSize: 13, borderRadius: 8, border: `0.8px solid ${C.border}`,
-                      boxShadow: '0px 4px 12px rgba(0,0,0,0.08)',
+                      boxShadow: '0px 4px 12px var(--el-shadow-1)',
                     }}
                   />
                   <Area type="monotone" dataKey="views" stroke={C.blue} strokeWidth={2} fill="url(#viewsGrad)" />
@@ -1420,7 +1472,7 @@ export default function EventsLanding() {
                     <Tooltip
                       contentStyle={{
                         ...Fb, fontSize: 13, borderRadius: 8, border: `0.8px solid ${C.border}`,
-                        boxShadow: '0px 4px 12px rgba(0,0,0,0.08)',
+                        boxShadow: '0px 4px 12px var(--el-shadow-1)',
                       }}
                     />
                     <Bar dataKey="count" fill={C.blue} radius={[4, 4, 0, 0]} />
@@ -1473,10 +1525,10 @@ export default function EventsLanding() {
                     placeholder="Enter your email address"
                     style={{
                       flex: 1, height: 48,
-                      border: '0.8px solid rgba(255,255,255,0.15)',
+                      border: '0.8px solid rgba(var(--el-white-rgb, 255, 255, 255), 0.15)',
                       borderRadius: 10, padding: '0 16px',
                       ...Fb, fontWeight: 400, fontSize: 14,
-                      color: C.white, background: 'rgba(255,255,255,0.08)',
+                      color: C.white, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.08)',
                       outline: 'none', boxSizing: 'border-box',
                     }}
                   />
@@ -1503,7 +1555,7 @@ export default function EventsLanding() {
         {/* Footer */}
         <footer style={{
           background: C.dark,
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          borderTop: '1px solid rgba(var(--el-white-rgb, 255, 255, 255), 0.08)',
           padding: '32px 24px',
         }}>
           <div style={{ maxWidth: 1183, margin: '0 auto' }}>

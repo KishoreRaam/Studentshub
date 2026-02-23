@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
+import { ThemeToggle } from '../components/ThemeToggle';
 import {
   FileText, CheckCircle, MapPin, BarChart3,
   TrendingUp, Eye, MousePointerClick, Clock,
@@ -15,20 +16,20 @@ import {
 
 // ── Design Tokens ─────────────────────────────────────────────────────────────
 const C = {
-  blue:        '#1A56DB',
-  dark:        '#0A0A0A',
-  body:        '#374151',
-  muted:       '#6B7280',
-  border:      '#E5E7EB',
-  blueLight:   '#EBF2FF',
-  white:       '#FFFFFF',
-  grayBg:      '#F9FAFB',
-  green:       '#10B981',
-  greenLight:  '#ECFDF5',
-  amber:       '#D97706',
-  amberLight:  '#FFFBEB',
-  purpleLight: '#F3E8FF',
-  mapBg:       '#F0F4F8',
+  blue:        'var(--vl-blue, #1A56DB)',
+  dark:        'var(--vl-dark, #0A0A0A)',
+  body:        'var(--vl-body, #374151)',
+  muted:       'var(--vl-muted, #6B7280)',
+  border:      'var(--vl-border, #E5E7EB)',
+  blueLight:   'var(--vl-blueLight, #EBF2FF)',
+  white:       'var(--vl-white, #FFFFFF)',
+  grayBg:      'var(--vl-grayBg, #F9FAFB)',
+  green:       'var(--vl-green, #10B981)',
+  greenLight:  'var(--vl-greenLight, #ECFDF5)',
+  amber:       'var(--vl-amber, #D97706)',
+  amberLight:  'var(--vl-amberLight, #FFFBEB)',
+  purpleLight: 'var(--vl-purpleLight, #F3E8FF)',
+  mapBg:       'var(--vl-mapBg, #F0F4F8)',
 };
 
 // ── Font helpers ──────────────────────────────────────────────────────────────
@@ -109,7 +110,7 @@ function MapMockup({ height = 280, showLegend = false }: { height?: number; show
           background: C.white,
           border: `1.6px solid ${C.blue}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0px 4px 12px rgba(0,0,0,0.08)',
+          boxShadow: '0px 4px 12px var(--vl-shadow-1)',
           transform: 'translate(-50%,-50%)',
           zIndex: 2,
         }}>
@@ -131,7 +132,7 @@ function MapMockup({ height = 280, showLegend = false }: { height?: number; show
           transform: 'translateX(-50%)',
           background: C.white,
           borderRadius: 12,
-          boxShadow: '0px 8px 24px rgba(0,0,0,0.12)',
+          boxShadow: '0px 8px 24px var(--vl-shadow-2)',
           border: `0.8px solid ${C.border}`,
           padding: '10px 12px',
           width: 180,
@@ -185,12 +186,12 @@ function MapMockup({ height = 280, showLegend = false }: { height?: number; show
       {showLegend && (
         <div style={{
           position: 'absolute', bottom: 12, left: 12,
-          background: 'rgba(255,255,255,0.92)',
+          background: 'var(--vl-bg-overlay)',
           backdropFilter: 'blur(4px)',
           borderRadius: 8,
           padding: '6px 14px',
           display: 'flex', alignItems: 'center', gap: 14,
-          boxShadow: '0px 2px 8px rgba(0,0,0,0.08)',
+          boxShadow: '0px 2px 8px var(--vl-shadow-1)',
           zIndex: 10,
           border: `0.8px solid ${C.border}`,
         }}>
@@ -260,6 +261,49 @@ export default function VendorLanding() {
     <>
       {/* ─ Responsive CSS ─ */}
       <style>{`
+        :root {
+          --vl-white-rgb: 255, 255, 255;
+          --vl-blue: #1A56DB;
+          --vl-dark: #0A0A0A;
+          --vl-body: #374151;
+          --vl-muted: #6B7280;
+          --vl-border: #E5E7EB;
+          --vl-blueLight: #EBF2FF;
+          --vl-white: #FFFFFF;
+          --vl-grayBg: #F9FAFB;
+          --vl-green: #10B981;
+          --vl-greenLight: #ECFDF5;
+          --vl-amber: #D97706;
+          --vl-amberLight: #FFFBEB;
+          --vl-purpleLight: #F3E8FF;
+          --vl-mapBg: #F0F4F8;
+          --vl-bg-overlay: rgba(255,255,255,0.92);
+          --vl-bg-card: rgba(255,255,255,0.25);
+          --vl-shadow-1: rgba(0,0,0,0.08);
+          --vl-shadow-2: rgba(0,0,0,0.12);
+        }
+        .dark {
+          --vl-white-rgb: 10, 10, 10;
+          --vl-blue: #1A56DB;
+          --vl-dark: #FFFFFF;
+          --vl-body: #D1D5DB;
+          --vl-muted: #9CA3AF;
+          --vl-border: #374151;
+          --vl-blueLight: rgba(26,86,219,0.15);
+          --vl-white: #0A0A0A;
+          --vl-grayBg: #111827;
+          --vl-green: #10B981;
+          --vl-greenLight: rgba(16,185,129,0.15);
+          --vl-amber: #D97706;
+          --vl-amberLight: rgba(217,119,6,0.15);
+          --vl-purpleLight: rgba(124,58,237,0.15);
+          --vl-mapBg: #111827;
+          --vl-bg-overlay: rgba(10,10,10,0.92);
+          --vl-bg-card: rgba(10,10,10,0.4);
+          --vl-shadow-1: rgba(0,0,0,0.4);
+          --vl-shadow-2: rgba(0,0,0,0.5);
+        }
+      
         .vl-hero-grid   { display:grid; grid-template-columns:1fr 1fr; gap:65px; align-items:center; }
         .vl-steps-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; position:relative; }
         .vl-map-grid    { display:grid; grid-template-columns:2fr 1fr; gap:48px; align-items:start; }
@@ -321,7 +365,7 @@ export default function VendorLanding() {
         ══════════════════════════════════════════════════════════════════ */}
         <nav style={{
           position: 'sticky', top: 0, zIndex: 50,
-          background: 'rgba(255,255,255,0.92)',
+          background: 'var(--vl-bg-overlay)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: `0.8px solid ${C.border}`,
@@ -363,6 +407,7 @@ export default function VendorLanding() {
                     }}>{label}</button>
                 );
               })}
+              <ThemeToggle />
               <button onClick={() => scrollTo('apply')}
                 className="vl-apply-btn"
                 style={{
@@ -396,6 +441,7 @@ export default function VendorLanding() {
 
             {/* Right: Apply Now + hamburger */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              <ThemeToggle />
               <button onClick={() => scrollTo('apply')}
                 className="vl-apply-btn"
                 style={{
@@ -428,7 +474,7 @@ export default function VendorLanding() {
               borderTop: `0.8px solid ${C.border}`,
               gap: 2,
               background: C.white,
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+              boxShadow: '0 4px 16px var(--vl-shadow-1)',
             }}>
               {(['How It Works', 'Benefits', 'Pricing'] as const).map((label, i) => {
                 const ids = ['how-it-works', 'benefits', 'pricing'];
@@ -565,7 +611,7 @@ export default function VendorLanding() {
                     background: C.white,
                     border: `0.8px solid ${C.border}`,
                     borderRadius: 14,
-                    boxShadow: '0px 8px 24px rgba(0,0,0,0.08)',
+                    boxShadow: '0px 8px 24px var(--vl-shadow-1)',
                     padding: '10px 14px',
                     display: 'flex', alignItems: 'center', gap: 10,
                   }}
@@ -589,7 +635,7 @@ export default function VendorLanding() {
                   background: C.white,
                   border: `0.8px solid ${C.border}`,
                   borderRadius: 16,
-                  boxShadow: '0px 25px 50px rgba(0,0,0,0.12), 0px 10px 20px rgba(0,0,0,0.06)',
+                  boxShadow: '0px 25px 50px var(--vl-shadow-2), 0px 10px 20px rgba(0,0,0,0.06)',
                   overflow: 'hidden',
                 }}>
                   {/* Top bar */}
