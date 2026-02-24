@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { OAuthProvider } from 'appwrite';
 import { account, OAUTH_CONFIG, AppwriteID } from '../lib/appwrite.js';
 
 interface AuthContextType {
@@ -52,8 +53,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Login with Google OAuth
   const loginWithGoogle = async () => {
     try {
+      console.log('[Auth] Starting Google OAuth...', {
+        successUrl: OAUTH_CONFIG.SUCCESS_URL,
+        failureUrl: OAUTH_CONFIG.FAILURE_URL,
+      });
       account.createOAuth2Session(
-        'google' as any,
+        OAuthProvider.Google,
         OAUTH_CONFIG.SUCCESS_URL,
         OAUTH_CONFIG.FAILURE_URL
       );

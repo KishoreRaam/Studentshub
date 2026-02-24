@@ -1,15 +1,24 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { GoogleIcon, SheerIDIcon } from './AuthIcons';
 import './AuthStyles.css';
 
 const SignInPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { loginWithGoogle, loginWithEmail, user, loading } = useAuth();
   const [formData, setFormData] = React.useState({ email: '', password: '' });
   const [error, setError] = React.useState('');
   const [submitting, setSubmitting] = React.useState(false);
+
+  // Show OAuth error if redirected back with error param
+  useEffect(() => {
+    const oauthError = searchParams.get('error');
+    if (oauthError === 'oauth_failed') {
+      setError('Google sign-in failed. Please check that Google OAuth is enabled in Appwrite Console and try again.');
+    }
+  }, [searchParams]);
 
   // Redirect if user is already logged in
   useEffect(() => {

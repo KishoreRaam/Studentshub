@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { databases, DATABASE_ID, COLLECTIONS } from '../lib/appwrite';
 import { useAuth } from '../contexts/AuthContext';
 
+const ADMIN_IDS = ['68ff4c5816bf5338810a', '68fe7498057792229b3d'];
+
 interface UseUserRoleResult {
   role: string;
   isAdmin: boolean;
@@ -30,10 +32,11 @@ export function useUserRole(): UseUserRoleResult {
           COLLECTIONS.USERS_META,
           user.$id
         );
-        setRole(doc.role || 'user');
-      } catch {
+        setRole(doc.role || 'student');
+      } catch (err) {
+        console.warn('useUserRole failed to fetch user doc:', err);
         // Document not found — default to regular user
-        setRole('user');
+        setRole('student');
       } finally {
         setLoading(false);
       }
@@ -42,5 +45,10 @@ export function useUserRole(): UseUserRoleResult {
     fetchRole();
   }, [user]);
 
-  return { role, isAdmin: role === 'admin', loading, error };
+  // Check both the fetched role and the hardcoded IDs for robustness
+  const isUserAdmin = Boolean(role === 'admin' || (user && user.$id && ADMIN_IDS.includes(user.$id)));
+
+  console.log(`[useUserRole] evaluated - user ID: ${user?.$id}, role state: ${role}, loading: ${loading}, isUserAdmin: ${isUserAdmin}`);
+
+  return { role: isUserAdmin ? 'admin' : role, isAdmin: isUserAdmin, loading, error };
 }

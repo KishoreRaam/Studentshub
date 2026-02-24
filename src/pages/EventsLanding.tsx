@@ -200,17 +200,24 @@ export default function EventsLanding() {
       try {
         setEventsLoading(true);
         const now = new Date().toISOString();
+        // Query solely by date to utilize idx_eventDate directly
         const response = await databases.listDocuments(
           DATABASE_ID,
           COLLECTIONS.EVENTS,
           [
-            Query.equal('approved', true),
             Query.greaterThanEqual('eventDate', now),
             Query.orderAsc('eventDate'),
-            Query.limit(50),
+            Query.limit(100),
           ]
         );
-        setEvents(response.documents as unknown as EventDocument[]);
+
+        // Filter approved events locally to bypass strict exact-index Appwrite requirements
+        const rawEvents = response.documents as unknown as EventDocument[];
+        console.log("RAW DB EVENTS RETURNED:", rawEvents);
+        const approvedEvents = rawEvents.filter((e: any) => e.approved === true);
+        console.log("FILTERED ADMIN EVENTS:", approvedEvents);
+
+        setEvents(approvedEvents);
       } catch (err) {
         console.error('Failed to fetch events:', err);
       } finally {
@@ -272,10 +279,22 @@ export default function EventsLanding() {
     const grouped: Record<string, EventDocument[]> = {};
     events.forEach(evt => {
       let cats: string[] = [];
-      if (Array.isArray(evt.category)) cats = evt.category;
-      else if (typeof evt.category === 'string') cats = [evt.category];
-      else if (evt.eventType) cats = [evt.eventType];
-      else cats = ['Other'];
+      let parsedCat = evt.category;
+
+      // Handle Appwrite serialized arrays if they are stuck as strings
+      if (typeof evt.category === 'string' && evt.category.startsWith('[')) {
+        try { parsedCat = JSON.parse(evt.category); } catch (e) { }
+      }
+
+      if (Array.isArray(parsedCat) && parsedCat.length > 0) {
+        cats = parsedCat;
+      } else if (typeof parsedCat === 'string' && parsedCat.trim() !== '') {
+        cats = [parsedCat.trim()];
+      } else if (evt.eventType && typeof evt.eventType === 'string' && evt.eventType.trim() !== '') {
+        cats = [evt.eventType.trim()];
+      } else {
+        cats = ['Other'];
+      }
 
       cats.forEach(cat => {
         if (!grouped[cat]) grouped[cat] = [];
