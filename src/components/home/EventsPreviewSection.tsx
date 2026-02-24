@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "motion/react";
 import { Link } from "react-router-dom";
 import {
@@ -10,6 +10,9 @@ import {
   ArrowRight,
   Users,
 } from "lucide-react";
+
+import { databases, DATABASE_ID, COLLECTIONS, eventMediaBucket } from "../../lib/appwrite";
+import { Query } from "appwrite";
 
 /* ═══════════════════════ Types ═══════════════════════ */
 
@@ -29,12 +32,12 @@ interface EventItem {
 /* ═══════════════════ Category Colors ═════════════════ */
 
 const CAT_COLORS: Record<string, { bg: string; text: string; darkBg: string; darkText: string }> = {
-  Hackathon:   { bg: "bg-[#DBEAFE]", text: "text-[#1447E6]", darkBg: "dark:bg-blue-900/40",    darkText: "dark:text-blue-300" },
-  Workshop:    { bg: "bg-[#D0FAE5]", text: "text-[#007A55]", darkBg: "dark:bg-emerald-900/40",  darkText: "dark:text-emerald-300" },
-  Sports:      { bg: "bg-[#FFE4E6]", text: "text-[#C70036]", darkBg: "dark:bg-rose-900/40",     darkText: "dark:text-rose-300" },
-  Webinar:     { bg: "bg-[#CEFAFE]", text: "text-[#007595]", darkBg: "dark:bg-cyan-900/40",     darkText: "dark:text-cyan-300" },
-  Competition: { bg: "bg-purple-100", text: "text-purple-700", darkBg: "dark:bg-purple-900/40",  darkText: "dark:text-purple-300" },
-  Cultural:    { bg: "bg-amber-100",  text: "text-amber-700",  darkBg: "dark:bg-amber-900/40",   darkText: "dark:text-amber-300" },
+  Hackathon: { bg: "bg-[#DBEAFE]", text: "text-[#1447E6]", darkBg: "dark:bg-blue-900/40", darkText: "dark:text-blue-300" },
+  Workshop: { bg: "bg-[#D0FAE5]", text: "text-[#007A55]", darkBg: "dark:bg-emerald-900/40", darkText: "dark:text-emerald-300" },
+  Sports: { bg: "bg-[#FFE4E6]", text: "text-[#C70036]", darkBg: "dark:bg-rose-900/40", darkText: "dark:text-rose-300" },
+  Webinar: { bg: "bg-[#CEFAFE]", text: "text-[#007595]", darkBg: "dark:bg-cyan-900/40", darkText: "dark:text-cyan-300" },
+  Competition: { bg: "bg-purple-100", text: "text-purple-700", darkBg: "dark:bg-purple-900/40", darkText: "dark:text-purple-300" },
+  Cultural: { bg: "bg-amber-100", text: "text-amber-700", darkBg: "dark:bg-amber-900/40", darkText: "dark:text-amber-300" },
 };
 
 /* ═══════════════════ Sample Data ═════════════════════ */
@@ -177,11 +180,10 @@ function EventCard({
           }}
         >
           <Bookmark
-            className={`w-[16px] h-[16px] ${
-              event.bookmarked
+            className={`w-[16px] h-[16px] ${event.bookmarked
                 ? "fill-[#1A56DB] text-[#1A56DB] dark:fill-blue-400 dark:text-blue-400"
                 : "text-[#6A7282] dark:text-gray-400"
-            }`}
+              }`}
             strokeWidth={2}
           />
         </button>
@@ -230,9 +232,8 @@ function EventCard({
           className="flex items-center justify-between mt-auto pt-[12px] pb-[20px] border-t border-[#F3F4F6] dark:border-gray-700"
         >
           <span
-            className={`flex items-center gap-[6px] font-body font-medium text-[12px] leading-[18px] ${
-              isLow ? "text-[#EC003F] dark:text-rose-400" : "text-[#6A7282] dark:text-gray-400"
-            }`}
+            className={`flex items-center gap-[6px] font-body font-medium text-[12px] leading-[18px] ${isLow ? "text-[#EC003F] dark:text-rose-400" : "text-[#6A7282] dark:text-gray-400"
+              }`}
           >
             <Users className="w-[14px] h-[14px]" strokeWidth={2} />
             {event.spotsLeft} spots left
@@ -281,6 +282,80 @@ export function EventsPreviewSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
+
+  useEffect(() => {
+    const fetchLiveEvents = async () => {
+      try {
+        const now = new Date().toISOString();
+        const response = await databases.listDocuments(
+          DATABASE_ID,
+          COLLECTIONS.EVENTS,
+          [
+            Query.greaterThanEqual('eventDate', now),
+            Query.orderAsc('eventDate'),
+            Query.limit(10),
+          ]
+        );
+
+        const rawEvents = response.documents as any[];
+        const approvedEvents = rawEvents.filter(e => e.approved === true);
+
+        if (approvedEvents.length > 0) {
+          const mappedEvents: EventItem[] = approvedEvents.map(evt => {
+            // Determine Poster logic (Matches EventsLanding logic)
+            let poster = "https://images.unsplash.com/photo-1561089489-f13d5e730d72?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=720&q=80";
+            if (evt.posterFileId && eventMediaBucket) {
+              const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1';
+              const project = import.meta.env.VITE_APPWRITE_PROJECT || '';
+              poster = `${endpoint}/storage/buckets/${eventMediaBucket}/files/${evt.posterFileId}/preview?project=${project}&width=600&height=400`;
+            } else if (evt.thumbnailUrl) {
+              poster = evt.thumbnailUrl;
+            }
+
+            // Figure out valid string category
+            let rawCat = "Workshop";
+            if (evt.category) {
+              if (typeof evt.category === 'string' && evt.category.startsWith('[')) {
+                try {
+                  const parsed = JSON.parse(evt.category);
+                  if (Array.isArray(parsed) && parsed.length > 0) rawCat = parsed[0];
+                } catch (e) { }
+              } else if (Array.isArray(evt.category) && evt.category.length > 0) {
+                rawCat = evt.category[0];
+              } else if (typeof evt.category === 'string') {
+                rawCat = evt.category;
+              }
+            } else if (evt.eventType) {
+              rawCat = evt.eventType;
+            }
+
+            // Constrain string category into the strictest type definitions we have layout colors for
+            const validCategories = ["Hackathon", "Workshop", "Sports", "Webinar", "Competition", "Cultural"];
+            const resolvedCat = validCategories.includes(rawCat) ? rawCat as any : "Workshop";
+
+            return {
+              id: evt.$id,
+              title: evt.title || "Upcoming Event",
+              category: resolvedCat,
+              dateShort: new Date(evt.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+              location: evt.platform || evt.location || "TBA",
+              isOnline: !!evt.platform || evt.location === "Online",
+              description: evt.description || "",
+              spotsLeft: evt.maxParticipants ? Math.max(0, evt.maxParticipants - (evt.participantCount || 0)) : 100,
+              image: poster,
+              bookmarked: false,
+            };
+          });
+
+          setEvents(mappedEvents);
+        }
+      } catch (err) {
+        console.error("Failed to load generic events preview:", err);
+      }
+    };
+
+    fetchLiveEvents();
+  }, []);
 
   const maxIndex = Math.max(events.length - VISIBLE, 0);
   const dotCount = maxIndex + 1;
@@ -382,9 +457,8 @@ export function EventsPreviewSection() {
           {/* Left arrow */}
           <button
             onClick={handlePrev}
-            className={`hidden lg:flex absolute z-10 items-center justify-center bg-white dark:bg-gray-800 rounded-full cursor-pointer transition-all duration-200 hover:scale-105 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_10px_15px_rgba(0,0,0,0.1),0_4px_6px_rgba(0,0,0,0.1)] w-[48px] h-[48px] top-[200px] -left-[24px] -translate-y-1/2 ${
-              currentIndex === 0 ? "opacity-0 pointer-events-none" : "opacity-100"
-            }`}
+            className={`hidden lg:flex absolute z-10 items-center justify-center bg-white dark:bg-gray-800 rounded-full cursor-pointer transition-all duration-200 hover:scale-105 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_10px_15px_rgba(0,0,0,0.1),0_4px_6px_rgba(0,0,0,0.1)] w-[48px] h-[48px] top-[200px] -left-[24px] -translate-y-1/2 ${currentIndex === 0 ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
             aria-label="Previous"
           >
             <ChevronLeft className="w-[20px] h-[20px] text-[#374151] dark:text-gray-300" strokeWidth={2} />
@@ -393,9 +467,8 @@ export function EventsPreviewSection() {
           {/* Right arrow */}
           <button
             onClick={handleNext}
-            className={`hidden lg:flex absolute z-10 items-center justify-center bg-white dark:bg-gray-800 rounded-full cursor-pointer transition-all duration-200 hover:scale-105 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_10px_15px_rgba(0,0,0,0.1),0_4px_6px_rgba(0,0,0,0.1)] w-[48px] h-[48px] top-[200px] -right-[24px] -translate-y-1/2 ${
-              currentIndex >= maxIndex ? "opacity-0 pointer-events-none" : "opacity-100"
-            }`}
+            className={`hidden lg:flex absolute z-10 items-center justify-center bg-white dark:bg-gray-800 rounded-full cursor-pointer transition-all duration-200 hover:scale-105 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_10px_15px_rgba(0,0,0,0.1),0_4px_6px_rgba(0,0,0,0.1)] w-[48px] h-[48px] top-[200px] -right-[24px] -translate-y-1/2 ${currentIndex >= maxIndex ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
             aria-label="Next"
           >
             <ChevronRight className="w-[20px] h-[20px] text-[#374151] dark:text-gray-300" strokeWidth={2} />

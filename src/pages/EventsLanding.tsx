@@ -868,7 +868,7 @@ export default function EventsLanding() {
               ) : categories.length === 0 ? (
                 <p style={{ ...Fb, fontSize: 14, color: C.muted, padding: 40, textAlign: 'center', width: '100%' }}>No upcoming events found.</p>
               ) : categories.map(cat => (
-                <div key={cat.title} className="el-cat-card el-card" style={{
+                <div key={cat.title} onClick={() => { setActiveFilter(cat.title); scrollTo('this-week'); }} className="el-cat-card el-card" style={{
                   background: C.white,
                   border: `0.8px solid ${C.border}`,
                   borderRadius: 16,
@@ -956,7 +956,7 @@ export default function EventsLanding() {
                     }}
                   />
                 </div>
-                <button style={{
+                <button onClick={() => alert("Location filtering map coming soon!")} style={{
                   height: 48, padding: '0 16px', borderRadius: 10,
                   border: `0.8px solid ${C.border}`, background: C.white,
                   ...Fb, fontWeight: 500, fontSize: 14, color: C.body,
@@ -964,7 +964,7 @@ export default function EventsLanding() {
                 }}>
                   <MapPin size={16} /> Location <ChevronDown size={14} />
                 </button>
-                <button style={{
+                <button onClick={() => setShowCalendar(v => !v)} style={{
                   height: 48, padding: '0 16px', borderRadius: 10,
                   border: `0.8px solid ${C.border}`, background: C.white,
                   ...Fb, fontWeight: 500, fontSize: 14, color: C.body,
