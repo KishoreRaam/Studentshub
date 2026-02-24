@@ -25,6 +25,7 @@ const DATABASE_ID = databaseId; // Alias for compatibility
 // Storage bucket IDs
 //const avatarsBucket = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || "avatars";
 const profilePicturesBucket = import.meta.env.VITE_APPWRITE_BUCKET_PROFILE_PICTURES || "69376d25000b39c8273e";
+const eventMediaBucket = import.meta.env.VITE_APPWRITE_BUCKET_EVENT_MEDIA || "event_media";
 
 // Collections configuration
 const COLLECTIONS = {
@@ -48,16 +49,17 @@ const OAUTH_CONFIG = {
 };
 
 // Export named ESM bindings (all exports needed by the application)
-export { 
-  client, 
-  account, 
-  databases, 
-  storage, 
-  AppwriteID, 
-  databaseId, 
+export {
+  client,
+  account,
+  databases,
+  storage,
+  AppwriteID,
+  databaseId,
   DATABASE_ID,
   profilePicturesBucket,
-  COLLECTIONS, 
-  OAUTH_CONFIG 
+  eventMediaBucket,
+  COLLECTIONS,
+  OAUTH_CONFIG
 };
 export default client;

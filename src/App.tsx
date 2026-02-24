@@ -27,12 +27,13 @@ import CollegePortal from "./pages/CollegePortal";
 import MapPage from "./pages/MapPage";
 import VendorLanding from "./pages/VendorLanding";
 import EventsLanding from "./pages/EventsLanding";
+import EventRegister from "./pages/EventRegister";
 
 export default function App() {
   const location = useLocation();
-  const isMapPage = location.pathname === "/map";
   const isVendorPage = location.pathname === "/vendors";
-  const isEventsPage = location.pathname === "/events";
+  const isMapPage = location.pathname === "/map";
+  const isEventsPage = location.pathname.startsWith("/events");
 
   useEffect(() => {
     ReactGA.send({ hitType: "pageview", page: location.pathname });
@@ -46,6 +47,7 @@ export default function App() {
         {isEventsPage ? (
           <Routes>
             <Route path="/events" element={<EventsLanding />} />
+            <Route path="/events/register" element={<EventRegister />} />
           </Routes>
         ) : isVendorPage ? (
           <Routes>

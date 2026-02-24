@@ -22,7 +22,8 @@
       "Bash(dir:*)",
       "Bash(npx tsc:*)",
       "Bash(ls:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": []

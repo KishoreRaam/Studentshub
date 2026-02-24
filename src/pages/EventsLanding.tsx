@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Link } from 'react-router-dom';
+import { Hero } from '../components/Hero';
+import { Link, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { useAuth } from '../contexts/AuthContext';
 import {
-  Search, Filter, MapPin, Calendar, Clock, Users, ChevronDown,
-  Zap, Palette, Trophy, BookOpen, Monitor, ArrowRight, Upload,
+  Search, MapPin, Calendar, Clock, Users, ChevronDown,
+  Zap, Trophy, BookOpen, Monitor, ArrowRight,
   BarChart3, Eye, MousePointerClick, Share2, TrendingUp, Menu, X,
-  GraduationCap, CheckCircle, Globe, Star, Play, ChevronRight,
+  GraduationCap, CheckCircle, Globe, Star, Play, ChevronRight, User, LogIn,
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -14,28 +16,32 @@ import {
 } from 'recharts';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Query } from 'appwrite';
+import { databases, DATABASE_ID, COLLECTIONS, storage, eventMediaBucket } from '../lib/appwrite';
+import { EventCalendar } from '../components/events/EventCalendar';
+import { Footer } from '../components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
 // ── Design Tokens ─────────────────────────────────────────────────────────────
 const C = {
-  blue:        'var(--el-blue, #1A56DB)',
-  blueDark:    'var(--el-blueDark, #1548c7)',
-  dark:        'var(--el-dark, #0A0A0A)',
-  body:        'var(--el-body, #374151)',
-  muted:       'var(--el-muted, #6B7280)',
-  border:      'var(--el-border, #E5E7EB)',
-  blueLight:   'var(--el-blueLight, #EBF2FF)',
-  white:       'var(--el-white, #FFFFFF)',
-  grayBg:      'var(--el-grayBg, #F9FAFB)',
-  green:       'var(--el-green, #10B981)',
-  greenLight:  'var(--el-greenLight, #ECFDF5)',
-  amber:       'var(--el-amber, #D97706)',
-  amberLight:  'var(--el-amberLight, #FFFBEB)',
-  purple:      'var(--el-purple, #7C3AED)',
+  blue: 'var(--el-blue, #1A56DB)',
+  blueDark: 'var(--el-blueDark, #1548c7)',
+  dark: 'var(--el-dark, #0A0A0A)',
+  body: 'var(--el-body, #374151)',
+  muted: 'var(--el-muted, #6B7280)',
+  border: 'var(--el-border, #E5E7EB)',
+  blueLight: 'var(--el-blueLight, #EBF2FF)',
+  white: 'var(--el-white, #FFFFFF)',
+  grayBg: 'var(--el-grayBg, #F9FAFB)',
+  green: 'var(--el-green, #10B981)',
+  greenLight: 'var(--el-greenLight, #ECFDF5)',
+  amber: 'var(--el-amber, #D97706)',
+  amberLight: 'var(--el-amberLight, #FFFBEB)',
+  purple: 'var(--el-purple, #7C3AED)',
   purpleLight: 'var(--el-purpleLight, #F3E8FF)',
-  red:         'var(--el-red, #EF4444)',
-  redLight:    'var(--el-redLight, #FEF2F2)',
+  red: 'var(--el-red, #EF4444)',
+  redLight: 'var(--el-redLight, #FEF2F2)',
 };
 
 // ── Font helpers ──────────────────────────────────────────────────────────────
@@ -109,70 +115,118 @@ function Section({ children, id, style, className }: {
   );
 }
 
-// ── Floating Event Card ───────────────────────────────────────────────────────
-function FloatingCard({ title, date, color, icon, style }: {
+
+// ── Appwrite Event Document ──────────────────────────────────────────────────
+interface EventDocument {
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
   title: string;
-  date: string;
-  color: string;
-  icon: React.ReactNode;
-  style?: React.CSSProperties;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    gsap.to(ref.current, {
-      y: '+=12',
-      duration: 2 + Math.random() * 1.5,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-    });
-  }, []);
-
-  return (
-    <div ref={ref} style={{
-      position: 'absolute',
-      background: C.white,
-      border: `0.8px solid ${C.border}`,
-      borderRadius: 14,
-      boxShadow: '0px 8px 24px var(--el-shadow-1)',
-      padding: '12px 16px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 10,
-      zIndex: 5,
-      ...style,
-    }}>
-      <div style={{
-        width: 36, height: 36, borderRadius: 10,
-        background: color,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-      }}>
-        {icon}
-      </div>
-      <div>
-        <p style={{ ...Fb, fontWeight: 600, fontSize: 12, color: C.dark, margin: 0, whiteSpace: 'nowrap' }}>{title}</p>
-        <p style={{ ...Fb, fontWeight: 400, fontSize: 10, color: C.muted, margin: 0 }}>{date}</p>
-      </div>
-    </div>
-  );
+  description: string;
+  category?: string;
+  eventType?: string;
+  status: string;
+  eventDate: string;
+  time: string;
+  duration?: string;
+  organizer: string;
+  organizerLogo?: string;
+  organizerWebsite?: string;
+  participantCount: number;
+  maxParticipants?: number;
+  registrationLink: string;
+  thumbnailUrl?: string;
+  posterFileId?: string;
+  recordingUrl?: string;
+  streams?: string[];
+  tags?: string[];
+  location?: string;
+  platform?: string;
+  isPopular?: boolean;
+  isFeatured?: boolean;
+  certificateOffered?: boolean;
+  isPaid?: boolean;
+  price?: string;
 }
+
+function getEventType(evt: EventDocument): string {
+  return evt.category || evt.eventType || 'Other';
+}
+
+function getPosterUrl(evt: EventDocument): string | null {
+  if (evt.posterFileId && eventMediaBucket) {
+    const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1';
+    const project = import.meta.env.VITE_APPWRITE_PROJECT || '';
+    return `${endpoint}/storage/buckets/${eventMediaBucket}/files/${evt.posterFileId}/preview?project=${project}&width=600&height=400`;
+  }
+  if (evt.thumbnailUrl) return evt.thumbnailUrl;
+  return null;
+}
+
+function formatShortDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+const CATEGORY_META: Record<string, { icon: React.ReactNode; color: string }> = {
+  Webinar: { icon: <Monitor size={20} color={C.red} />, color: C.redLight },
+  Hackathon: { icon: <Zap size={20} color={C.blue} />, color: C.blueLight },
+  Workshop: { icon: <BookOpen size={20} color={C.green} />, color: C.greenLight },
+  Conference: { icon: <Trophy size={20} color={C.amber} />, color: C.amberLight },
+};
+
+const DEFAULT_CATEGORY_META = { icon: <Star size={20} color={C.purple} />, color: C.purpleLight };
 
 // ── EventsLanding ─────────────────────────────────────────────────────────────
 export default function EventsLanding() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All Events');
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  // Countdown timer state (target: 5 days from now)
-  const [countdown, setCountdown] = useState({ days: 5, hours: 12, mins: 30, secs: 0 });
+  // ── Appwrite events state ──────────────────────────────────────────────────
+  const [events, setEvents] = useState<EventDocument[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
 
   useEffect(() => {
-    const target = Date.now() + 5 * 86400000 + 12 * 3600000 + 30 * 60000;
-    const timer = setInterval(() => {
+    const fetchEvents = async () => {
+      try {
+        setEventsLoading(true);
+        const now = new Date().toISOString();
+        const response = await databases.listDocuments(
+          DATABASE_ID,
+          COLLECTIONS.EVENTS,
+          [
+            Query.equal('approved', true),
+            Query.greaterThanEqual('eventDate', now),
+            Query.orderAsc('eventDate'),
+            Query.limit(50),
+          ]
+        );
+        setEvents(response.documents as unknown as EventDocument[]);
+      } catch (err) {
+        console.error('Failed to fetch events:', err);
+      } finally {
+        setEventsLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  // ── Derived data ───────────────────────────────────────────────────────────
+  const featuredEvent = events.find(e => e.isFeatured) || events[0] || null;
+
+  // Countdown timer for featured event
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
+  const featuredEventDate = featuredEvent?.eventDate;
+
+  useEffect(() => {
+    if (!featuredEventDate) return;
+    const target = new Date(featuredEventDate).getTime();
+    const update = () => {
       const diff = Math.max(0, target - Date.now());
       setCountdown({
         days: Math.floor(diff / 86400000),
@@ -180,28 +234,11 @@ export default function EventsLanding() {
         mins: Math.floor((diff % 3600000) / 60000),
         secs: Math.floor((diff % 60000) / 1000),
       });
-    }, 1000);
+    };
+    update();
+    const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
-  }, []);
-
-  // GSAP blob animation
-  const blobRef1 = useRef<HTMLDivElement>(null);
-  const blobRef2 = useRef<HTMLDivElement>(null);
-  const blobRef3 = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    [blobRef1, blobRef2, blobRef3].forEach((ref, i) => {
-      if (!ref.current) return;
-      gsap.to(ref.current, {
-        x: `+=${20 + i * 10}`,
-        y: `+=${15 + i * 8}`,
-        duration: 4 + i * 1.5,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-      });
-    });
-  }, []);
+  }, [featuredEventDate]);
 
   // GSAP timeline stagger
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -227,46 +264,53 @@ export default function EventsLanding() {
 
   const filterTabs = ['All Events', 'Tech', 'Cultural', 'Sports', 'Workshops', 'Webinars'];
 
-  const categories = [
-    { icon: <Zap size={20} color={C.blue} />, title: 'Tech', count: 12, color: C.blueLight,
-      events: ['Hackathon 2026 — Mar 15', 'AI/ML Workshop — Mar 18', 'Code Sprint — Mar 22'] },
-    { icon: <Palette size={20} color={C.purple} />, title: 'Cultural', count: 8, color: C.purpleLight,
-      events: ['Cultural Night — Mar 14', 'Dance Competition — Mar 17', 'Music Fest — Mar 20'] },
-    { icon: <Trophy size={20} color={C.amber} />, title: 'Sports', count: 6, color: C.amberLight,
-      events: ['Cricket Tournament — Mar 13', 'Basketball League — Mar 16', 'Athletics Meet — Mar 21'] },
-    { icon: <BookOpen size={20} color={C.green} />, title: 'Workshops', count: 15, color: C.greenLight,
-      events: ['UI/UX Masterclass — Mar 14', 'Cloud Computing — Mar 16', 'Data Science — Mar 19'] },
-    { icon: <Monitor size={20} color={C.red} />, title: 'Webinars', count: 9, color: C.redLight,
-      events: ['Career in Tech — Mar 15', 'Startup Stories — Mar 17', 'AI Ethics — Mar 20'] },
-  ];
+  const categories = (() => {
+    const grouped: Record<string, EventDocument[]> = {};
+    events.forEach(evt => {
+      const cat = getEventType(evt);
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(evt);
+    });
+    return Object.entries(grouped).map(([title, evts]) => {
+      const meta = CATEGORY_META[title] || DEFAULT_CATEGORY_META;
+      return {
+        icon: meta.icon,
+        title,
+        count: evts.length,
+        color: meta.color,
+        events: evts.slice(0, 3).map(e => `${e.title} — ${formatShortDate(e.eventDate)}`),
+      };
+    });
+  })();
 
-  const weekDays = [
-    { day: 'THU', date: 12, events: [
-      { time: '10:00 AM', title: 'AI Workshop: GPT & Beyond', location: 'VIT Chennai, Hall A', tag: 'Tech' },
-      { time: '2:00 PM', title: 'Cultural Dance Rehearsal', location: 'SRM University, Auditorium', tag: 'Cultural' },
-    ]},
-    { day: 'FRI', date: 13, events: [
-      { time: '9:00 AM', title: 'Cricket Tournament — Day 1', location: 'Anna University, Grounds', tag: 'Sports' },
-    ]},
-    { day: 'SAT', date: 14, events: [
-      { time: '10:00 AM', title: 'UI/UX Design Masterclass', location: 'IIT Madras, IC&SR Hall', tag: 'Workshop' },
-      { time: '4:00 PM', title: 'Cultural Night 2026', location: 'Loyola College, Main Stage', tag: 'Cultural' },
-      { time: '6:00 PM', title: 'Startup Pitch Night', location: 'SSN College, Seminar Hall', tag: 'Tech' },
-    ]},
-    { day: 'SUN', date: 15, events: [
-      { time: '9:00 AM', title: 'Hackathon 2026: Build the Future', location: 'CEG Campus, Lab Complex', tag: 'Tech' },
-    ]},
-    { day: 'MON', date: 16, events: [
-      { time: '11:00 AM', title: 'Cloud Computing Workshop', location: 'SRMIST, TP Hall', tag: 'Workshop' },
-      { time: '3:00 PM', title: 'Basketball League Finals', location: 'VIT, Indoor Stadium', tag: 'Sports' },
-    ]},
-    { day: 'TUE', date: 17, events: [
-      { time: '5:00 PM', title: 'Startup Stories Webinar', location: 'Online — Zoom', tag: 'Webinar' },
-    ]},
-    { day: 'WED', date: 18, events: [
-      { time: '10:00 AM', title: 'Data Science Bootcamp', location: 'PSG Tech, CS Block', tag: 'Workshop' },
-    ]},
-  ];
+  const weekDays = (() => {
+    const days: { day: string; date: number; events: { time: string; title: string; location: string; tag: string; registrationLink?: string; posterUrl?: string | null; videoUrl?: string }[] }[] = [];
+    const now = new Date();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(now);
+      d.setDate(d.getDate() + i);
+      const dateKey = d.toISOString().slice(0, 10);
+      // If a calendar date is selected, only show that date
+      if (selectedDate && dateKey !== selectedDate) continue;
+      const dayEvents = events.filter(e => e.eventDate.slice(0, 10) === dateKey);
+      if (dayEvents.length > 0) {
+        days.push({
+          day: d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase().slice(0, 3),
+          date: d.getDate(),
+          events: dayEvents.map(e => ({
+            time: e.time || 'TBA',
+            title: e.title,
+            location: e.location || 'Online',
+            tag: getEventType(e),
+            registrationLink: e.registrationLink,
+            posterUrl: getPosterUrl(e),
+            videoUrl: e.recordingUrl,
+          })),
+        });
+      }
+    }
+    return days;
+  })();
 
   const topColleges = [
     { name: 'VIT Chennai', value: 342, pct: 85 },
@@ -275,9 +319,6 @@ export default function EventsLanding() {
     { name: 'IIT Madras', value: 198, pct: 49 },
     { name: 'Loyola College', value: 173, pct: 43 },
   ];
-
-  const eventTypes = ['Hackathon', 'Workshop', 'Seminar', 'Cultural', 'Sports', 'Webinar'];
-  const tagOptions = ['Tech', 'AI/ML', 'Web Dev', 'Design', 'Business', 'Career'];
 
   return (
     <>
@@ -338,7 +379,6 @@ export default function EventsLanding() {
         .el-cat-card { min-width:260px; scroll-snap-align:start; flex-shrink:0; }
         .el-feat-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
         .el-org-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
-        .el-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
         .el-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
         .el-chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
         .el-week-events { display:flex; gap:16px; flex-wrap:wrap; flex:1; }
@@ -347,7 +387,6 @@ export default function EventsLanding() {
 
         @media (max-width:1100px) {
           .el-feat-grid { grid-template-columns:1fr; }
-          .el-form-grid { grid-template-columns:1fr; }
           .el-hero-cards { display:none; }
         }
         @media (max-width:900px) {
@@ -419,7 +458,36 @@ export default function EventsLanding() {
                 );
               })}
               <ThemeToggle />
-              <button onClick={() => scrollTo('organizers')}
+              {/* User / Profile button */}
+              {!authLoading && (
+                user ? (
+                  <button
+                    onClick={() => navigate('/profile')}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 8,
+                      ...Fb, fontWeight: 500, fontSize: 14, color: C.body,
+                      background: 'none', border: `0.8px solid ${C.border}`,
+                      borderRadius: 10, height: 41, padding: '0 16px',
+                      cursor: 'pointer', transition: 'all 0.15s',
+                    }}
+                  >
+                    <User size={16} />
+                    {user.name?.split(' ')[0] || 'Profile'}
+                  </button>
+                ) : (
+                  <Link to="/login" style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    ...Fb, fontWeight: 500, fontSize: 14, color: C.body,
+                    background: 'none', border: `0.8px solid ${C.border}`,
+                    borderRadius: 10, height: 41, padding: '0 16px',
+                    cursor: 'pointer', transition: 'all 0.15s',
+                    textDecoration: 'none',
+                  }}>
+                    <LogIn size={16} /> Sign In
+                  </Link>
+                )
+              )}
+              <Link to="/events/register"
                 className="el-cta-btn"
                 style={{
                   background: C.blue, color: C.white,
@@ -427,7 +495,8 @@ export default function EventsLanding() {
                   height: 41, padding: '0 20px', borderRadius: 10,
                   border: 'none', cursor: 'pointer',
                   transition: 'background 0.15s',
-                }}>Submit Event</button>
+                  textDecoration: 'none', display: 'inline-flex', alignItems: 'center',
+                }}>Submit Event</Link>
             </div>
           </div>
 
@@ -447,7 +516,31 @@ export default function EventsLanding() {
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               <ThemeToggle />
-              <button onClick={() => scrollTo('organizers')}
+              {/* Mobile user button */}
+              {!authLoading && (
+                user ? (
+                  <button
+                    onClick={() => navigate('/profile')}
+                    style={{
+                      width: 36, height: 36, borderRadius: 8,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: C.blueLight, border: 'none', cursor: 'pointer',
+                    }}
+                  >
+                    <User size={16} color={C.blue} />
+                  </button>
+                ) : (
+                  <Link to="/login" style={{
+                    width: 36, height: 36, borderRadius: 8,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'none', border: `0.8px solid ${C.border}`,
+                    textDecoration: 'none',
+                  }}>
+                    <LogIn size={16} color={C.body} />
+                  </Link>
+                )
+              )}
+              <Link to="/events/register"
                 className="el-cta-btn"
                 style={{
                   background: C.blue, color: C.white,
@@ -455,7 +548,8 @@ export default function EventsLanding() {
                   height: 36, padding: '0 14px', borderRadius: 9,
                   border: 'none', cursor: 'pointer',
                   transition: 'background 0.15s', whiteSpace: 'nowrap',
-                }}>Submit Event</button>
+                  textDecoration: 'none', display: 'inline-flex', alignItems: 'center',
+                }}>Submit Event</Link>
               <button onClick={() => setMobileMenuOpen(v => !v)} style={{
                 width: 36, height: 36,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -490,6 +584,20 @@ export default function EventsLanding() {
                     }}>{label}</button>
                 );
               })}
+              {/* Mobile sign in link in dropdown */}
+              {!authLoading && !user && (
+                <Link to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="el-mob-link"
+                  style={{
+                    ...Fb, fontWeight: 500, fontSize: 15, color: C.blue,
+                    padding: '10px 12px', borderRadius: 8, textDecoration: 'none',
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    transition: 'background 0.15s',
+                  }}>
+                  <LogIn size={16} /> Sign In
+                </Link>
+              )}
             </div>
           )}
         </nav>
@@ -497,170 +605,7 @@ export default function EventsLanding() {
         {/* ══════════════════════════════════════════════════════════════════
             SECTION 1 — HERO
         ══════════════════════════════════════════════════════════════════ */}
-        <section style={{
-          minHeight: '100vh',
-          position: 'relative',
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          {/* Gradient blobs */}
-          <div ref={blobRef1} style={{
-            position: 'absolute', top: '-10%', left: '-5%',
-            width: 500, height: 500, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
-            filter: 'blur(60px)',
-          }} />
-          <div ref={blobRef2} style={{
-            position: 'absolute', top: '20%', right: '-10%',
-            width: 450, height: 450, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(26,86,219,0.15) 0%, transparent 70%)',
-            filter: 'blur(60px)',
-          }} />
-          <div ref={blobRef3} style={{
-            position: 'absolute', bottom: '-5%', left: '30%',
-            width: 400, height: 400, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)',
-            filter: 'blur(60px)',
-          }} />
-
-          <div style={{ maxWidth: 1183, margin: '0 auto', padding: '80px 24px 60px', width: '100%', position: 'relative', zIndex: 2 }}>
-            <div style={{ textAlign: 'center', maxWidth: 800, margin: '0 auto' }}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                {/* Badge */}
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  ...Fb, fontWeight: 500, fontSize: 12,
-                  color: C.blue, background: C.blueLight,
-                  padding: '6px 16px', borderRadius: 9999,
-                  letterSpacing: 0.5, textTransform: 'uppercase',
-                  marginBottom: 32,
-                }}>
-                  <span style={{
-                    width: 8, height: 8, borderRadius: '50%',
-                    background: C.green,
-                    boxShadow: '0 0 8px rgba(16,185,129,0.6)',
-                    animation: 'pulse 2s ease-in-out infinite',
-                  }} />
-                  LIVE EVENTS PLATFORM
-                </span>
-                <style>{`@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }`}</style>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.1 }}
-                style={{
-                  ...Fd, fontSize: 56, lineHeight: '64px',
-                  color: C.dark, margin: '24px 0 0',
-                }}
-              >
-                Discover What's{' '}
-                <span style={{
-                  background: 'linear-gradient(135deg, #1A56DB, #7C3AED)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}>Happening</span>
-                <br />Near You
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                style={{
-                  ...Fb, fontWeight: 400, fontSize: 18, lineHeight: '28px',
-                  color: C.body, maxWidth: 560, margin: '20px auto 36px',
-                }}
-              >
-                From hackathons to cultural fests, find and register for the most exciting
-                student events across Tamil Nadu. Never miss what matters.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}
-              >
-                <button onClick={() => scrollTo('this-week')}
-                  className="el-cta-btn"
-                  style={{
-                    background: C.blue, color: C.white,
-                    ...Fb, fontWeight: 600, fontSize: 16,
-                    height: 52, padding: '0 32px', borderRadius: 12,
-                    border: 'none', cursor: 'pointer',
-                    boxShadow: '0px 10px 25px rgba(26,86,219,0.25)',
-                    transition: 'background 0.15s',
-                    display: 'flex', alignItems: 'center', gap: 8,
-                  }}>Explore Events <ArrowRight size={18} /></button>
-                <button onClick={() => scrollTo('organizers')}
-                  style={{
-                    background: 'transparent', color: C.dark,
-                    ...Fb, fontWeight: 600, fontSize: 16,
-                    height: 52, padding: '0 32px', borderRadius: 12,
-                    border: `1.5px solid ${C.border}`, cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}>Submit Event</button>
-              </motion.div>
-
-              {/* Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                style={{ display: 'flex', gap: 32, justifyContent: 'center', marginTop: 48, flexWrap: 'wrap' }}
-              >
-                {[
-                  { value: '47', label: 'Events This Week' },
-                  { value: '12', label: 'Colleges Hosting' },
-                  { value: '3.2K', label: 'Registrations' },
-                ].map(s => (
-                  <div key={s.label} style={{ textAlign: 'center' }}>
-                    <p style={{ ...Fm, fontSize: 28, color: C.dark, margin: 0 }}>{s.value}</p>
-                    <p style={{ ...Fb, fontWeight: 400, fontSize: 13, color: C.muted, margin: '4px 0 0' }}>{s.label}</p>
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            {/* Floating cards — desktop only */}
-            <div className="el-hero-cards" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none' }}>
-              <FloatingCard title="Hackathon 2026" date="Mar 15 — VIT Chennai" color={C.blueLight}
-                icon={<Zap size={16} color={C.blue} />} style={{ top: '15%', left: '2%' }} />
-              <FloatingCard title="Cultural Night" date="Mar 14 — Loyola" color={C.purpleLight}
-                icon={<Palette size={16} color={C.purple} />} style={{ top: '10%', right: '3%' }} />
-              <FloatingCard title="AI Workshop" date="Mar 18 — IIT Madras" color={C.greenLight}
-                icon={<BookOpen size={16} color={C.green} />} style={{ bottom: '25%', left: '0%' }} />
-              <FloatingCard title="Sports Meet" date="Mar 21 — Anna Univ" color={C.amberLight}
-                icon={<Trophy size={16} color={C.amber} />} style={{ bottom: '20%', right: '2%' }} />
-              <FloatingCard title="Web Dev Bootcamp" date="Mar 22 — SRM" color={C.redLight}
-                icon={<Monitor size={16} color={C.red} />} style={{ top: '50%', right: '8%' }} />
-            </div>
-
-            {/* Scroll indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
-              style={{ textAlign: 'center', marginTop: 48 }}
-            >
-              <p style={{ ...Fb, fontWeight: 400, fontSize: 13, color: C.muted, margin: '0 0 8px' }}>Scroll to explore</p>
-              <motion.div
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                <ChevronDown size={20} color={C.muted} />
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
+        <Hero />
 
         {/* ══════════════════════════════════════════════════════════════════
             SECTION 2 — FEATURED EVENT SPOTLIGHT
@@ -681,7 +626,9 @@ export default function EventsLanding() {
               {/* Event image */}
               <div style={{
                 borderRadius: 16, overflow: 'hidden', position: 'relative',
-                background: 'linear-gradient(135deg, #1A56DB 0%, #7C3AED 100%)',
+                background: featuredEvent && getPosterUrl(featuredEvent)
+                  ? `url(${getPosterUrl(featuredEvent)}) center/cover no-repeat`
+                  : 'linear-gradient(135deg, #1A56DB 0%, #7C3AED 100%)',
                 minHeight: 360,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
@@ -690,12 +637,12 @@ export default function EventsLanding() {
                     ...Fm, fontSize: 14, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)',
                     padding: '6px 16px', borderRadius: 8, display: 'inline-block', marginBottom: 16,
                   }}>FEATURED</div>
-                  <h3 style={{ ...Fd, fontSize: 32, margin: '0 0 8px' }}>TechnoVanza 2026</h3>
-                  <p style={{ ...Fb, fontSize: 16, opacity: 0.9 }}>Innovation Summit & Hackathon</p>
+                  <h3 style={{ ...Fd, fontSize: 32, margin: '0 0 8px' }}>{featuredEvent?.title ?? 'Coming Soon'}</h3>
+                  <p style={{ ...Fb, fontSize: 16, opacity: 0.9 }}>{featuredEvent?.description?.slice(0, 60) ?? ''}</p>
                   <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
-                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)', padding: '4px 12px', borderRadius: 9999 }}>Hackathon</span>
-                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)', padding: '4px 12px', borderRadius: 9999 }}>Workshops</span>
-                    <span style={{ ...Fb, fontSize: 12, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)', padding: '4px 12px', borderRadius: 9999 }}>Prizes Worth ₹5L</span>
+                    {(featuredEvent?.tags?.length ? featuredEvent.tags : (featuredEvent ? [getEventType(featuredEvent)] : [])).map(t => (
+                      <span key={t} style={{ ...Fb, fontSize: 12, background: 'rgba(var(--el-white-rgb, 255, 255, 255), 0.2)', padding: '4px 12px', borderRadius: 9999 }}>{t}</span>
+                    ))}
                   </div>
                 </div>
                 {/* Play button overlay */}
@@ -721,7 +668,7 @@ export default function EventsLanding() {
                     <GraduationCap size={18} color={C.blue} />
                   </div>
                   <div>
-                    <p style={{ ...Fb, fontWeight: 600, fontSize: 14, color: C.dark, margin: 0 }}>VIT Chennai</p>
+                    <p style={{ ...Fb, fontWeight: 600, fontSize: 14, color: C.dark, margin: 0 }}>{featuredEvent?.organizer ?? 'Organizer'}</p>
                     <p style={{ ...Fb, fontWeight: 400, fontSize: 12, color: C.muted, margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
                       <CheckCircle size={12} color={C.green} /> Verified College
                     </p>
@@ -729,11 +676,11 @@ export default function EventsLanding() {
                 </div>
 
                 <h3 style={{ ...Fd, fontSize: 28, color: C.dark, margin: '0 0 12px', lineHeight: '36px' }}>
-                  TechnoVanza 2026: Innovation Summit & Hackathon
+                  {featuredEvent?.title ?? 'No Featured Event'}
                 </h3>
 
                 <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-                  {['Hackathon', 'Workshops', 'Prizes Worth ₹5L'].map(t => (
+                  {(featuredEvent?.tags?.length ? featuredEvent.tags : (featuredEvent ? [getEventType(featuredEvent)] : [])).map(t => (
                     <span key={t} style={{
                       ...Fb, fontWeight: 500, fontSize: 12,
                       background: C.blueLight, color: C.blue,
@@ -769,10 +716,10 @@ export default function EventsLanding() {
                 {/* Meta */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
                   {[
-                    { icon: <Calendar size={16} color={C.muted} />, text: 'March 15-17, 2026' },
-                    { icon: <MapPin size={16} color={C.muted} />, text: 'VIT Chennai Campus, Kelambakkam' },
-                    { icon: <Users size={16} color={C.muted} />, text: '500+ participants expected' },
-                    { icon: <Globe size={16} color={C.muted} />, text: 'Registration closes Mar 12' },
+                    { icon: <Calendar size={16} color={C.muted} />, text: featuredEvent ? `${formatShortDate(featuredEvent.eventDate)}${featuredEvent.time ? ` at ${featuredEvent.time}` : ''}` : 'TBA' },
+                    { icon: <MapPin size={16} color={C.muted} />, text: featuredEvent?.location || featuredEvent?.platform || 'TBA' },
+                    { icon: <Users size={16} color={C.muted} />, text: featuredEvent?.maxParticipants ? `${featuredEvent.maxParticipants} max participants` : `${featuredEvent?.participantCount ?? 0} participants` },
+                    { icon: <Globe size={16} color={C.muted} />, text: featuredEvent?.registrationLink ? 'Registration Open' : 'Registration Closed' },
                   ].map((m, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       {m.icon}
@@ -782,14 +729,15 @@ export default function EventsLanding() {
                 </div>
 
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  <button className="el-cta-btn" style={{
+                  <a href={featuredEvent?.registrationLink || '#'} target="_blank" rel="noopener noreferrer" className="el-cta-btn" style={{
                     background: C.blue, color: C.white,
                     ...Fb, fontWeight: 600, fontSize: 15,
                     height: 48, padding: '0 28px', borderRadius: 10,
                     border: 'none', cursor: 'pointer',
                     transition: 'background 0.15s',
-                    display: 'flex', alignItems: 'center', gap: 8,
-                  }}>Register Now <ArrowRight size={16} /></button>
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    textDecoration: 'none',
+                  }}>Register Now <ArrowRight size={16} /></a>
                   <button style={{
                     background: 'transparent', color: C.body,
                     ...Fb, fontWeight: 500, fontSize: 15,
@@ -816,7 +764,11 @@ export default function EventsLanding() {
             </div>
 
             <div className="el-cat-grid">
-              {categories.map(cat => (
+              {eventsLoading ? (
+                <p style={{ ...Fb, fontSize: 14, color: C.muted, padding: 40, textAlign: 'center', width: '100%' }}>Loading events...</p>
+              ) : categories.length === 0 ? (
+                <p style={{ ...Fb, fontSize: 14, color: C.muted, padding: 40, textAlign: 'center', width: '100%' }}>No upcoming events found.</p>
+              ) : categories.map(cat => (
                 <div key={cat.title} className="el-cat-card el-card" style={{
                   background: C.white,
                   border: `0.8px solid ${C.border}`,
@@ -942,16 +894,31 @@ export default function EventsLanding() {
             {/* Week heading */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
               <h2 style={{ ...Fd, fontSize: 32, color: C.dark, margin: 0 }}>Happening This Week</h2>
-              <button style={{
+              <button onClick={() => setShowCalendar(v => !v)} style={{
                 ...Fb, fontWeight: 500, fontSize: 14, color: C.blue,
                 background: 'none', border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 4,
-              }}>View calendar <ArrowRight size={14} /></button>
+              }}>{showCalendar ? 'Hide calendar' : 'View calendar'} <ArrowRight size={14} /></button>
             </div>
+
+            {showCalendar && (
+              <div style={{ marginBottom: 32 }}>
+                <EventCalendar
+                  events={events}
+                  onDateSelect={(date) => setSelectedDate(date)}
+                />
+              </div>
+            )}
 
             {/* Timeline */}
             <div ref={timelineRef} style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-              {weekDays.map((wd, dayIdx) => (
+              {eventsLoading ? (
+                <p style={{ ...Fb, fontSize: 14, color: C.muted, padding: 40, textAlign: 'center' }}>Loading events...</p>
+              ) : weekDays.length === 0 ? (
+                <p style={{ ...Fb, fontSize: 14, color: C.muted, padding: 40, textAlign: 'center' }}>
+                  {selectedDate ? 'No events on this date.' : 'No events scheduled this week.'}
+                </p>
+              ) : weekDays.map((wd, dayIdx) => (
                 <div key={wd.day} className="el-timeline-item" style={{
                   display: 'flex', gap: 24, minHeight: 80,
                 }}>
@@ -978,39 +945,54 @@ export default function EventsLanding() {
                         background: C.white,
                         border: `0.8px solid ${C.border}`,
                         borderRadius: 12,
-                        padding: '16px 20px',
+                        overflow: 'hidden',
                         flex: '1 1 260px',
                         maxWidth: 340,
                         boxShadow: '0px 2px 8px rgba(0,0,0,0.04)',
                         transition: 'all 0.2s',
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                          <span style={{
-                            ...Fb, fontWeight: 500, fontSize: 12, color: C.blue,
+                        {evt.posterUrl && (
+                          <img src={evt.posterUrl} alt={evt.title} style={{ width: '100%', height: 120, objectFit: 'cover', display: 'block' }} />
+                        )}
+                        <div style={{ padding: '16px 20px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                            <span style={{
+                              ...Fb, fontWeight: 500, fontSize: 12, color: C.blue,
+                              display: 'flex', alignItems: 'center', gap: 4,
+                            }}>
+                              <Clock size={12} /> {evt.time}
+                            </span>
+                            <span style={{
+                              ...Fb, fontWeight: 500, fontSize: 11,
+                              background: C.blueLight, color: C.blue,
+                              padding: '2px 8px', borderRadius: 9999,
+                            }}>{evt.tag}</span>
+                          </div>
+                          <p style={{ ...Fb, fontWeight: 600, fontSize: 14, color: C.dark, margin: '0 0 6px' }}>{evt.title}</p>
+                          <p style={{
+                            ...Fb, fontWeight: 400, fontSize: 12, color: C.muted, margin: '0 0 12px',
                             display: 'flex', alignItems: 'center', gap: 4,
                           }}>
-                            <Clock size={12} /> {evt.time}
-                          </span>
-                          <span style={{
-                            ...Fb, fontWeight: 500, fontSize: 11,
-                            background: C.blueLight, color: C.blue,
-                            padding: '2px 8px', borderRadius: 9999,
-                          }}>{evt.tag}</span>
+                            <MapPin size={12} /> {evt.location}
+                          </p>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <a href={evt.registrationLink || '#'} target="_blank" rel="noopener noreferrer" className="el-cta-btn" style={{
+                              background: C.blue, color: C.white,
+                              ...Fb, fontWeight: 600, fontSize: 12,
+                              height: 32, padding: '0 16px', borderRadius: 8,
+                              border: 'none', cursor: 'pointer',
+                              transition: 'background 0.15s',
+                              textDecoration: 'none', display: 'inline-flex', alignItems: 'center',
+                            }}>Register</a>
+                            {evt.videoUrl && (
+                              <a href={evt.videoUrl} target="_blank" rel="noopener noreferrer" style={{
+                                ...Fb, fontWeight: 500, fontSize: 12, color: C.blue,
+                                display: 'inline-flex', alignItems: 'center', gap: 4,
+                                textDecoration: 'none',
+                              }}><Play size={12} /> Video</a>
+                            )}
+                          </div>
                         </div>
-                        <p style={{ ...Fb, fontWeight: 600, fontSize: 14, color: C.dark, margin: '0 0 6px' }}>{evt.title}</p>
-                        <p style={{
-                          ...Fb, fontWeight: 400, fontSize: 12, color: C.muted, margin: '0 0 12px',
-                          display: 'flex', alignItems: 'center', gap: 4,
-                        }}>
-                          <MapPin size={12} /> {evt.location}
-                        </p>
-                        <button className="el-cta-btn" style={{
-                          background: C.blue, color: C.white,
-                          ...Fb, fontWeight: 600, fontSize: 12,
-                          height: 32, padding: '0 16px', borderRadius: 8,
-                          border: 'none', cursor: 'pointer',
-                          transition: 'background 0.15s',
-                        }}>Register</button>
                       </div>
                     ))}
                   </div>
@@ -1101,7 +1083,7 @@ export default function EventsLanding() {
             </div>
 
             <div style={{ textAlign: 'center' }}>
-              <button onClick={() => scrollTo('publish')} className="el-cta-btn" style={{
+              <Link to="/events/register" className="el-cta-btn" style={{
                 background: C.blue, color: C.white,
                 ...Fb, fontWeight: 600, fontSize: 16,
                 height: 52, padding: '0 36px', borderRadius: 12,
@@ -1109,203 +1091,8 @@ export default function EventsLanding() {
                 boxShadow: '0px 10px 25px rgba(26,86,219,0.25)',
                 transition: 'background 0.15s',
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-              }}>Submit Your Event <ArrowRight size={18} /></button>
-            </div>
-          </div>
-        </Section>
-
-        {/* ══════════════════════════════════════════════════════════════════
-            SECTION 6 — EFFORTLESS EVENT PUBLISHING (Form Mockup)
-        ══════════════════════════════════════════════════════════════════ */}
-        <Section id="publish" style={{ background: C.grayBg, padding: '80px 24px' }}>
-          <div style={{ maxWidth: 1183, margin: '0 auto' }}>
-            <div className="el-form-grid">
-              {/* Left text */}
-              <div>
-                <span style={{
-                  ...Fb, fontWeight: 500, fontSize: 12,
-                  color: C.blue, background: C.blueLight,
-                  padding: '4px 14px', borderRadius: 9999,
-                  letterSpacing: 0.5, textTransform: 'uppercase',
-                }}>SIMPLE PROCESS</span>
-                <h2 style={{ ...Fd, fontSize: 36, color: C.dark, margin: '16px 0 12px', lineHeight: '44px' }}>
-                  Effortless Event Publishing
-                </h2>
-                <p style={{ ...Fb, fontWeight: 400, fontSize: 16, color: C.muted, lineHeight: '26px', maxWidth: 480 }}>
-                  Create and publish your event in under 5 minutes. Our streamlined form
-                  handles everything — from posters to registration links.
-                </p>
-                <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {[
-                    'Fill in event details and upload your poster',
-                    'Add registration link and expected attendees',
-                    'Preview your listing and publish instantly',
-                  ].map((step, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{
-                        width: 28, height: 28, borderRadius: '50%',
-                        background: C.blueLight,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        flexShrink: 0,
-                      }}>
-                        <span style={{ ...Fm, fontSize: 12, color: C.blue }}>{i + 1}</span>
-                      </div>
-                      <span style={{ ...Fb, fontWeight: 400, fontSize: 14, color: C.body }}>{step}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Form card */}
-              <div style={{
-                background: C.white,
-                border: `0.8px solid ${C.border}`,
-                borderRadius: 16,
-                boxShadow: '0px 12px 40px var(--el-shadow-1)',
-                padding: 32,
-              }}>
-                <h3 style={{ ...Fb, fontWeight: 600, fontSize: 18, color: C.dark, margin: '0 0 24px' }}>Create Event</h3>
-
-                {/* Event Title */}
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Event Title</label>
-                  <input placeholder="e.g., Hackathon 2026" style={{
-                    width: '100%', height: 44, border: `0.8px solid ${C.border}`,
-                    borderRadius: 10, padding: '0 14px', ...Fb, fontWeight: 400, fontSize: 14,
-                    color: C.body, background: C.white, outline: 'none', boxSizing: 'border-box',
-                  }} />
-                </div>
-
-                {/* Event Type */}
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Event Type</label>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {eventTypes.map((type, i) => (
-                      <span key={type} style={{
-                        ...Fb, fontWeight: 500, fontSize: 12,
-                        padding: '6px 14px', borderRadius: 9999,
-                        background: i === 0 ? C.blue : C.grayBg,
-                        color: i === 0 ? C.white : C.body,
-                        border: `0.8px solid ${i === 0 ? C.blue : C.border}`,
-                        cursor: 'pointer',
-                      }}>{type}</span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Date + Time */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 18 }}>
-                  <div>
-                    <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Date</label>
-                    <div style={{
-                      width: '100%', height: 44, border: `0.8px solid ${C.border}`,
-                      borderRadius: 10, padding: '0 14px', ...Fb, fontWeight: 400, fontSize: 14,
-                      color: C.muted, background: C.white, boxSizing: 'border-box',
-                      display: 'flex', alignItems: 'center', gap: 8,
-                    }}>
-                      <Calendar size={14} color={C.muted} /> Select date
-                    </div>
-                  </div>
-                  <div>
-                    <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Time</label>
-                    <div style={{
-                      width: '100%', height: 44, border: `0.8px solid ${C.border}`,
-                      borderRadius: 10, padding: '0 14px', ...Fb, fontWeight: 400, fontSize: 14,
-                      color: C.muted, background: C.white, boxSizing: 'border-box',
-                      display: 'flex', alignItems: 'center', gap: 8,
-                    }}>
-                      <Clock size={14} color={C.muted} /> Select time
-                    </div>
-                  </div>
-                </div>
-
-                {/* Location */}
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Location</label>
-                  <div style={{
-                    width: '100%', height: 44, border: `0.8px solid ${C.border}`,
-                    borderRadius: 10, padding: '0 14px', ...Fb, fontWeight: 400, fontSize: 14,
-                    color: C.muted, background: C.white, boxSizing: 'border-box',
-                    display: 'flex', alignItems: 'center', gap: 8,
-                  }}>
-                    <MapPin size={14} color={C.muted} /> Enter venue or select online
-                  </div>
-                </div>
-
-                {/* Event Poster */}
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Event Poster</label>
-                  <div style={{
-                    border: `1.5px dashed ${C.border}`,
-                    borderRadius: 10, padding: '24px 0',
-                    textAlign: 'center', cursor: 'pointer',
-                    background: C.grayBg,
-                  }}>
-                    <Upload size={24} color={C.muted} />
-                    <p style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.muted, margin: '8px 0 0' }}>
-                      Drag & drop or click to upload
-                    </p>
-                    <p style={{ ...Fb, fontWeight: 400, fontSize: 11, color: C.muted, margin: '4px 0 0' }}>
-                      PNG, JPG up to 5MB
-                    </p>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Description</label>
-                  <div style={{
-                    width: '100%', height: 80, border: `0.8px solid ${C.border}`,
-                    borderRadius: 10, padding: '12px 14px', ...Fb, fontWeight: 400, fontSize: 14,
-                    color: C.muted, background: C.white, boxSizing: 'border-box',
-                  }}>Describe your event...</div>
-                </div>
-
-                {/* Registration Link */}
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Registration Link</label>
-                  <input placeholder="https://..." style={{
-                    width: '100%', height: 44, border: `0.8px solid ${C.border}`,
-                    borderRadius: 10, padding: '0 14px', ...Fb, fontWeight: 400, fontSize: 14,
-                    color: C.body, background: C.white, outline: 'none', boxSizing: 'border-box',
-                  }} />
-                </div>
-
-                {/* Expected Attendees */}
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Expected Attendees</label>
-                  <input placeholder="e.g., 200" style={{
-                    width: '100%', height: 44, border: `0.8px solid ${C.border}`,
-                    borderRadius: 10, padding: '0 14px', ...Fb, fontWeight: 400, fontSize: 14,
-                    color: C.body, background: C.white, outline: 'none', boxSizing: 'border-box',
-                  }} />
-                </div>
-
-                {/* Tags */}
-                <div style={{ marginBottom: 24 }}>
-                  <label style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body, display: 'block', marginBottom: 6 }}>Tags</label>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {tagOptions.map((tag, i) => (
-                      <span key={tag} className="el-tag-btn" style={{
-                        ...Fb, fontWeight: 500, fontSize: 12,
-                        padding: '6px 14px', borderRadius: 9999,
-                        background: i < 2 ? C.blue : C.grayBg,
-                        color: i < 2 ? C.white : C.body,
-                        border: `0.8px solid ${i < 2 ? C.blue : C.border}`,
-                      }}>{tag}</span>
-                    ))}
-                  </div>
-                </div>
-
-                <button className="el-cta-btn" style={{
-                  width: '100%', height: 48,
-                  background: C.blue, color: C.white,
-                  ...Fb, fontWeight: 600, fontSize: 15,
-                  borderRadius: 10, border: 'none', cursor: 'pointer',
-                  transition: 'background 0.15s',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                }}>Preview & Publish <ArrowRight size={16} /></button>
-              </div>
+                textDecoration: 'none',
+              }}>Submit Your Event <ArrowRight size={18} /></Link>
             </div>
           </div>
         </Section>
@@ -1552,31 +1339,8 @@ export default function EventsLanding() {
           </div>
         </Section>
 
-        {/* Footer */}
-        <footer style={{
-          background: C.dark,
-          borderTop: '1px solid rgba(var(--el-white-rgb, 255, 255, 255), 0.08)',
-          padding: '32px 24px',
-        }}>
-          <div style={{ maxWidth: 1183, margin: '0 auto' }}>
-            <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              flexWrap: 'wrap', gap: 16,
-            }}>
-              <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-                {['About', 'Privacy', 'Terms', 'Contact', 'Blog'].map(link => (
-                  <a key={link} href="#" style={{
-                    ...Fb, fontWeight: 400, fontSize: 13, color: '#9CA3AF',
-                    textDecoration: 'none', transition: 'color 0.15s',
-                  }}>{link}</a>
-                ))}
-              </div>
-              <p style={{ ...Fb, fontWeight: 400, fontSize: 13, color: '#6B7280', margin: 0 }}>
-                &copy; 2026 StudentsHub. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
+        {/* Common Footer */}
+        <Footer />
       </div>
     </>
   );

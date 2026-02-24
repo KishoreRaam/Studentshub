@@ -37,6 +37,7 @@ export const profilePicturesBucket = import.meta.env.VITE_APPWRITE_BUCKET_PROFIL
 
 // Legacy bucket exports (kept for backward compatibility)
 export const avatarsBucket = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || 'avatars';
+export const eventMediaBucket = import.meta.env.VITE_APPWRITE_BUCKET_EVENT_MEDIA || 'event_media';
 
 // Collections configuration (named exports for easy importing)
 export const COLLECTIONS = {
@@ -54,10 +55,10 @@ export const COLLECTIONS = {
 
 // OAuth Configuration
 export const OAUTH_CONFIG = {
-  SUCCESS_URL: typeof window !== 'undefined' 
+  SUCCESS_URL: typeof window !== 'undefined'
     ? `${window.location.protocol}//${window.location.host}/dashboard`
     : 'https://studentperks.in/dashboard',
-  FAILURE_URL: typeof window !== 'undefined' 
+  FAILURE_URL: typeof window !== 'undefined'
     ? `${window.location.protocol}//${window.location.host}/login?error=oauth_failed`
     : 'https://studentperks.in/login?error=oauth_failed',
 };
