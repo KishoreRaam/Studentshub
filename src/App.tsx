@@ -28,11 +28,15 @@ import MapPage from "./pages/MapPage";
 import VendorLanding from "./pages/VendorLanding";
 import EventsLanding from "./pages/EventsLanding";
 import EventRegister from "./pages/EventRegister";
+import EventCreatorDashboard from "./pages/EventCreatorDashboard";
+import AdminEventsModeration from "./pages/AdminEventsModeration";
+import { AdminRoute } from "./components/AdminRoute";
 
 export default function App() {
   const location = useLocation();
   const isVendorPage = location.pathname === "/vendors";
   const isMapPage = location.pathname === "/map";
+  const isAdminPage = location.pathname.startsWith("/admin");
   const isEventsPage = location.pathname.startsWith("/events");
 
   useEffect(() => {
@@ -44,10 +48,22 @@ export default function App() {
       <SearchProvider>
         <ScrollToTop />
 
-        {isEventsPage ? (
+        {isAdminPage ? (
+          <Routes>
+            <Route
+              path="/admin/events"
+              element={
+                <AdminRoute>
+                  <AdminEventsModeration />
+                </AdminRoute>
+              }
+            />
+          </Routes>
+        ) : isEventsPage ? (
           <Routes>
             <Route path="/events" element={<EventsLanding />} />
             <Route path="/events/register" element={<EventRegister />} />
+            <Route path="/events/dashboard" element={<EventCreatorDashboard />} />
           </Routes>
         ) : isVendorPage ? (
           <Routes>

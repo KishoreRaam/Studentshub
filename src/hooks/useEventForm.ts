@@ -7,9 +7,9 @@ export interface EventFormData {
   organizer: string;
   organizerEmail: string;
   phoneNumber: string;
-  category: 'Webinar' | 'Hackathon' | 'Workshop' | 'Conference' | '';
+  category: string[];
   eventDate: string;
-  time: string;
+  tillDate: string;
   location: string;
   description: string;
   registrationLink: string;
@@ -20,7 +20,7 @@ export interface FieldErrors {
   organizer?: string;
   category?: string;
   eventDate?: string;
-  time?: string;
+  tillDate?: string;
   description?: string;
   registrationLink?: string;
 }
@@ -30,16 +30,16 @@ const initialFormData: EventFormData = {
   organizer: '',
   organizerEmail: '',
   phoneNumber: '',
-  category: '',
+  category: [],
   eventDate: '',
-  time: '',
+  tillDate: '',
   location: '',
   description: '',
   registrationLink: '',
 };
 
 const REQUIRED_FIELDS: (keyof EventFormData)[] = [
-  'title', 'organizer', 'category', 'eventDate', 'time', 'description',
+  'title', 'organizer', 'category', 'eventDate', 'tillDate', 'description',
 ];
 
 const URL_REGEX = /^https?:\/\/.+\..+/;
@@ -84,7 +84,7 @@ export function useEventForm() {
   }, [posterPreview]);
 
   const progress = useMemo(() => {
-    const filled = REQUIRED_FIELDS.filter(f => formData[f].trim() !== '').length;
+    const filled = REQUIRED_FIELDS.filter(f => Array.isArray(formData[f]) ? (formData[f] as string[]).length > 0 : (formData[f] as string).trim() !== '').length;
     return Math.round((filled / REQUIRED_FIELDS.length) * 100);
   }, [formData]);
 
@@ -93,8 +93,8 @@ export function useEventForm() {
 
     if (!formData.title.trim()) errors.title = 'Title is required';
     if (!formData.organizer.trim()) errors.organizer = 'Organizer is required';
-    if (!formData.category) errors.category = 'Category is required';
-    if (!formData.time.trim()) errors.time = 'Time is required';
+    if (!formData.category || formData.category.length === 0) errors.category = 'At least one category is required';
+    if (!formData.tillDate.trim()) errors.tillDate = 'Till Date is required';
 
     if (!formData.eventDate) {
       errors.eventDate = 'Event date is required';
@@ -158,10 +158,10 @@ export function useEventForm() {
         title: formData.title.trim(),
         description: formData.description.trim(),
         category: formData.category,
-        eventType: formData.category,
+        eventType: formData.category.length > 0 ? formData.category[0] : 'Other',
         status: 'Upcoming',
         eventDate: new Date(formData.eventDate).toISOString(),
-        time: formData.time.trim() || '12:00 PM',
+        time: formData.tillDate.trim() || '12:00 PM', // storing tillDate in time field to preserve schema
         organizer: formData.organizer.trim(),
         location: formData.location.trim() || 'Online',
         registrationLink: formData.registrationLink.trim() || 'N/A',

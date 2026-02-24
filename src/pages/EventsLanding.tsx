@@ -8,7 +8,7 @@ import {
   Search, MapPin, Calendar, Clock, Users, ChevronDown,
   Zap, Trophy, BookOpen, Monitor, ArrowRight,
   BarChart3, Eye, MousePointerClick, Share2, TrendingUp, Menu, X,
-  GraduationCap, CheckCircle, Globe, Star, Play, ChevronRight, User, LogIn,
+  GraduationCap, CheckCircle, Globe, Star, Play, ChevronRight, User, LogIn, Shield,
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -74,8 +74,8 @@ const peakHoursData = [
 // ── Animated counter hook ─────────────────────────────────────────────────────
 function useCountUp(end: number, duration = 2, startOnView = true) {
   const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref as React.RefObject<Element>, { once: true });
+  const ref = useRef<any>(null);
+  const inView = useInView(ref, { once: true });
   const started = useRef(false);
 
   useEffect(() => {
@@ -123,7 +123,7 @@ interface EventDocument {
   $updatedAt: string;
   title: string;
   description: string;
-  category?: string;
+  category?: string[] | string;
   eventType?: string;
   status: string;
   eventDate: string;
@@ -150,7 +150,9 @@ interface EventDocument {
 }
 
 function getEventType(evt: EventDocument): string {
-  return evt.category || evt.eventType || 'Other';
+  if (Array.isArray(evt.category) && evt.category.length > 0) return evt.category[0];
+  if (typeof evt.category === 'string') return evt.category;
+  return evt.eventType || 'Other';
 }
 
 function getPosterUrl(evt: EventDocument): string | null {
@@ -175,6 +177,8 @@ const CATEGORY_META: Record<string, { icon: React.ReactNode; color: string }> = 
 };
 
 const DEFAULT_CATEGORY_META = { icon: <Star size={20} color={C.purple} />, color: C.purpleLight };
+
+const ADMIN_IDS = ['68ff4c5816bf5338810a', '68fe7498057792229b3d'];
 
 // ── EventsLanding ─────────────────────────────────────────────────────────────
 export default function EventsLanding() {
@@ -262,14 +266,21 @@ export default function EventsLanding() {
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
-  const filterTabs = ['All Events', 'Tech', 'Cultural', 'Sports', 'Workshops', 'Webinars'];
+  const filterTabs = ['All Events', 'Technical', 'Cultural', 'Sports', 'Webinar', 'Hackathon'];
 
   const categories = (() => {
     const grouped: Record<string, EventDocument[]> = {};
     events.forEach(evt => {
-      const cat = getEventType(evt);
-      if (!grouped[cat]) grouped[cat] = [];
-      grouped[cat].push(evt);
+      let cats: string[] = [];
+      if (Array.isArray(evt.category)) cats = evt.category;
+      else if (typeof evt.category === 'string') cats = [evt.category];
+      else if (evt.eventType) cats = [evt.eventType];
+      else cats = ['Other'];
+
+      cats.forEach(cat => {
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(evt);
+      });
     });
     return Object.entries(grouped).map(([title, evts]) => {
       const meta = CATEGORY_META[title] || DEFAULT_CATEGORY_META;
@@ -292,7 +303,18 @@ export default function EventsLanding() {
       const dateKey = d.toISOString().slice(0, 10);
       // If a calendar date is selected, only show that date
       if (selectedDate && dateKey !== selectedDate) continue;
-      const dayEvents = events.filter(e => e.eventDate.slice(0, 10) === dateKey);
+
+      const dayEvents = events.filter(e => {
+        if (e.eventDate.slice(0, 10) !== dateKey) return false;
+
+        // Filter logic based on activeFilter
+        if (activeFilter === 'All Events') return true;
+        if (Array.isArray(e.category)) {
+          return e.category.includes(activeFilter);
+        } else {
+          return e.category === activeFilter || e.eventType === activeFilter;
+        }
+      });
       if (dayEvents.length > 0) {
         days.push({
           day: d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase().slice(0, 3),
@@ -458,6 +480,33 @@ export default function EventsLanding() {
                 );
               })}
               <ThemeToggle />
+              {/* My Events link for logged-in users */}
+              {!authLoading && user && (
+                <>
+                  <Link to="/events/dashboard" style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    ...Fb, fontWeight: 500, fontSize: 14, color: C.blue,
+                    background: C.blueLight,
+                    borderRadius: 10, height: 41, padding: '0 16px',
+                    textDecoration: 'none', transition: 'all 0.15s',
+                  }}>
+                    <BarChart3 size={16} /> My Events
+                  </Link>
+
+                  {/* Admin Moderation link */}
+                  {ADMIN_IDS.includes(user.$id) && (
+                    <Link to="/admin/events" style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      ...Fb, fontWeight: 500, fontSize: 14, color: C.red,
+                      background: C.redLight,
+                      borderRadius: 10, height: 41, padding: '0 16px',
+                      textDecoration: 'none', transition: 'all 0.15s',
+                    }}>
+                      <Shield size={16} /> Admin Panel
+                    </Link>
+                  )}
+                </>
+              )}
               {/* User / Profile button */}
               {!authLoading && (
                 user ? (
@@ -584,6 +633,37 @@ export default function EventsLanding() {
                     }}>{label}</button>
                 );
               })}
+              {/* My Events link for logged-in users */}
+              {!authLoading && user && (
+                <>
+                  <Link to="/events/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="el-mob-link"
+                    style={{
+                      ...Fb, fontWeight: 500, fontSize: 15, color: C.blue,
+                      padding: '10px 12px', borderRadius: 8, textDecoration: 'none',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      transition: 'background 0.15s',
+                    }}>
+                    <BarChart3 size={16} /> My Events
+                  </Link>
+
+                  {/* Admin Panel link for mobile */}
+                  {ADMIN_IDS.includes(user.$id) && (
+                    <Link to="/admin/events"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="el-mob-link"
+                      style={{
+                        ...Fb, fontWeight: 500, fontSize: 15, color: C.red,
+                        padding: '10px 12px', borderRadius: 8, textDecoration: 'none',
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        transition: 'background 0.15s',
+                      }}>
+                      <Shield size={16} /> Admin Panel
+                    </Link>
+                  )}
+                </>
+              )}
               {/* Mobile sign in link in dropdown */}
               {!authLoading && !user && (
                 <Link to="/login"
@@ -716,7 +796,7 @@ export default function EventsLanding() {
                 {/* Meta */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
                   {[
-                    { icon: <Calendar size={16} color={C.muted} />, text: featuredEvent ? `${formatShortDate(featuredEvent.eventDate)}${featuredEvent.time ? ` at ${featuredEvent.time}` : ''}` : 'TBA' },
+                    { icon: <Calendar size={16} color={C.muted} />, text: featuredEvent ? `${formatShortDate(featuredEvent.eventDate)}${featuredEvent.time ? (/^\\d{4}-\\d{2}-\\d{2}/.test(featuredEvent.time) ? ` till ${formatShortDate(featuredEvent.time)}` : ` at ${featuredEvent.time}`) : ''}` : 'TBA' },
                     { icon: <MapPin size={16} color={C.muted} />, text: featuredEvent?.location || featuredEvent?.platform || 'TBA' },
                     { icon: <Users size={16} color={C.muted} />, text: featuredEvent?.maxParticipants ? `${featuredEvent.maxParticipants} max participants` : `${featuredEvent?.participantCount ?? 0} participants` },
                     { icon: <Globe size={16} color={C.muted} />, text: featuredEvent?.registrationLink ? 'Registration Open' : 'Registration Closed' },
@@ -960,7 +1040,7 @@ export default function EventsLanding() {
                               ...Fb, fontWeight: 500, fontSize: 12, color: C.blue,
                               display: 'flex', alignItems: 'center', gap: 4,
                             }}>
-                              <Clock size={12} /> {evt.time}
+                              {(/^\\d{4}-\\d{2}-\\d{2}/.test(evt.time)) ? <Calendar size={12} /> : <Clock size={12} />} {(/hw\\d{4}-\\d{2}-\\d{2}/.test(evt.time)) ? `Till ${formatShortDate(evt.time)}` : evt.time}
                             </span>
                             <span style={{
                               ...Fb, fontWeight: 500, fontSize: 11,
@@ -1183,8 +1263,8 @@ export default function EventsLanding() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
-                  <XAxis dataKey="day" tick={{ ...Fb, fontSize: 12, fill: C.muted }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ ...Fb, fontSize: 12, fill: C.muted }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="day" tick={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, fill: C.muted }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, fill: C.muted }} axisLine={false} tickLine={false} />
                   <Tooltip
                     contentStyle={{
                       ...Fb, fontSize: 13, borderRadius: 8, border: `0.8px solid ${C.border}`,
@@ -1254,8 +1334,8 @@ export default function EventsLanding() {
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={peakHoursData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
-                    <XAxis dataKey="hour" tick={{ ...Fb, fontSize: 11, fill: C.muted }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ ...Fb, fontSize: 11, fill: C.muted }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="hour" tick={{ fontFamily: '"DM Sans", sans-serif', fontSize: 11, fill: C.muted }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontFamily: '"DM Sans", sans-serif', fontSize: 11, fill: C.muted }} axisLine={false} tickLine={false} />
                     <Tooltip
                       contentStyle={{
                         ...Fb, fontSize: 13, borderRadius: 8, border: `0.8px solid ${C.border}`,

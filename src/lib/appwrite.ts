@@ -52,6 +52,7 @@ export const COLLECTIONS = {
   EVENTS: import.meta.env.VITE_APPWRITE_COLLECTION_EVENTS || 'events',
   SAVED_EVENTS: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_EVENTS || 'saved_events',
   COLLEGE_REGISTRATIONS: import.meta.env.VITE_APPWRITE_COLLECTION_COLLEGE_REGISTRATIONS || 'college_registrations',
+  USERS_META: import.meta.env.VITE_APPWRITE_COLLECTION_USERS_META || 'users_meta',
 };
 
 // OAuth Configuration

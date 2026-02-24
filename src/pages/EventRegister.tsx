@@ -53,8 +53,10 @@ function Section({ children, id, style, className }: {
   );
 }
 
-// ── Categories ────────────────────────────────────────────────────────────────
-const CATEGORIES = ['Webinar', 'Hackathon', 'Workshop', 'Conference'] as const;
+const CATEGORIES = [
+  'Webinar', 'Hackathon', 'Workshop', 'Conference',
+  'Cultural', 'Sports', 'Technical', 'Seminar', 'Competition', 'Symposium'
+];
 
 // ── Testimonials ──────────────────────────────────────────────────────────────
 const testimonials = [
@@ -591,255 +593,267 @@ export default function EventRegister() {
               </div>
             ) : (
 
-            <div style={{
-              background: C.white, border: `0.8px solid ${C.border}`,
-              borderRadius: 20, padding: '40px 36px',
-              boxShadow: '0px 12px 40px var(--el-shadow-1)',
-            }}>
-              {/* Progress bar */}
-              <div style={{ marginBottom: 32 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body }}>Form Progress</span>
-                  <span style={{ ...Fm, fontSize: 13, color: C.blue }}>{progress}%</span>
-                </div>
-                <div style={{ height: 6, background: C.grayBg, borderRadius: 3, overflow: 'hidden' }}>
-                  <motion.div
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 0.4 }}
-                    style={{
-                      height: '100%', borderRadius: 3,
-                      background: progress === 100 ? C.green : `linear-gradient(90deg, ${C.blue}, ${C.purple})`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Event Title */}
-              <FieldWrapper label="Event Title" required error={fieldErrors.title}>
-                <input
-                  className="er-input"
-                  value={formData.title}
-                  onChange={e => updateField('title', e.target.value)}
-                  placeholder="e.g., National Hackathon 2026"
-                  maxLength={255}
-                  style={inputStyle}
-                />
-              </FieldWrapper>
-
-              {/* Organizer */}
-              <FieldWrapper label="Organizing Club / Name" required error={fieldErrors.organizer}>
-                <input
-                  className="er-input"
-                  value={formData.organizer}
-                  onChange={e => updateField('organizer', e.target.value)}
-                  placeholder="e.g., VIT Coding Club"
-                  maxLength={255}
-                  style={inputStyle}
-                />
-              </FieldWrapper>
-
-              {/* Email + Phone (2-col) */}
-              <div className="er-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <FieldWrapper label="Organizer Email" icon={<Mail size={16} color={C.muted} />}>
-                  <input
-                    className="er-input"
-                    type="email"
-                    value={formData.organizerEmail}
-                    onChange={e => updateField('organizerEmail', e.target.value)}
-                    placeholder="club@college.edu"
-                    style={inputStyle}
-                  />
-                </FieldWrapper>
-                <FieldWrapper label="Phone Number" icon={<Phone size={16} color={C.muted} />}>
-                  <input
-                    className="er-input"
-                    type="tel"
-                    value={formData.phoneNumber}
-                    onChange={e => updateField('phoneNumber', e.target.value)}
-                    placeholder="+91 98765 43210"
-                    style={inputStyle}
-                  />
-                </FieldWrapper>
-              </div>
-
-              {/* Category */}
-              <FieldWrapper label="Category" required error={fieldErrors.category}>
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                  {CATEGORIES.map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => updateField('category', cat)}
-                      style={{
-                        ...Fb, fontWeight: 500, fontSize: 13,
-                        padding: '8px 20px', borderRadius: 9999,
-                        background: formData.category === cat ? C.blue : C.grayBg,
-                        color: formData.category === cat ? '#FFFFFF' : C.body,
-                        border: `1px solid ${formData.category === cat ? C.blue : C.border}`,
-                        cursor: 'pointer', transition: 'all 0.15s',
-                      }}
-                    >{cat}</button>
-                  ))}
-                </div>
-              </FieldWrapper>
-
-              {/* Date + Time (2-col) */}
-              <div className="er-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <FieldWrapper label="Event Date" required error={fieldErrors.eventDate} icon={<Calendar size={16} color={C.muted} />}>
-                  <input
-                    className="er-input"
-                    type="date"
-                    value={formData.eventDate}
-                    onChange={e => updateField('eventDate', e.target.value)}
-                    min={todayStr}
-                    style={inputStyle}
-                  />
-                </FieldWrapper>
-                <FieldWrapper label="Time" required error={fieldErrors.time} icon={<Clock size={16} color={C.muted} />}>
-                  <input
-                    className="er-input"
-                    type="time"
-                    value={formData.time}
-                    onChange={e => updateField('time', e.target.value)}
-                    style={inputStyle}
-                  />
-                </FieldWrapper>
-              </div>
-
-              {/* Location */}
-              <FieldWrapper label="Event Location" icon={<MapPin size={16} color={C.muted} />}>
-                <input
-                  className="er-input"
-                  value={formData.location}
-                  onChange={e => updateField('location', e.target.value)}
-                  placeholder="e.g., Main Auditorium, VIT Chennai or 'Online'"
-                  maxLength={255}
-                  style={inputStyle}
-                />
-              </FieldWrapper>
-
-              {/* Description */}
-              <FieldWrapper label="Short Description" required error={fieldErrors.description}>
-                <textarea
-                  className="er-input"
-                  value={formData.description}
-                  onChange={e => updateField('description', e.target.value)}
-                  placeholder="Describe your event, what attendees can expect, prerequisites..."
-                  maxLength={5000}
-                  style={{
-                    ...inputStyle,
-                    height: 120, padding: '12px 14px', resize: 'vertical' as const,
-                  }}
-                />
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-                  <span style={{
-                    ...Fm, fontSize: 11,
-                    color: formData.description.length > 4500 ? C.red : C.muted,
-                  }}>{formData.description.length}/5000</span>
-                </div>
-              </FieldWrapper>
-
-              {/* Poster Upload */}
-              <FieldWrapper label="Upload Event Poster">
-                <input
-                  ref={posterInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp"
-                  onChange={handlePosterSelect}
-                  style={{ display: 'none' }}
-                />
-                {posterPreview ? (
-                  <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: `0.8px solid ${C.border}` }}>
-                    <img src={posterPreview} alt="Poster preview" style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }} />
-                    <button
-                      type="button"
-                      onClick={removePoster}
-                      style={{
-                        position: 'absolute', top: 10, right: 10,
-                        width: 32, height: 32, borderRadius: '50%',
-                        background: 'rgba(0,0,0,0.6)', color: '#fff',
-                        border: 'none', cursor: 'pointer', fontSize: 16,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}
-                    ><X size={16} /></button>
+              <div style={{
+                background: C.white, border: `0.8px solid ${C.border}`,
+                borderRadius: 20, padding: '40px 36px',
+                boxShadow: '0px 12px 40px var(--el-shadow-1)',
+              }}>
+                {/* Progress bar */}
+                <div style={{ marginBottom: 32 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ ...Fb, fontWeight: 500, fontSize: 13, color: C.body }}>Form Progress</span>
+                    <span style={{ ...Fm, fontSize: 13, color: C.blue }}>{progress}%</span>
                   </div>
-                ) : (
-                  <div
-                    onClick={() => posterInputRef.current?.click()}
-                    onDragOver={e => e.preventDefault()}
-                    onDrop={handlePosterDrop}
-                    style={{
-                      border: `2px dashed ${C.border}`,
-                      borderRadius: 12, padding: '32px 0',
-                      textAlign: 'center', cursor: 'pointer',
-                      background: C.grayBg, transition: 'border-color 0.15s',
-                    }}
-                  >
-                    <Upload size={28} color={C.muted} />
-                    <p style={{ ...Fb, fontWeight: 500, fontSize: 14, color: C.body, margin: '12px 0 4px' }}>
-                      Click to upload or drag and drop
-                    </p>
-                    <p style={{ ...Fb, fontWeight: 400, fontSize: 12, color: C.muted, margin: 0 }}>
-                      JPG, PNG, GIF, WebP up to 10MB
-                    </p>
-                  </div>
-                )}
-              </FieldWrapper>
-
-              {/* Registration Link */}
-              <FieldWrapper label="Registration Link" error={fieldErrors.registrationLink}>
-                <input
-                  className="er-input"
-                  value={formData.registrationLink}
-                  onChange={e => updateField('registrationLink', e.target.value)}
-                  placeholder="https://forms.google.com/... (optional)"
-                  maxLength={500}
-                  style={inputStyle}
-                />
-              </FieldWrapper>
-
-              {/* Submit Button */}
-              <button
-                type="button"
-                onClick={submitEvent}
-                disabled={isSubmitting || progress < 100}
-                className={progress === 100 && !isSubmitting ? 'er-cta' : ''}
-                style={{
-                  width: '100%', height: 52, marginTop: 8,
-                  background: isSubmitting ? C.muted : progress < 100 ? '#9CA3AF' : C.blue,
-                  color: '#FFFFFF',
-                  ...Fb, fontWeight: 600, fontSize: 16,
-                  borderRadius: 12, border: 'none',
-                  cursor: isSubmitting || progress < 100 ? 'not-allowed' : 'pointer',
-                  transition: 'background 0.15s',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  boxShadow: progress === 100 ? '0px 10px 25px rgba(26,86,219,0.25)' : 'none',
-                }}
-              >
-                {isSubmitting ? (
-                  <>
+                  <div style={{ height: 6, background: C.grayBg, borderRadius: 3, overflow: 'hidden' }}>
                     <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                      style={{ width: 20, height: 20, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%' }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.4 }}
+                      style={{
+                        height: '100%', borderRadius: 3,
+                        background: progress === 100 ? C.green : `linear-gradient(90deg, ${C.blue}, ${C.purple})`,
+                      }}
                     />
-                    Submitting...
-                  </>
-                ) : isSuccess ? (
-                  <>
-                    <CheckCircle size={18} /> Event Submitted!
-                  </>
-                ) : (
-                  <>Submit Event <ArrowRight size={16} /></>
-                )}
-              </button>
+                  </div>
+                </div>
 
-              {progress < 100 && !isSubmitting && (
-                <p style={{ ...Fb, fontSize: 12, color: C.muted, textAlign: 'center', margin: '12px 0 0' }}>
-                  Please fill all required fields to enable submission
-                </p>
-              )}
-            </div>
+                {/* Event Title */}
+                <FieldWrapper label="Event Title" required error={fieldErrors.title}>
+                  <input
+                    className="er-input"
+                    value={formData.title}
+                    onChange={e => updateField('title', e.target.value)}
+                    placeholder="e.g., National Hackathon 2026"
+                    maxLength={255}
+                    style={inputStyle}
+                  />
+                </FieldWrapper>
+
+                {/* Organizer */}
+                <FieldWrapper label="Organizing Club / Name" required error={fieldErrors.organizer}>
+                  <input
+                    className="er-input"
+                    value={formData.organizer}
+                    onChange={e => updateField('organizer', e.target.value)}
+                    placeholder="e.g., VIT Coding Club"
+                    maxLength={255}
+                    style={inputStyle}
+                  />
+                </FieldWrapper>
+
+                {/* Email + Phone (2-col) */}
+                <div className="er-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <FieldWrapper label="Organizer Email" icon={<Mail size={16} color={C.muted} />}>
+                    <input
+                      className="er-input"
+                      type="email"
+                      value={formData.organizerEmail}
+                      onChange={e => updateField('organizerEmail', e.target.value)}
+                      placeholder="club@college.edu"
+                      style={inputStyle}
+                    />
+                  </FieldWrapper>
+                  <FieldWrapper label="Phone Number" icon={<Phone size={16} color={C.muted} />}>
+                    <input
+                      className="er-input"
+                      type="tel"
+                      value={formData.phoneNumber}
+                      onChange={e => updateField('phoneNumber', e.target.value)}
+                      placeholder="+91 98765 43210"
+                      style={inputStyle}
+                    />
+                  </FieldWrapper>
+                </div>
+
+                {/* Category */}
+                <FieldWrapper label="Category (Select up to 3)" required error={fieldErrors.category}>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                    {CATEGORIES.map(cat => {
+                      const isSelected = formData.category.includes(cat);
+                      return (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => {
+                            let newCats = [...formData.category];
+                            if (isSelected) {
+                              newCats = newCats.filter(c => c !== cat);
+                            } else {
+                              if (newCats.length < 3) newCats.push(cat);
+                            }
+                            updateField('category', newCats);
+                          }}
+                          style={{
+                            ...Fb, fontWeight: 500, fontSize: 13,
+                            padding: '8px 20px', borderRadius: 9999,
+                            background: isSelected ? C.blue : C.grayBg,
+                            color: isSelected ? '#FFFFFF' : C.body,
+                            border: `1px solid ${isSelected ? C.blue : C.border}`,
+                            cursor: 'pointer', transition: 'all 0.15s',
+                          }}
+                        >{cat}</button>
+                      );
+                    })}
+                  </div>
+                </FieldWrapper>
+
+                {/* Date + Till Date (2-col) */}
+                <div className="er-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <FieldWrapper label="Event Date" required error={fieldErrors.eventDate} icon={<Calendar size={16} color={C.muted} />}>
+                    <input
+                      className="er-input"
+                      type="date"
+                      value={formData.eventDate}
+                      onChange={e => updateField('eventDate', e.target.value)}
+                      min={todayStr}
+                      style={inputStyle}
+                    />
+                  </FieldWrapper>
+                  <FieldWrapper label="Till Date" required error={fieldErrors.tillDate} icon={<Calendar size={16} color={C.muted} />}>
+                    <input
+                      className="er-input"
+                      type="date"
+                      value={formData.tillDate}
+                      onChange={e => updateField('tillDate', e.target.value)}
+                      min={formData.eventDate || todayStr}
+                      style={inputStyle}
+                    />
+                  </FieldWrapper>
+                </div>
+
+                {/* Location */}
+                <FieldWrapper label="Event Location" icon={<MapPin size={16} color={C.muted} />}>
+                  <input
+                    className="er-input"
+                    value={formData.location}
+                    onChange={e => updateField('location', e.target.value)}
+                    placeholder="e.g., Main Auditorium, VIT Chennai or 'Online'"
+                    maxLength={255}
+                    style={inputStyle}
+                  />
+                </FieldWrapper>
+
+                {/* Description */}
+                <FieldWrapper label="Short Description" required error={fieldErrors.description}>
+                  <textarea
+                    className="er-input"
+                    value={formData.description}
+                    onChange={e => updateField('description', e.target.value)}
+                    placeholder="Describe your event, what attendees can expect, prerequisites..."
+                    maxLength={5000}
+                    style={{
+                      ...inputStyle,
+                      height: 120, padding: '12px 14px', resize: 'vertical' as const,
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+                    <span style={{
+                      ...Fm, fontSize: 11,
+                      color: formData.description.length > 4500 ? C.red : C.muted,
+                    }}>{formData.description.length}/5000</span>
+                  </div>
+                </FieldWrapper>
+
+                {/* Poster Upload */}
+                <FieldWrapper label="Upload Event Poster">
+                  <input
+                    ref={posterInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    onChange={handlePosterSelect}
+                    style={{ display: 'none' }}
+                  />
+                  {posterPreview ? (
+                    <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: `0.8px solid ${C.border}` }}>
+                      <img src={posterPreview} alt="Poster preview" style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }} />
+                      <button
+                        type="button"
+                        onClick={removePoster}
+                        style={{
+                          position: 'absolute', top: 10, right: 10,
+                          width: 32, height: 32, borderRadius: '50%',
+                          background: 'rgba(0,0,0,0.6)', color: '#fff',
+                          border: 'none', cursor: 'pointer', fontSize: 16,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                      ><X size={16} /></button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => posterInputRef.current?.click()}
+                      onDragOver={e => e.preventDefault()}
+                      onDrop={handlePosterDrop}
+                      style={{
+                        border: `2px dashed ${C.border}`,
+                        borderRadius: 12, padding: '32px 0',
+                        textAlign: 'center', cursor: 'pointer',
+                        background: C.grayBg, transition: 'border-color 0.15s',
+                      }}
+                    >
+                      <Upload size={28} color={C.muted} />
+                      <p style={{ ...Fb, fontWeight: 500, fontSize: 14, color: C.body, margin: '12px 0 4px' }}>
+                        Click to upload or drag and drop
+                      </p>
+                      <p style={{ ...Fb, fontWeight: 400, fontSize: 12, color: C.muted, margin: 0 }}>
+                        JPG, PNG, GIF, WebP up to 10MB
+                      </p>
+                    </div>
+                  )}
+                </FieldWrapper>
+
+                {/* Registration Link */}
+                <FieldWrapper label="Registration Link" error={fieldErrors.registrationLink}>
+                  <input
+                    className="er-input"
+                    value={formData.registrationLink}
+                    onChange={e => updateField('registrationLink', e.target.value)}
+                    placeholder="https://forms.google.com/... (optional)"
+                    maxLength={500}
+                    style={inputStyle}
+                  />
+                </FieldWrapper>
+
+                {/* Submit Button */}
+                <button
+                  type="button"
+                  onClick={submitEvent}
+                  disabled={isSubmitting || progress < 100}
+                  className={progress === 100 && !isSubmitting ? 'er-cta' : ''}
+                  style={{
+                    width: '100%', height: 52, marginTop: 8,
+                    background: isSubmitting ? C.muted : progress < 100 ? '#9CA3AF' : C.blue,
+                    color: '#FFFFFF',
+                    ...Fb, fontWeight: 600, fontSize: 16,
+                    borderRadius: 12, border: 'none',
+                    cursor: isSubmitting || progress < 100 ? 'not-allowed' : 'pointer',
+                    transition: 'background 0.15s',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    boxShadow: progress === 100 ? '0px 10px 25px rgba(26,86,219,0.25)' : 'none',
+                  }}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                        style={{ width: 20, height: 20, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%' }}
+                      />
+                      Submitting...
+                    </>
+                  ) : isSuccess ? (
+                    <>
+                      <CheckCircle size={18} /> Event Submitted!
+                    </>
+                  ) : (
+                    <>Submit Event <ArrowRight size={16} /></>
+                  )}
+                </button>
+
+                {progress < 100 && !isSubmitting && (
+                  <p style={{ ...Fb, fontSize: 12, color: C.muted, textAlign: 'center', margin: '12px 0 0' }}>
+                    Please fill all required fields to enable submission
+                  </p>
+                )}
+              </div>
 
             )}
           </div>
