@@ -6,7 +6,7 @@ interface AuthContextType {
   loading: boolean;
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, password: string) => Promise<void>;
-  signupWithEmail: (email: string, password: string, name: string) => Promise<void>;
+  signupWithEmail: (email: string, password: string, name: string, state?: string, district?: string, institution?: string) => Promise<void>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 }
@@ -85,10 +85,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       // Create account with Appwrite's unique ID generator
       await account.create(AppwriteID.unique(), email, password, name);
-      
+
       // Auto-login after signup
       await account.createEmailPasswordSession(email, password);
-      
+
       // Store additional profile data in preferences
       if (state || district || institution) {
         await account.updatePrefs({
@@ -97,11 +97,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           institution: institution || ''
         });
       }
-      
+
       // Send verification email
       const verificationUrl = `${window.location.origin}/verify-email`;
       await account.createVerification(verificationUrl);
-      
+
       // Get user data
       const currentUser = await account.get();
       setUser(currentUser);

@@ -3,19 +3,33 @@ import { motion } from 'motion/react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Mail, CheckCircle } from 'lucide-react';
+import { functions } from '../lib/appwrite';
 
 export function NewsletterSignup() {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+
+    setIsLoading(true);
+    try {
+      // Execute generic newsletter subscription endpoint
+      // Ensure 'subscribeNewsletter' is the actual ID of your Appwrite function
+      await functions.createExecution('subscribeNewsletter', JSON.stringify({ email }));
+
       setIsSubscribed(true);
       setTimeout(() => {
         setIsSubscribed(false);
         setEmail('');
-      }, 3000);
+      }, 5000);
+    } catch (error) {
+      console.error('Newsletter subscription failed', error);
+      alert('Failed to subscribe. Please try again later.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -33,9 +47,9 @@ export function NewsletterSignup() {
             <Mail className="w-8 h-8 mr-3" />
             <h3 className="text-3xl md:text-4xl">Stay Updated</h3>
           </div>
-          
+
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Get notified about new student benefits, exclusive offers, and important updates 
+            Get notified about new student benefits, exclusive offers, and important updates
             directly to your inbox.
           </p>
 
@@ -51,9 +65,10 @@ export function NewsletterSignup() {
               />
               <Button
                 type="submit"
+                disabled={isLoading}
                 className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
               >
-                Subscribe
+                {isLoading ? 'Subscribing...' : 'Subscribe'}
               </Button>
             </form>
           ) : (

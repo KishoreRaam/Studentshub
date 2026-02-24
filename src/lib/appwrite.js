@@ -2,10 +2,10 @@
 // ESM, Vite-friendly Appwrite client wrapper for browser usage.
 // Uses import.meta.env.VITE_* variables  do NOT put secret keys here.
 
-import { Client, Account, Databases, Storage, ID } from "appwrite";
+import { Client, Account, Databases, Storage, ID, Functions } from "appwrite";
 
 const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT || "";
-const project  = import.meta.env.VITE_APPWRITE_PROJECT || "";
+const project = import.meta.env.VITE_APPWRITE_PROJECT || "";
 
 // Create a client instance safe for bundlers (no server-only code)
 const client = new Client()
@@ -16,6 +16,7 @@ const client = new Client()
 const account = new Account(client);
 const databases = new Databases(client);
 const storage = new Storage(client);
+const functions = new Functions(client);
 const AppwriteID = ID;
 
 // Database and collection IDs (populated from .env)
@@ -54,6 +55,7 @@ export {
   account,
   databases,
   storage,
+  functions,
   AppwriteID,
   databaseId,
   DATABASE_ID,

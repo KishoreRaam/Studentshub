@@ -1,0 +1,17 @@
+{
+    "name": "subscribeNewsletter",
+    "version": "1.0.0",
+    "description": "Subscribe users to SendGrid newsletter",
+    "main": "index.js",
+    "dependencies": {
+        "node-appwrite": "^11.0.0",
+        "node-fetch": "^2.6.7"
+    },
+    "keywords": [
+        "appwrite",
+        "sendgrid",
+        "newsletter"
+    ],
+    "author": "StudentPerks",
+    "license": "MIT"
+}

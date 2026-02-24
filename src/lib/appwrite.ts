@@ -1,4 +1,4 @@
-import { Client, Account, Databases, Storage, ID } from 'appwrite';
+import { Client, Account, Databases, Storage, ID, Functions } from 'appwrite';
 
 /**
  * Appwrite Client Configuration
@@ -25,6 +25,7 @@ client
 export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
+export const functions = new Functions(client);
 export const AppwriteID = ID;
 
 // Export client for advanced usage

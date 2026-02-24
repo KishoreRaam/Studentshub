@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { GoogleIcon, SheerIDIcon } from './Login/AuthIcons';
 import './Login/AuthStyles.css';
-import { 
-  fetchColleges, 
-  getUniqueStates, 
+import {
+  fetchColleges,
+  getUniqueStates,
   getDistrictsByState,
   filterByStateAndDistrict,
   searchCollegesByName,
-  type College 
+  type College
 } from '../utils/collegeUtils';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
   const { loginWithGoogle, signupWithEmail, user, loading } = useAuth();
-  
+
   // Form data state
   const [formData, setFormData] = React.useState({
     firstName: '',
@@ -28,7 +28,7 @@ const SignUpPage = () => {
     confirm: '',
     terms: false
   });
-  
+
   // College data state
   const [colleges, setColleges] = useState<College[]>([]);
   const [states, setStates] = useState<string[]>([]);
@@ -36,7 +36,7 @@ const SignUpPage = () => {
   const [filteredColleges, setFilteredColleges] = useState<College[]>([]);
   const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
   const [collegesLoading, setCollegesLoading] = useState(true);
-  
+
   const [error, setError] = React.useState('');
   const [submitting, setSubmitting] = React.useState(false);
 
@@ -80,7 +80,7 @@ const SignUpPage = () => {
   // Filter colleges based on search term
   const handleInstitutionSearch = (value: string) => {
     setFormData(prev => ({ ...prev, institution: value }));
-    
+
     if (value.length > 0 && formData.state && formData.district) {
       const baseFiltered = filterByStateAndDistrict(
         colleges,
@@ -120,23 +120,23 @@ const SignUpPage = () => {
     // Logic from auth-bg.js for background animations
     const bgContainer = document.querySelector('[data-auth-bg]');
     if (bgContainer) {
-        const icons = [
-            { svg: '🎓', size: 52, x: '10vw', y: '15vh', dur: '18s' },
-            { svg: '📚', size: 48, x: '85vw', y: '25vh', dur: '22s' },
-            { svg: '✏️', size: 40, x: '15vw', y: '70vh', dur: '20s' },
-            { svg: '💻', size: 55, x: '80vw', y: '75vh', dur: '17s' }
-        ];
-        icons.forEach(icon => {
-            const el = document.createElement('div');
-            el.className = 'floating-icon';
-            el.innerHTML = icon.svg;
-            el.style.width = `${icon.size}px`;
-            el.style.height = `${icon.size}px`;
-            el.style.left = icon.x;
-            el.style.top = icon.y;
-            el.style.animation = `drift ${icon.dur} linear infinite`;
-            bgContainer.appendChild(el);
-        });
+      const icons = [
+        { svg: '🎓', size: 52, x: '10vw', y: '15vh', dur: '18s' },
+        { svg: '📚', size: 48, x: '85vw', y: '25vh', dur: '22s' },
+        { svg: '✏️', size: 40, x: '15vw', y: '70vh', dur: '20s' },
+        { svg: '💻', size: 55, x: '80vw', y: '75vh', dur: '17s' }
+      ];
+      icons.forEach(icon => {
+        const el = document.createElement('div');
+        el.className = 'floating-icon';
+        el.innerHTML = icon.svg;
+        el.style.width = `${icon.size}px`;
+        el.style.height = `${icon.size}px`;
+        el.style.left = icon.x;
+        el.style.top = icon.y;
+        el.style.animation = `drift ${icon.dur} linear infinite`;
+        bgContainer.appendChild(el);
+      });
     }
 
     // Apply body class for styling
@@ -164,7 +164,7 @@ const SignUpPage = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    
+
     if (name === 'state') {
       // Reset district and institution when state changes
       setFormData(prev => ({
@@ -186,7 +186,7 @@ const SignUpPage = () => {
         [name]: type === 'checkbox' ? checked : value
       }));
     }
-    
+
     setError(''); // Clear error on input change
   };
 
@@ -215,6 +215,13 @@ const SignUpPage = () => {
       setError('Please enter a valid email address');
       return;
     }
+
+    // Academic email validation
+    const emailDomain = formData.email.split('@')[1]?.toLowerCase();
+    if (!emailDomain || (!emailDomain.endsWith('.edu') && !emailDomain.endsWith('.ac.in') && !emailDomain.endsWith('.edu.in'))) {
+      setError('Please use a valid college email address (.edu or .ac.in)');
+      return;
+    }
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters');
       return;
@@ -232,14 +239,14 @@ const SignUpPage = () => {
       setSubmitting(true);
       const fullName = `${formData.firstName} ${formData.lastName}`;
       await signupWithEmail(
-        formData.email, 
-        formData.password, 
+        formData.email,
+        formData.password,
         fullName,
         formData.state,
         formData.district,
         formData.institution
       );
-      
+
       // Redirect to verify email page
       navigate('/verify-email');
     } catch (error: any) {
@@ -260,7 +267,7 @@ const SignUpPage = () => {
         <div className="signup-panel" role="form" aria-labelledby="signupTitle">
           <h2 id="signupTitle">Create your account</h2>
           <p className="sub">Start saving today</p>
-          
+
           <div className="oauth-stack" aria-label="Third-party sign up options">
             <button type="button" className="oauth-btn google" onClick={handleGoogleSignUp} disabled={loading}>
               <GoogleIcon />
@@ -280,11 +287,11 @@ const SignUpPage = () => {
           </div>
 
           {error && (
-            <div className="error-message" style={{ 
-              padding: '12px', 
-              background: '#fee', 
-              border: '1px solid #fcc', 
-              borderRadius: '8px', 
+            <div className="error-message" style={{
+              padding: '12px',
+              background: '#fee',
+              border: '1px solid #fcc',
+              borderRadius: '8px',
               color: '#c33',
               marginBottom: '16px',
               fontSize: '14px'
@@ -297,11 +304,11 @@ const SignUpPage = () => {
             <div className="field-row">
               <div className="field">
                 <label htmlFor="firstName">First Name</label>
-                <input 
-                  id="firstName" 
-                  name="firstName" 
-                  required 
-                  placeholder="Jane" 
+                <input
+                  id="firstName"
+                  name="firstName"
+                  required
+                  placeholder="Jane"
                   autoComplete="given-name"
                   value={formData.firstName}
                   onChange={handleInputChange}
@@ -309,11 +316,11 @@ const SignUpPage = () => {
               </div>
               <div className="field">
                 <label htmlFor="lastName">Last Name</label>
-                <input 
-                  id="lastName" 
-                  name="lastName" 
-                  required 
-                  placeholder="Doe" 
+                <input
+                  id="lastName"
+                  name="lastName"
+                  required
+                  placeholder="Doe"
                   autoComplete="family-name"
                   value={formData.lastName}
                   onChange={handleInputChange}
@@ -366,9 +373,9 @@ const SignUpPage = () => {
               <label htmlFor="institution">
                 Institution
                 {formData.state && formData.district && filteredColleges.length > 0 && (
-                  <span style={{ 
-                    marginLeft: '8px', 
-                    fontSize: '12px', 
+                  <span style={{
+                    marginLeft: '8px',
+                    fontSize: '12px',
                     color: '#666',
                     fontWeight: 'normal'
                   }}>
@@ -376,16 +383,16 @@ const SignUpPage = () => {
                   </span>
                 )}
               </label>
-              <input 
-                id="institution" 
-                name="institution" 
-                required 
+              <input
+                id="institution"
+                name="institution"
+                required
                 placeholder={
-                  !formData.state 
-                    ? "Select state first" 
-                    : !formData.district 
-                    ? "Select district first" 
-                    : "Search or type your institution"
+                  !formData.state
+                    ? "Select state first"
+                    : !formData.district
+                      ? "Select district first"
+                      : "Search or type your institution"
                 }
                 autoComplete="off"
                 value={formData.institution}
@@ -401,7 +408,7 @@ const SignUpPage = () => {
                 }}
                 disabled={!formData.state || !formData.district}
               />
-              
+
               {/* College Dropdown */}
               {showCollegeDropdown && filteredColleges.length > 0 && (
                 <div style={{
@@ -459,12 +466,12 @@ const SignUpPage = () => {
             </div>
             <div className="field">
               <label htmlFor="email">Academic Email</label>
-              <input 
-                id="email" 
-                name="email" 
-                type="email" 
-                required 
-                placeholder="you@university.edu" 
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="you@university.edu"
                 autoComplete="email"
                 value={formData.email}
                 onChange={handleInputChange}
@@ -473,13 +480,13 @@ const SignUpPage = () => {
             <div className="field-row">
               <div className="field">
                 <label htmlFor="password">Password</label>
-                <input 
-                  id="password" 
-                  name="password" 
-                  type="password" 
-                  required 
-                  minLength={8} 
-                  placeholder="••••••••" 
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  minLength={8}
+                  placeholder="••••••••"
                   autoComplete="new-password"
                   value={formData.password}
                   onChange={handleInputChange}
@@ -487,13 +494,13 @@ const SignUpPage = () => {
               </div>
               <div className="field">
                 <label htmlFor="confirm">Confirm Password</label>
-                <input 
-                  id="confirm" 
-                  name="confirm" 
-                  type="password" 
-                  required 
-                  minLength={8} 
-                  placeholder="••••••••" 
+                <input
+                  id="confirm"
+                  name="confirm"
+                  type="password"
+                  required
+                  minLength={8}
+                  placeholder="••••••••"
                   autoComplete="new-password"
                   value={formData.confirm}
                   onChange={handleInputChange}
@@ -501,9 +508,9 @@ const SignUpPage = () => {
               </div>
             </div>
             <label className="inline">
-              <input 
-                type="checkbox" 
-                id="terms" 
+              <input
+                type="checkbox"
+                id="terms"
                 name="terms"
                 required
                 checked={formData.terms}

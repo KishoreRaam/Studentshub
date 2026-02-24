@@ -16,20 +16,20 @@ import {
 
 // ── Design Tokens ─────────────────────────────────────────────────────────────
 const C = {
-  blue:        'var(--vl-blue, #1A56DB)',
-  dark:        'var(--vl-dark, #0A0A0A)',
-  body:        'var(--vl-body, #374151)',
-  muted:       'var(--vl-muted, #6B7280)',
-  border:      'var(--vl-border, #E5E7EB)',
-  blueLight:   'var(--vl-blueLight, #EBF2FF)',
-  white:       'var(--vl-white, #FFFFFF)',
-  grayBg:      'var(--vl-grayBg, #F9FAFB)',
-  green:       'var(--vl-green, #10B981)',
-  greenLight:  'var(--vl-greenLight, #ECFDF5)',
-  amber:       'var(--vl-amber, #D97706)',
-  amberLight:  'var(--vl-amberLight, #FFFBEB)',
+  blue: 'var(--vl-blue, #1A56DB)',
+  dark: 'var(--vl-dark, #0A0A0A)',
+  body: 'var(--vl-body, #374151)',
+  muted: 'var(--vl-muted, #6B7280)',
+  border: 'var(--vl-border, #E5E7EB)',
+  blueLight: 'var(--vl-blueLight, #EBF2FF)',
+  white: 'var(--vl-white, #FFFFFF)',
+  grayBg: 'var(--vl-grayBg, #F9FAFB)',
+  green: 'var(--vl-green, #10B981)',
+  greenLight: 'var(--vl-greenLight, #ECFDF5)',
+  amber: 'var(--vl-amber, #D97706)',
+  amberLight: 'var(--vl-amberLight, #FFFBEB)',
   purpleLight: 'var(--vl-purpleLight, #F3E8FF)',
-  mapBg:       'var(--vl-mapBg, #F0F4F8)',
+  mapBg: 'var(--vl-mapBg, #F0F4F8)',
 };
 
 // ── Font helpers ──────────────────────────────────────────────────────────────
@@ -281,27 +281,35 @@ export default function VendorLanding() {
           --vl-bg-card: rgba(255,255,255,0.25);
           --vl-shadow-1: rgba(0,0,0,0.08);
           --vl-shadow-2: rgba(0,0,0,0.12);
+          --vl-gradient-1: linear-gradient(149.4deg, #F9FAFB 0%, #EBF2FF 50%, #ECFDF5 100%);
+          --vl-gradient-2: linear-gradient(135deg, #EBF2FF 0%, #F9FAFB 50%, #ECFDF5 100%);
+          --vl-gradient-3: linear-gradient(180deg, #FFFFFF 0%, #ECFDF5 100%);
+          --vl-gradient-4: linear-gradient(135deg, #F9FAFB 0%, #EBF2FF 100%);
         }
         .dark {
           --vl-white-rgb: 10, 10, 10;
-          --vl-blue: #1A56DB;
-          --vl-dark: #FFFFFF;
+          --vl-blue: #3b82f6;
+          --vl-dark: #F3F4F6;
           --vl-body: #D1D5DB;
           --vl-muted: #9CA3AF;
           --vl-border: #374151;
-          --vl-blueLight: rgba(26,86,219,0.15);
-          --vl-white: #0A0A0A;
-          --vl-grayBg: #111827;
+          --vl-blueLight: rgba(59,130,246,0.15);
+          --vl-white: #111827;
+          --vl-grayBg: #1F2937;
           --vl-green: #10B981;
           --vl-greenLight: rgba(16,185,129,0.15);
-          --vl-amber: #D97706;
-          --vl-amberLight: rgba(217,119,6,0.15);
-          --vl-purpleLight: rgba(124,58,237,0.15);
-          --vl-mapBg: #111827;
-          --vl-bg-overlay: rgba(10,10,10,0.92);
-          --vl-bg-card: rgba(10,10,10,0.4);
+          --vl-amber: #F59E0B;
+          --vl-amberLight: rgba(245,158,11,0.15);
+          --vl-purpleLight: rgba(139,92,246,0.15);
+          --vl-mapBg: #1F2937;
+          --vl-bg-overlay: rgba(17,24,39,0.92);
+          --vl-bg-card: rgba(17,24,39,0.4);
           --vl-shadow-1: rgba(0,0,0,0.4);
           --vl-shadow-2: rgba(0,0,0,0.5);
+          --vl-gradient-1: linear-gradient(149.4deg, #111827 0%, #1e3a8a 50%, #064e3b 100%);
+          --vl-gradient-2: linear-gradient(135deg, #1e3a8a 0%, #111827 50%, #064e3b 100%);
+          --vl-gradient-3: linear-gradient(180deg, #111827 0%, #064e3b 100%);
+          --vl-gradient-4: linear-gradient(135deg, #111827 0%, #1e3a8a 100%);
         }
       
         .vl-hero-grid   { display:grid; grid-template-columns:1fr 1fr; gap:65px; align-items:center; }
@@ -499,11 +507,7 @@ export default function VendorLanding() {
         ══════════════════════════════════════════════════════════════════ */}
         <section style={{
           minHeight: 700,
-          backgroundImage: [
-            'linear-gradient(149.4deg, #F9FAFB 0%, #EBF2FF 50%, #ECFDF5 100%)',
-            'linear-gradient(180deg, rgba(0,0,0,0.03) 0.14%, transparent 0.14%)',
-            'linear-gradient(90deg, rgba(0,0,0,0.03) 0%, transparent 0%)',
-          ].join(', '),
+          background: 'var(--vl-gradient-1)',
           display: 'flex', alignItems: 'center',
         }}>
           <div style={{
@@ -549,8 +553,8 @@ export default function VendorLanding() {
                 <div style={{ display: 'flex', gap: 12, marginBottom: 32, flexWrap: 'wrap' }}>
                   {[
                     { value: '5,664', label: 'Colleges' },
-                    { value: '50K+',  label: 'Students' },
-                    { value: 'TN',    label: 'Tamil Nadu Wide' },
+                    { value: '50K+', label: 'Students' },
+                    { value: 'TN', label: 'Tamil Nadu Wide' },
                   ].map(s => (
                     <div key={s.label} style={{
                       background: C.white,
@@ -755,10 +759,10 @@ export default function VendorLanding() {
 
               <div className="vl-steps-grid">
                 {[
-                  { num: 1, title: 'Register Business',   desc: 'Submit business name, category, location, and discount offer.',                                    Icon: FileText },
-                  { num: 2, title: 'Get Verified',        desc: 'Upload business registration proof. Approval within 24 hours.',                                   Icon: CheckCircle },
-                  { num: 3, title: 'Appear on Map',       desc: 'Your discount goes live. Students discover you through map search and filters.',                  Icon: MapPin },
-                  { num: 4, title: 'Monitor Analytics',   desc: 'Access real-time data on impressions, clicks, and peak traffic times.',                           Icon: BarChart3 },
+                  { num: 1, title: 'Register Business', desc: 'Submit business name, category, location, and discount offer.', Icon: FileText },
+                  { num: 2, title: 'Get Verified', desc: 'Upload business registration proof. Approval within 24 hours.', Icon: CheckCircle },
+                  { num: 3, title: 'Appear on Map', desc: 'Your discount goes live. Students discover you through map search and filters.', Icon: MapPin },
+                  { num: 4, title: 'Monitor Analytics', desc: 'Access real-time data on impressions, clicks, and peak traffic times.', Icon: BarChart3 },
                 ].map((step, i) => (
                   <motion.div
                     key={step.num}
@@ -843,9 +847,9 @@ export default function VendorLanding() {
                 style={{ display: 'flex', flexDirection: 'column', gap: 0 }}
               >
                 {[
-                  { Icon: MapPinned,   title: 'Prime Placement',       desc: 'Appear when students filter by category and distance. Your business shown prominently on the map.' },
-                  { Icon: Eye,         title: 'Highlight Your Offer',  desc: 'Your discount % prominently displayed on every marker. Attract attention instantly.' },
-                  { Icon: TrendingUp,  title: 'Traffic Intelligence',  desc: 'Get featured during high-traffic periods automatically. Maximise student visibility.' },
+                  { Icon: MapPinned, title: 'Prime Placement', desc: 'Appear when students filter by category and distance. Your business shown prominently on the map.' },
+                  { Icon: Eye, title: 'Highlight Your Offer', desc: 'Your discount % prominently displayed on every marker. Attract attention instantly.' },
+                  { Icon: TrendingUp, title: 'Traffic Intelligence', desc: 'Get featured during high-traffic periods automatically. Maximise student visibility.' },
                 ].map((f, i) => (
                   <div key={f.title} style={{
                     display: 'flex', alignItems: 'flex-start', gap: 16,
@@ -894,10 +898,10 @@ export default function VendorLanding() {
 
             <div className="vl-ben-grid">
               {[
-                { Icon: ShieldCheck, bg: C.blueLight,   iconColor: C.blue,    title: 'Verified Students Only',      desc: 'Every user is a verified college student with .edu email or institutional ID. No fake claims, no spam.' },
-                { Icon: MapPin,      bg: C.blueLight,   iconColor: C.blue,    title: 'Foot Traffic When It Counts', desc: "Students discover you when they're nearby — peak visibility during lunch hours, exam prep seasons, and college events." },
-                { Icon: BarChart3,   bg: C.purpleLight, iconColor: '#7C3AED', title: 'Performance Insights',         desc: 'Track impressions, clicks, peak hours, and nearby college engagement. Optimize your offers based on actual data.' },
-                { Icon: TrendingUp,  bg: C.purpleLight, iconColor: '#7C3AED', title: 'Free to Start',                desc: 'Basic listing is always free. Upgrade to featured placement for premium visibility during high-traffic windows.' },
+                { Icon: ShieldCheck, bg: C.blueLight, iconColor: C.blue, title: 'Verified Students Only', desc: 'Every user is a verified college student with .edu email or institutional ID. No fake claims, no spam.' },
+                { Icon: MapPin, bg: C.blueLight, iconColor: C.blue, title: 'Foot Traffic When It Counts', desc: "Students discover you when they're nearby — peak visibility during lunch hours, exam prep seasons, and college events." },
+                { Icon: BarChart3, bg: C.purpleLight, iconColor: '#7C3AED', title: 'Performance Insights', desc: 'Track impressions, clicks, peak hours, and nearby college engagement. Optimize your offers based on actual data.' },
+                { Icon: TrendingUp, bg: C.purpleLight, iconColor: '#7C3AED', title: 'Free to Start', desc: 'Basic listing is always free. Upgrade to featured placement for premium visibility during high-traffic windows.' },
               ].map((b, i) => (
                 <motion.div
                   key={b.title}
@@ -940,7 +944,7 @@ export default function VendorLanding() {
         ══════════════════════════════════════════════════════════════════ */}
         <section style={{
           padding: '100px 24px',
-          background: 'linear-gradient(135deg, #EBF2FF 0%, #F9FAFB 50%, #ECFDF5 100%)',
+          background: 'var(--vl-gradient-2)',
         }}>
           <div style={{ maxWidth: 1183, margin: '0 auto' }}>
 
@@ -974,11 +978,11 @@ export default function VendorLanding() {
               <div className="vl-met-grid">
                 {[
                   { label: 'MAP IMPRESSIONS', value: '2,847', trend: '+18% ↑', pos: true },
-                  { label: 'DETAIL VIEWS',    value: '412',   trend: '+24% ↑', pos: true },
-                  { label: 'CLICK-THROUGHS',  value: '89',    trend: '+9% ↑',  pos: true },
-                  { label: 'PEAK HOUR',       value: '1:30 PM', trend: 'Steady', pos: false },
-                  { label: 'NEARBY COLLEGES', value: '3',     trend: 'campuses', pos: false },
-                  { label: 'AVG. DISTANCE',   value: '0.4 km', trend: 'from colleges', pos: false },
+                  { label: 'DETAIL VIEWS', value: '412', trend: '+24% ↑', pos: true },
+                  { label: 'CLICK-THROUGHS', value: '89', trend: '+9% ↑', pos: true },
+                  { label: 'PEAK HOUR', value: '1:30 PM', trend: 'Steady', pos: false },
+                  { label: 'NEARBY COLLEGES', value: '3', trend: 'campuses', pos: false },
+                  { label: 'AVG. DISTANCE', value: '0.4 km', trend: 'from colleges', pos: false },
                 ].map(m => (
                   <div key={m.label} style={{
                     border: `0.8px solid ${C.border}`,
@@ -1277,7 +1281,7 @@ export default function VendorLanding() {
         ══════════════════════════════════════════════════════════════════ */}
         <section id="apply" style={{
           padding: '100px 24px',
-          background: 'linear-gradient(180deg, #FFFFFF 0%, #ECFDF5 100%)',
+          background: 'var(--vl-gradient-3)',
         }}>
           <div style={{ maxWidth: 1183, margin: '0 auto' }}>
 
@@ -1513,7 +1517,7 @@ export default function VendorLanding() {
         ══════════════════════════════════════════════════════════════════ */}
         <section style={{
           padding: '80px 24px',
-          background: 'linear-gradient(135deg, #F9FAFB 0%, #EBF2FF 100%)',
+          background: 'var(--vl-gradient-4)',
           textAlign: 'center',
         }}>
           <div style={{ maxWidth: 900, margin: '0 auto' }}>
