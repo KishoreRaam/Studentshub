@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
 import {
-  Search, MapPin, Calendar, Clock, Users, ChevronDown,
+  Search, MapPin, Calendar, Users, ChevronDown,
   Zap, Trophy, BookOpen, Monitor, ArrowRight,
   BarChart3, Eye, MousePointerClick, Share2, TrendingUp, Menu, X,
   GraduationCap, CheckCircle, Globe, Star, Play, ChevronRight, User, LogIn, Shield,
@@ -169,6 +169,20 @@ function formatShortDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+function isDateString(str: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}/.test(str);
+}
+
+function formatDateRange(startDate: string, endDateOrTime?: string): string {
+  const start = formatShortDate(startDate);
+  if (endDateOrTime && isDateString(endDateOrTime)) {
+    const end = formatShortDate(endDateOrTime);
+    if (start === end) return start;
+    return `${start} — ${end}`;
+  }
+  return start;
+}
+
 const CATEGORY_META: Record<string, { icon: React.ReactNode; color: string }> = {
   Webinar: { icon: <Monitor size={20} color={C.red} />, color: C.redLight },
   Hackathon: { icon: <Zap size={20} color={C.blue} />, color: C.blueLight },
@@ -314,7 +328,7 @@ export default function EventsLanding() {
   })();
 
   const weekDays = (() => {
-    const days: { day: string; date: number; events: { time: string; title: string; location: string; tag: string; registrationLink?: string; posterUrl?: string | null; videoUrl?: string }[] }[] = [];
+    const days: { day: string; date: number; events: { dateRange: string; title: string; location: string; tag: string; registrationLink?: string; posterUrl?: string | null; videoUrl?: string }[] }[] = [];
     const now = new Date();
     for (let i = 0; i < 7; i++) {
       const d = new Date(now);
@@ -339,7 +353,7 @@ export default function EventsLanding() {
           day: d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase().slice(0, 3),
           date: d.getDate(),
           events: dayEvents.map(e => ({
-            time: e.time || 'TBA',
+            dateRange: formatDateRange(e.eventDate, e.time),
             title: e.title,
             location: e.location || 'Online',
             tag: getEventType(e),
@@ -815,7 +829,7 @@ export default function EventsLanding() {
                 {/* Meta */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
                   {[
-                    { icon: <Calendar size={16} color={C.muted} />, text: featuredEvent ? `${formatShortDate(featuredEvent.eventDate)}${featuredEvent.time ? (/^\\d{4}-\\d{2}-\\d{2}/.test(featuredEvent.time) ? ` till ${formatShortDate(featuredEvent.time)}` : ` at ${featuredEvent.time}`) : ''}` : 'TBA' },
+                    { icon: <Calendar size={16} color={C.muted} />, text: featuredEvent ? formatDateRange(featuredEvent.eventDate, featuredEvent.time) : 'TBA' },
                     { icon: <MapPin size={16} color={C.muted} />, text: featuredEvent?.location || featuredEvent?.platform || 'TBA' },
                     { icon: <Users size={16} color={C.muted} />, text: featuredEvent?.maxParticipants ? `${featuredEvent.maxParticipants} max participants` : `${featuredEvent?.participantCount ?? 0} participants` },
                     { icon: <Globe size={16} color={C.muted} />, text: featuredEvent?.registrationLink ? 'Registration Open' : 'Registration Closed' },
@@ -1059,7 +1073,7 @@ export default function EventsLanding() {
                               ...Fb, fontWeight: 500, fontSize: 12, color: C.blue,
                               display: 'flex', alignItems: 'center', gap: 4,
                             }}>
-                              {(/^\\d{4}-\\d{2}-\\d{2}/.test(evt.time)) ? <Calendar size={12} /> : <Clock size={12} />} {(/hw\\d{4}-\\d{2}-\\d{2}/.test(evt.time)) ? `Till ${formatShortDate(evt.time)}` : evt.time}
+                              <Calendar size={12} /> {evt.dateRange}
                             </span>
                             <span style={{
                               ...Fb, fontWeight: 500, fontSize: 11,
