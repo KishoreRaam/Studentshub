@@ -8,28 +8,44 @@ import { ThemeToggle } from './ThemeToggle';
 import { GlobalSearchModal } from './search/GlobalSearchModal';
 import { OnboardingModal } from './onboarding/OnboardingModal';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useScrollTracking } from '../hooks/useScrollTracking';
+import { useAuth } from '../contexts/AuthContext';
+import { getUserProfile } from '../services/profile.service';
+
+const ONBOARDING_SEEN_KEY = 'edubuzz_onboarding_seen';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
+    return !!localStorage.getItem(ONBOARDING_SEEN_KEY) || !!localStorage.getItem('edubuzz_onboarding');
+  });
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // Define sections for scroll tracking (order matters - bottom to top check)
-  const sections = [
-    { id: 'home', path: '/', elementId: 'home' },
-    { id: 'events', path: '#events', elementId: 'events' },
-    { id: 'benefits', path: '#benefits', elementId: 'benefits' },
-    { id: 'ai-tools', path: '#ai-tools', elementId: 'ai-tools' },
-    { id: 'dashboard', path: '#dashboard', elementId: 'dashboard' },
-  ];
+  // Determine active nav link based on current route
+  const activeSection = location.pathname;
 
-  // Use scroll tracking hook
-  const activeSection = useScrollTracking(sections);
+  // For logged-in users, check database for onboardingComplete (persists across devices)
+  useEffect(() => {
+    if (user && !hasSeenOnboarding) {
+      getUserProfile(user.$id).then(profile => {
+        if (profile?.onboardingComplete) {
+          setHasSeenOnboarding(true);
+          localStorage.setItem(ONBOARDING_SEEN_KEY, 'true');
+        }
+      }).catch(() => {});
+    }
+  }, [user, hasSeenOnboarding]);
+
+  const handleOpenOnboarding = () => {
+    setIsOnboardingOpen(true);
+    setHasSeenOnboarding(true);
+    localStorage.setItem(ONBOARDING_SEEN_KEY, 'true');
+  };
 
   // Auto-close mobile menu when route changes
   useEffect(() => {
@@ -45,18 +61,18 @@ export function Header() {
   }, [isMobileSearchExpanded]);
 
   const navLinks = [
-    { name: 'Home', path: '/', icon: Home, scrollTo: 'home' },
-    { name: 'Events', path: '#events', icon: Calendar, scrollTo: 'events' },
-    { name: 'Benefits', path: '#benefits', icon: Gift, scrollTo: 'benefits' },
-    { name: 'AI Tools', path: '#ai-tools', icon: Star, scrollTo: 'ai-tools' },
-    { name: 'Dashboard', path: '#dashboard', icon: BarChart3, scrollTo: 'dashboard' },
+    { name: 'Home', path: '/', icon: Home, isPage: true },
+    { name: 'Events', path: '/events', icon: Calendar, isPage: true },
+    { name: 'Benefits', path: '/perks', icon: Gift, isPage: true },
+    { name: 'AI Tools', path: '/tools', icon: Star, isPage: true },
+    { name: 'Dashboard', path: '/dashboard', icon: BarChart3, isPage: true },
   ];
   const mobileNavLinks = [
-    { name: 'Home', path: '/', icon: Home, scrollTo: 'home' },
-    { name: 'Events', path: '#events', icon: Calendar, scrollTo: 'events' },
-    { name: 'Benefits', path: '#benefits', icon: Gift, scrollTo: 'benefits' },
-    { name: 'AI Tools', path: '#ai-tools', icon: Star, scrollTo: 'ai-tools' },
-    { name: 'Dashboard', path: '#dashboard', icon: BarChart3, scrollTo: 'dashboard' },
+    { name: 'Home', path: '/', icon: Home, isPage: true },
+    { name: 'Events', path: '/events', icon: Calendar, isPage: true },
+    { name: 'Benefits', path: '/perks', icon: Gift, isPage: true },
+    { name: 'AI Tools', path: '/tools', icon: Star, isPage: true },
+    { name: 'Dashboard', path: '/dashboard', icon: BarChart3, isPage: true },
     { name: 'Register', path: '/college-portal', icon: BookOpen, isPage: true },
     { name: 'Maps', path: '/map', icon: MapPin, isPage: true },
   ];
@@ -317,13 +333,13 @@ export function Header() {
         <GlobalSearchModal open={isSearchOpen} onOpenChange={setIsSearchOpen} />
       </header>
 
-      {/* Start Onboarding - fixed below header, far right */}
-      {location.pathname === '/' && (
+      {/* Start Onboarding - fixed below header, far right (hidden once viewed) */}
+      {location.pathname === '/' && !hasSeenOnboarding && (
         <motion.button
           initial={{ opacity: 0, x: 10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.5 }}
-          onClick={() => setIsOnboardingOpen(true)}
+          onClick={handleOpenOnboarding}
           className="fixed top-20 right-8 z-40 text-white font-semibold px-7 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-sm whitespace-nowrap"
           style={{ background: 'linear-gradient(135deg, #22c55e, #0ea5e9, #2563eb)' }}
         >

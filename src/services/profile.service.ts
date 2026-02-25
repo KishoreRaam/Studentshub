@@ -53,6 +53,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
         end: response.validityEnd ? new Date(response.validityEnd) : new Date(Date.now() + 4 * 365 * 24 * 60 * 60 * 1000),
       },
       linkedAccounts: response.linkedAccounts || [],
+      onboardingComplete: response.onboardingComplete || false,
     } as UserProfile;
   } catch (error: any) {
     // If document doesn't exist (404), return null

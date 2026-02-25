@@ -420,6 +420,6 @@ APPWRITE_API_KEY=your_appwrite_server_key
 
 <div align="center">
 
-**Built with ❤️ for students, by  a student.**
+**Built with ❤️ for students, by students.**
 
 </div>

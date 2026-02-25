@@ -18,6 +18,7 @@ export interface UserProfile {
     end: Date;
   };
   linkedAccounts: LinkedAccount[];
+  onboardingComplete?: boolean;
 }
 
 export interface LinkedAccount {

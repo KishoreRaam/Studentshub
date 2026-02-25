@@ -27,6 +27,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
     setStep(0);
     setSelectedDepartment(null);
     setSelectedSpecialization(null);
+    localStorage.setItem('edubuzz_onboarding_seen', 'true');
     onClose();
   };
 
