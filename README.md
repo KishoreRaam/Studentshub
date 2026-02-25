@@ -1,357 +1,425 @@
-# StudentsHub
+<div align="center">
 
-> A comprehensive platform helping students discover perks, discounts, AI tools, and educational resources — all in one place.
+# 🎓 StudentsHub
 
-![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6.3-646CFF?logo=vite&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.x-06B6D4?logo=tailwindcss&logoColor=white)
-![Appwrite](https://img.shields.io/badge/Appwrite-21.x-FD366E?logo=appwrite&logoColor=white)
+### Everything a student needs — one platform.
 
----
+Discover student discounts, AI tools, courses, events, and campus resources — all verified, curated, and free.
 
-## Table of Contents
+<br />
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Pages & Routes](#pages--routes)
-- [Backend & Database](#backend--database)
-- [Authentication Flow](#authentication-flow)
-- [Appwrite Cloud Functions](#appwrite-cloud-functions)
-- [Contributing](#contributing)
+![React](https://img.shields.io/badge/React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite_6-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Appwrite](https://img.shields.io/badge/Appwrite-FD366E?style=for-the-badge&logo=appwrite&logoColor=white)
+![Mapbox](https://img.shields.io/badge/Mapbox-000000?style=for-the-badge&logo=mapbox&logoColor=white)
 
----
+<br />
 
-## Overview
+[Live Site](#) · [Report Bug](../../issues) · [Request Feature](../../issues)
 
-**StudentsHub** is a full-stack web application built for students to explore and take advantage of curated perks, discounts, AI tools, and educational resources. The platform features:
+</div>
 
-- A geo-location based interactive **map** showing nearby deals and discounts
-- A personalized **dashboard** with saved items and activity
-- A **college portal** for institution-based verification and access control
-- Complete **authentication** with college email verification (`.edu`/`.edu.in` domains)
-- A curated **AI tools** directory tailored for academic use
-- A **vendor/partner** portal for organizations offering student benefits
+<br />
 
 ---
 
-## Features
+<br />
 
-| Feature | Description |
-|---|---|
-| **Perks Discovery** | Browse and filter curated student discounts and benefits |
-| **Interactive Map** | Geo-based deal discovery with Mapbox GL |
-| **Personalized Dashboard** | Saved items, activity stats, and personalized content |
-| **AI Tools Directory** | Curated list of AI tools categorized for students |
-| **Educational Resources** | Guides, FAQs, and resource tabs |
-| **Courses Listing** | Course discovery with filtering |
-| **College Portal** | Domain-based college verification system |
-| **Vendor Landing** | Dedicated portal for vendors and partners |
-| **Business Model Calculator** | Financial modeling tool for student projects |
-| **Global Search** | Fuzzy search with command palette (⌘K) |
-| **Dark Mode** | Full light/dark theme support |
-| **Onboarding Flow** | Multi-step onboarding (department, specialization, summary) |
-| **Email Verification** | SendGrid-powered college email verification |
+## 🧭 What is StudentsHub?
+
+**StudentsHub** is a one-stop platform that helps college students **save money, learn smarter, and stay connected** with everything their student life needs.
+
+Too many student benefits go unclaimed simply because students don't know they exist. StudentsHub fixes that by bringing together:
+
+- **🏷️ Student Discounts & Perks** — Verified deals from 35+ brands like GitHub, Figma, Apple, JetBrains, Spotify, and more. Filter by category, search instantly, and claim with one click.
+
+- **🤖 AI Tools Directory** — A curated, searchable database of AI tools useful for assignments, research, coding, and productivity — categorized and rated for students.
+
+- **📚 Courses & Learning Resources** — Free and discounted courses, certifications, and study material from platforms like Coursera, Udemy, and LinkedIn Learning.
+
+- **🗺️ Interactive Deals Map** — A Mapbox-powered map showing nearby student discounts — food, shopping, travel, entertainment — based on your location.
+
+- **📅 Campus Events** — Discover, register for, and even create events. Includes an event creator dashboard and admin moderation panel.
+
+- **🏫 College Portal** — Institutions can register and verify their student email domains so their students get automatic access.
+
+- **🤝 Vendor Portal** — Businesses and brands can apply to list their student offers on the platform.
+
+<br />
+
+> **Who is it for?** College students in India (and beyond) who want to unlock every benefit their `.edu` email can get them.
+
+<br />
 
 ---
 
-## Tech Stack
+<br />
+
+## ✨ Feature Highlights
+
+<table>
+<tr>
+<td width="50%">
+
+### 🔍 Smart Search
+Global fuzzy search with a command palette (<kbd>⌘</kbd><kbd>K</kbd>). Find any perk, tool, course, or event instantly.
+
+</td>
+<td width="50%">
+
+### 🌙 Dark Mode
+Full light and dark theme support. Follows your system preference or toggle manually — persists across sessions.
+
+</td>
+</tr>
+<tr>
+<td>
+
+### 📊 Personal Dashboard
+A protected dashboard showing your saved perks, bookmarked tools, upcoming events, and activity stats.
+
+</td>
+<td>
+
+### 🛡️ College Email Verification
+Sign up with your college email. Automatic domain validation + SendGrid verification ensures only real students get access.
+
+</td>
+</tr>
+<tr>
+<td>
+
+### 🗓️ Event Management
+Full event lifecycle — students can browse, register, and create events. Admins moderate submissions before they go live.
+
+</td>
+<td>
+
+### 📈 Google Analytics
+Page-level analytics tracking built in. Every route change fires a pageview so you can understand user behavior.
+
+</td>
+</tr>
+<tr>
+<td>
+
+### 🧮 Business Model Calculator
+A financial modeling tool for student entrepreneurs to plan and validate their startup ideas.
+
+</td>
+<td>
+
+### 💬 Email Inquiry Widget
+A floating contact widget on every page lets users reach out with questions, feedback, or partnership inquiries.
+
+</td>
+</tr>
+</table>
+
+<br />
+
+---
+
+<br />
+
+## 🛠️ Tech Stack
 
 ### Frontend
 
-| Category | Technology |
-|---|---|
-| Framework | React 18.3 + TypeScript |
-| Build Tool | Vite 6.3 (SWC compiler) |
-| Routing | React Router DOM 7.9 |
-| Styling | Tailwind CSS + CVA |
-| UI Components | Radix UI (30+ primitives) |
-| Icons | Lucide React |
-| Forms | React Hook Form + Zod |
-| Animation | GSAP + Motion |
-| Charts | Recharts |
-| Maps | Mapbox GL 3.x |
-| Search | Fuse.js (fuzzy search) |
-| Notifications | Sonner (toasts) |
-| Carousel | Embla Carousel |
-| Analytics | React GA4 |
-| Theme | next-themes |
+| | Technology | Purpose |
+|:--|:--|:--|
+| ⚛️ | **React 18** + TypeScript | UI framework with type safety |
+| ⚡ | **Vite 6** (SWC) | Lightning-fast dev server & bundler |
+| 🎨 | **Tailwind CSS** + **shadcn/ui** | Utility-first styling with 30+ Radix UI primitives |
+| 🧭 | **React Router v7** | Client-side routing (20+ routes) |
+| 📝 | **React Hook Form** + **Zod** | Form handling with schema validation |
+| 🎞️ | **GSAP** + **Framer Motion** | Smooth animations & page transitions |
+| 🗺️ | **Mapbox GL** | Interactive geolocation-based map |
+| 📊 | **Recharts** | Dashboard charts and data visualization |
+| 🔎 | **Fuse.js** | Client-side fuzzy search |
+| 🔔 | **Sonner** | Toast notifications |
+| 🎠 | **Embla Carousel** | Responsive carousels |
 
 ### Backend & Services
 
-| Category | Technology |
-|---|---|
-| BaaS | Appwrite 21.x |
-| Serverless Functions | Appwrite Cloud Functions |
-| Email Delivery | SendGrid |
-| API Server | Node.js (Vercel Serverless) |
-| Data Parsing | PapaParse + csv-parse |
+| | Technology | Purpose |
+|:--|:--|:--|
+| ☁️ | **Appwrite** | Auth, database, storage, serverless functions |
+| 📧 | **SendGrid** | Transactional verification & newsletter emails |
+| 🌐 | **Node.js API** (Vercel) | College domain validation endpoint |
+| 📋 | **PapaParse** | CSV parsing for bulk data (perks, tools, events) |
+| 📈 | **React GA4** | Google Analytics integration |
+
+<br />
 
 ---
 
-## Project Structure
+<br />
+
+## 🗂️ Project Structure
 
 ```
-Studentshub/
+StudentsHub/
+│
+├── 📄 index.html                  # HTML entry point
+├── 📦 package.json                # Dependencies & scripts
+├── ⚙️ vite.config.ts              # Vite bundler config
+├── 🎨 postcss.config.js           # Tailwind CSS processing
+├── 🔒 .env                        # Environment variables (not committed)
+│
 ├── src/
-│   ├── components/              # 130+ React components
-│   │   ├── ui/                 # Radix UI wrappers (50+ components)
-│   │   ├── map/                # MapCanvas, MapNavBar, deal filters
-│   │   ├── dashboard/          # Dashboard card components
-│   │   ├── college-portal/     # College portal UI
-│   │   ├── courses/            # Course components
-│   │   ├── onboarding/         # Multi-step onboarding modal
-│   │   ├── profile/            # User profile components
-│   │   ├── search/             # Global search modal
-│   │   ├── ai-tools/           # AI tools section components
-│   │   └── home/               # Landing page sections
+│   ├── App.tsx                    # 🧭 Root — all routing lives here
+│   ├── main.tsx                   # 🚀 React entry point + AuthProvider
+│   ├── index.css                  # 🎨 Global styles, fonts, animations
 │   │
-│   ├── pages/                  # 20+ route-level page components
-│   │   ├── Home.tsx
-│   │   ├── Dashboard.tsx
-│   │   ├── Perks.tsx
-│   │   ├── MapPage.tsx
-│   │   ├── Profile.tsx
-│   │   ├── ResourcesPage.tsx
-│   │   ├── CoursesPage.tsx
-│   │   ├── AITools.tsx
-│   │   ├── BusinessModel.tsx
-│   │   ├── CollegePortal.tsx
-│   │   ├── VendorLanding.tsx
-│   │   └── [auth pages]        # Login, SignUp, Reset, Verify
+│   ├── pages/                     # 📄 Full-page route components
+│   │   ├── Home.tsx               #    Landing page
+│   │   ├── Dashboard.tsx          #    User dashboard (protected)
+│   │   ├── Perks.tsx              #    Student discounts catalog
+│   │   ├── AITools.tsx            #    AI tools directory
+│   │   ├── MapPage.tsx            #    Interactive deals map
+│   │   ├── EventsLanding.tsx      #    Events discovery
+│   │   ├── CollegePortal.tsx      #    College registration
+│   │   ├── VendorLanding.tsx      #    Vendor/partner portal
+│   │   └── ...                    #    Auth pages, Profile, Courses, etc.
 │   │
-│   ├── contexts/               # React Contexts
-│   │   ├── AuthContext.tsx     # Global auth state
-│   │   └── SearchContext.tsx   # Global search state
+│   ├── components/                # 🧩 54 reusable UI components
+│   │   ├── Header.tsx             #    Site-wide navigation bar
+│   │   ├── Footer.tsx             #    Site-wide footer
+│   │   ├── Hero.tsx               #    Landing page hero section
+│   │   ├── ui/                    #    shadcn/ui primitives (Button, Dialog, etc.)
+│   │   ├── map/                   #    Map canvas, controls, info cards
+│   │   ├── dashboard/             #    Dashboard cards & stats
+│   │   ├── college-portal/        #    Registration form, domain checker
+│   │   ├── onboarding/            #    Multi-step new user onboarding
+│   │   └── search/                #    Global search modal
 │   │
-│   ├── hooks/                  # Custom hooks
-│   │   ├── useMapState.ts
-│   │   ├── useSavedItems.ts
-│   │   ├── useFormAutoSave.ts
-│   │   └── useScrollTracking.ts
+│   ├── contexts/                  # 🔄 Global state
+│   │   ├── AuthContext.tsx         #    User auth (login, logout, session)
+│   │   └── SearchContext.tsx       #    Site-wide search state
 │   │
-│   ├── services/               # Appwrite service layer
-│   │   ├── profile.service.ts
-│   │   ├── saved-items.service.ts
-│   │   └── saved-events.service.ts
-│   │
-│   ├── utils/                  # Utility functions
-│   │   ├── csvParser.ts
-│   │   ├── collegeUtils.ts
-│   │   ├── searchUtils.ts
-│   │   └── streamUtils.ts
-│   │
-│   ├── data/                   # Static datasets
-│   │   ├── onboardingData.ts
-│   │   └── discountLocations.ts
-│   │
-│   ├── types/                  # TypeScript type definitions
-│   │   ├── ai-tools.ts
-│   │   ├── collegePortal.ts
-│   │   ├── dashboard.ts
-│   │   ├── event.ts
-│   │   ├── profile.types.ts
-│   │   ├── resource.ts
-│   │   └── search.ts
-│   │
-│   ├── App.tsx                 # Root app with routing
-│   ├── main.tsx                # React entry point
-│   └── index.css               # Global styles + animations
+│   ├── hooks/                     # 🪝 Custom React hooks
+│   ├── services/                  # 📡 Appwrite API service layer
+│   ├── utils/                     # 🔧 Helpers (CSV parser, search, etc.)
+│   ├── types/                     # 📐 TypeScript type definitions
+│   ├── data/                      # 📊 Static datasets
+│   └── styles/                    # 🎨 CSS variables & theme tokens
+│       └── globals.css            #    ← Change site colors here
 │
 ├── api/
-│   └── check-domain.js         # Vercel serverless — .edu domain checker
+│   └── check-domain.js            # 🌐 College domain validation API
 │
-├── appwrite-functions/         # Appwrite cloud functions
-│   ├── onUserUpdated/          # Post-verification role assignment
-│   ├── resendVerification/     # Rate-limited email resend
-│   ├── sendVerificationCustom/ # SendGrid email sender
-│   ├── adminEndpoints/         # Admin management API
-│   ├── sendgridWebhook/        # Email event webhook handler
-│   ├── DATABASE_SCHEMA.md      # Full DB schema documentation
-│   ├── DEPLOYMENT.md           # Function deployment guide
-│   └── README.md               # Functions overview
+├── appwrite-functions/            # ☁️ Serverless backend functions
+│   ├── sendVerificationCustom/    #    Sends branded verification email
+│   ├── resendVerification/        #    Rate-limited email resend
+│   ├── onUserUpdated/             #    Post-verification role assignment
+│   ├── adminEndpoints/            #    Admin user management API
+│   ├── sendgridWebhook/           #    Email bounce/unsubscribe handler
+│   ├── subscribeNewsletter/       #    Newsletter subscription
+│   └── shared/utils.js            #    Shared helper functions
 │
-├── scripts/                    # Utility/data scripts
-├── public/                     # Static assets
-├── vite.config.ts
-├── tailwind.config.js
-├── tsconfig.json
-└── package.json
+├── scripts/                       # 🔨 Setup & maintenance scripts
+│
+└── public/assets/                 # 📁 Static data & images
+    ├── Logos/                     #    38 brand logos
+    ├── Colleges/                  #    Indian college CSV datasets
+    ├── ai-tools-complete.csv      #    AI tools database
+    └── student_events_*.csv       #    Events data
 ```
+
+<br />
 
 ---
 
-## Getting Started
+<br />
+
+## 🗺️ Pages & Routes
+
+| Route | Page | Protected? | What it shows |
+|:--|:--|:--:|:--|
+| `/` | Home | | Landing page with hero, features, testimonials, FAQ |
+| `/perks` | Perks | | Browse & filter 35+ student discounts |
+| `/tools` | AI Tools | | Searchable directory of AI tools |
+| `/resources` | Resources | | Free learning materials & guides |
+| `/courses` | Courses | | Course discovery with filtering |
+| `/map` | Map | | Interactive Mapbox map of nearby deals |
+| `/events` | Events | | Browse and discover campus events |
+| `/events/register` | Event Register | | Submit a new event |
+| `/events/dashboard` | Creator Dashboard | | Manage your created events |
+| `/college-portal` | College Portal | | Register your institution |
+| `/vendors` | Vendor Portal | | Partner/vendor application page |
+| `/business-model` | Business Model | | Financial calculator for student startups |
+| `/dashboard` | Dashboard | 🔒 | Personal saved items, stats, activity |
+| `/profile` | Profile | 🔒 | Account settings & preferences |
+| `/admin/events` | Admin Moderation | 🔒 | Approve or reject submitted events |
+| `/login` | Login | | Email/password + Google OAuth |
+| `/signup` | Sign Up | | Create account with college email |
+
+<br />
+
+---
+
+<br />
+
+## 🔐 Authentication Flow
+
+```
+┌─────────────────────────────────────────┐
+│  Student signs up with college email    │
+└──────────────────┬──────────────────────┘
+                   ▼
+┌─────────────────────────────────────────┐
+│  Verification email sent via SendGrid   │
+│  (branded template with confirm link)   │
+└──────────────────┬──────────────────────┘
+                   ▼
+┌─────────────────────────────────────────┐
+│  Student clicks verification link       │
+└──────────────────┬──────────────────────┘
+                   ▼
+┌─────────────────────────────────────────┐
+│  Appwrite marks emailVerification=true  │
+└──────────────────┬──────────────────────┘
+                   ▼
+┌─────────────────────────────────────────┐
+│  onUserUpdated() cloud function fires:  │
+│  ├── Validates college email domain     │
+│  ├── Assigns "student" role             │
+│  └── Creates audit log entry            │
+└──────────────────┬──────────────────────┘
+                   ▼
+┌─────────────────────────────────────────┐
+│  ✅ Student gets full platform access   │
+└─────────────────────────────────────────┘
+```
+
+Login methods: **Google OAuth** and **Email + Password**. Protected routes redirect unauthenticated users to `/login`.
+
+<br />
+
+---
+
+<br />
+
+## ☁️ Appwrite Cloud Functions
+
+Each function in `appwrite-functions/` is independently deployable:
+
+| Function | Trigger | What it does |
+|:--|:--|:--|
+| `sendVerificationCustom` | HTTP | Sends branded verification email via SendGrid |
+| `resendVerification` | HTTP | Rate-limited resend (max 3/hour) |
+| `onUserUpdated` | Appwrite Event | Auto-assigns student role after email verification |
+| `adminEndpoints` | HTTP | Admin APIs — user stats, role overrides, audit logs |
+| `sendgridWebhook` | HTTP | Handles email bounces and unsubscribes from SendGrid |
+| `subscribeNewsletter` | HTTP | Adds email to newsletter mailing list |
+
+See [`appwrite-functions/DEPLOYMENT.md`](./appwrite-functions/DEPLOYMENT.md) for setup instructions.
+
+<br />
+
+---
+
+<br />
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js** v18+ and npm
-- An **Appwrite** instance (cloud or self-hosted)
-- A **Mapbox** account and API token
-- A **SendGrid** account for transactional email
-- A **Google Analytics** tracking ID (optional)
+- **Node.js** v18+
+- An [Appwrite](https://appwrite.io) project (cloud or self-hosted)
+- A [Mapbox](https://www.mapbox.com) access token
+- A [SendGrid](https://sendgrid.com) API key
+- (Optional) Google Analytics tracking ID
 
-### Installation
+### Install & Run
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/your-org/studentshub.git
+# Clone the repo
+git clone https://github.com/your-username/studentshub.git
 cd studentshub
 
-# 2. Install dependencies
+# Install dependencies
 npm install
 
-# 3. Copy and configure environment variables
+# Set up environment variables
 cp .env.example .env
-# Fill in your values (see Environment Variables section below)
+# Fill in your API keys (see below)
 
-# 4. Start the full development stack
-npm run dev:full
-# OR run just the frontend
+# Start the dev server
 npm run dev
 ```
 
-| Script | Description |
-|---|---|
-| `npm run dev` | Start the frontend dev server at `localhost:3000` |
-| `npm run api` | Start the Node.js API server at `localhost:3001` |
-| `npm run dev:full` | Start both frontend and API simultaneously |
-| `npm run build` | Create a production build in `build/` |
+### Available Scripts
+
+| Command | Description |
+|:--|:--|
+| `npm run dev` | Start frontend dev server |
+| `npm run api` | Start the domain-check API server |
+| `npm run dev:full` | Start both frontend + API together |
+| `npm run build` | Production build → `build/` |
+
+<br />
 
 ---
 
-## Environment Variables
+<br />
 
-Create a `.env` file at the project root with the following:
+## 🔑 Environment Variables
+
+Create a `.env` file in the project root:
 
 ```env
 # Appwrite
 VITE_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
-VITE_APPWRITE_PROJECT_ID=your_project_id
+VITE_APPWRITE_PROJECT=your_project_id
 VITE_APPWRITE_DATABASE_ID=studentperks_db
+VITE_APPWRITE_COLLECTION_USERS=users
+VITE_APPWRITE_BUCKET_PROFILE_PICTURES=profile_pictures
 
 # Mapbox
-VITE_MAPBOX_TOKEN=your_mapbox_public_token
+VITE_MAPBOX_TOKEN=pk.your_mapbox_token
 
-# Google Analytics
+# Google Analytics (optional)
 VITE_GA_TRACKING_ID=G-XXXXXXXXXX
 
-# API (used by the api/ server)
-SENDGRID_API_KEY=your_sendgrid_api_key
+# Backend (for cloud functions)
+SENDGRID_API_KEY=SG.your_sendgrid_key
 APPWRITE_API_KEY=your_appwrite_server_key
 ```
 
-> Appwrite Cloud Functions require additional environment variables. See [`appwrite-functions/DEPLOYMENT.md`](./appwrite-functions/DEPLOYMENT.md) for the complete guide.
+> All client-side variables must be prefixed with `VITE_` to be accessible in Vite.
+
+<br />
 
 ---
 
-## Pages & Routes
+<br />
 
-| Route | Page | Auth Required |
-|---|---|---|
-| `/` | Home — landing page | No |
-| `/dashboard` | Personalized user dashboard | Yes |
-| `/perks` | Perks & discounts catalog | No |
-| `/map` | Interactive geo-based deal map | No |
-| `/profile` | User profile & settings | Yes |
-| `/resources` | Educational resources & FAQs | No |
-| `/courses` | Course discovery & filtering | No |
-| `/tools` | AI tools directory | No |
-| `/business-model` | Financial modeling calculator | No |
-| `/college-portal` | College domain checker | No |
-| `/vendors` | Vendor / partner platform | No |
-| `/login` | Login | Guest only |
-| `/signup` | Sign up | Guest only |
-| `/forgot-password` | Password reset request | Guest only |
-| `/reset-password` | Set new password | Guest only |
-| `/verify-email` | Email verification | Guest only |
+## 🤝 Contributing
 
----
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feat/amazing-feature`
+3. **Commit** with conventional commits: `git commit -m "feat: add amazing feature"`
+4. **Push** and open a **Pull Request** against `main`
 
-## Backend & Database
-
-StudentsHub uses **Appwrite** as its backend-as-a-service.
-
-**Database ID:** `studentperks_db`
-
-### Collections
-
-| Collection | Purpose |
-|---|---|
-| `users_meta` | User metadata, roles, and verification status |
-| `audit_logs` | Authentication event tracking (signup, login, verify) |
-| `email_logs` | Email delivery status per user |
-
-For the full schema including field types, permissions, and indexes, see [`appwrite-functions/DATABASE_SCHEMA.md`](./appwrite-functions/DATABASE_SCHEMA.md).
-
-### Domain Checker API
-
-A lightweight Node.js serverless function at `/api/check-domain.js` performs DNS-based validation of `.edu` / `.edu.in` domains submitted during college portal registration.
-
-- **Endpoint:** `POST /api/check-domain`
-- **Runs on:** Port 3001 locally / Vercel in production
-
----
-
-## Authentication Flow
-
-```
-User signs up with college email
-        │
-        ▼
-Verification email sent via SendGrid
-        │
-        ▼
-User clicks verification link
-        │
-        ▼
-Appwrite marks emailVerification = true
-        │
-        ▼
-onUserUpdated cloud function triggers
-        ├── Validates college email domain
-        ├── Assigns "student" role in users_meta
-        └── Creates an audit log entry
-        │
-        ▼
-User gains full access to protected content
-```
-
-Protected routes are guarded via `AuthContext`. Unauthenticated users attempting to access protected pages are redirected to `/login`.
-
----
-
-## Appwrite Cloud Functions
-
-All serverless logic lives in `appwrite-functions/`. Each function is independently deployable.
-
-| Function | Trigger | Purpose |
-|---|---|---|
-| `onUserUpdated` | Appwrite event (user update) | Assigns role after email verification |
-| `resendVerification` | HTTP | Rate-limited resend of verification email |
-| `sendVerificationCustom` | HTTP | Sends branded verification email via SendGrid |
-| `adminEndpoints` | HTTP | Admin management — user stats, overrides |
-| `sendgridWebhook` | HTTP | Handles email bounces and suppressions from SendGrid |
-
-See [`appwrite-functions/README.md`](./appwrite-functions/README.md) for deployment instructions and individual function documentation.
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Make your changes following the existing code style
-4. Commit using conventional commits: `git commit -m "feat: add new feature"`
-5. Push and open a Pull Request against `main`
-
-**Code conventions:**
-- TypeScript strict mode — no `any`
-- Components go in `src/components/`, pages in `src/pages/`
+**Code style guidelines:**
+- TypeScript strict mode — avoid `any`
+- Components → `src/components/`, Pages → `src/pages/`
 - Use the service layer in `src/services/` for all Appwrite calls
-- Prefer Radix UI primitives from `src/components/ui/` for new UI elements
-- Run `npm run build` and ensure it passes before submitting a PR
+- Prefer Radix UI primitives from `src/components/ui/` for new UI
+- Run `npm run build` before submitting PRs
+
+<br />
+
+---
+
+<br />
+
+<div align="center">
+
+**Built with ❤️ for students, by students.**
+
+</div>
