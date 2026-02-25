@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Papa from "papaparse";
+import { getLogoUrl } from "../utils/logoUtils";
 
 type Resource = {
   provider: string;
@@ -23,6 +24,7 @@ type DisplayResource = {
   description: string;
   category: string;
   claimLink?: string;
+  logoUrl?: string;
 };
 
 // Fallback data in case CSV fails to load
@@ -117,7 +119,8 @@ export function FreeResourcesSection() {
                 name: resource.title || resource.provider,
                 description: resource.description,
                 category: resource.category,
-                claimLink: resource.claimLink
+                claimLink: resource.claimLink,
+                logoUrl: getLogoUrl(resource.provider || resource.title, resource.claimLink)
               }));
 
             if (freeCourses.length > 0) {
@@ -199,9 +202,20 @@ export function FreeResourcesSection() {
                     : "opacity-0 translate-y-8"
                 }`}
               >
-                {/* Icon */}
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-white" />
+                {/* Logo */}
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center mb-4 overflow-hidden">
+                  {resource.logoUrl ? (
+                    <img
+                      src={resource.logoUrl}
+                      alt={resource.name}
+                      className="w-full h-full object-contain p-1.5"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <Icon className={`w-6 h-6 text-white ${resource.logoUrl ? 'hidden' : ''}`} />
                 </div>
 
                 {/* Content */}

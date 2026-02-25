@@ -12,30 +12,45 @@ export type SavedPerk = {
   icon: string;
   validity: string;
   description: string;
+  website?: string;
+  logo?: string;
+  color?: string;
+  discount?: string;
+  claimLink?: string;
   isSaved: boolean;
+  claimed?: boolean;
+  savedId?: string;
 };
 
 export type SavedResource = {
   id: string;
   title: string;
+  provider?: string;
   category: string;
-  icon: string;
   description: string;
-  isPremium: boolean;
+  claimLink?: string;
+  badge?: string;
+  validity?: string;
   isSaved: boolean;
-  link?: string;
+  savedId?: string;
 };
 
 export type SavedAITool = {
   id: string;
-  title: string;
-  category: string;
-  icon: string;
+  name: string;
   description: string;
-  isPremium: boolean;
+  logo: string;
+  logo_url?: string;
+  category: string[];
+  pricing: string;
+  features: string[];
+  link: string;
+  isOpenSource?: boolean;
+  isPopular?: boolean;
+  isNew?: boolean;
+  requiresVerification?: boolean;
   isSaved: boolean;
-  link?: string;
-  features?: string[];
+  savedId?: string;
 };
 
 export type Subscription = {

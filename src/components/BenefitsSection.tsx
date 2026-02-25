@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from './ui/card';
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Badge } from './ui/badge';
 import { BenefitDetail } from './BenefitDetail';
 import { GitHubStudentPack } from './GitHubStudentPack';
 import { ExternalLink, Star } from 'lucide-react';
+import { getLogoUrl } from '../utils/logoUtils';
 
 // Remove GitHub Student Pack from regular benefits array
 const benefits = [
@@ -14,7 +14,7 @@ const benefits = [
     id: 3,
     title: "Microsoft 365",
     description: "Complete Office suite with Word, Excel, PowerPoint, OneDrive storage, and collaboration tools.",
-    image: "https://images.unsplash.com/photo-1649433391420-542fcd3835ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaWNyb3NvZnQlMjBvZmZpY2V8ZW58MXx8fHwxNzU3NDAyNjUyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: getLogoUrl("Microsoft 365"),
     value: "₹8,300/year",
     badge: "Productivity",
     link: "https://www.microsoft.com/en-us/education/products/office",
@@ -48,7 +48,7 @@ const benefits = [
     id: 4,
     title: "Spotify Premium",
     description: "Ad-free music streaming with offline downloads and high-quality audio at student pricing.",
-    image: "https://images.unsplash.com/photo-1658489958427-325ded050829?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG90aWZ5JTIwbXVzaWN8ZW58MXx8fHwxNzU3NDMxMjkwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: getLogoUrl("Spotify Premium"),
     value: "₹5,000/year",
     badge: "Entertainment",
     link: "https://www.spotify.com/in/student/",
@@ -83,7 +83,7 @@ const benefits = [
     id: 5,
     title: "Adobe Creative Cloud",
     description: "Professional creative software including Photoshop, Illustrator, Premiere Pro, and more.",
-    image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZG9iZSUyMGNyZWF0aXZlfGVufDF8fHx8MTc1NzQzMTI5MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: getLogoUrl("Adobe Creative Cloud"),
     value: "₹50,000/year",
     badge: "Creative",
     link: "https://www.adobe.com/in/creativecloud/buy/students.html",
@@ -119,7 +119,7 @@ const benefits = [
     id: 6,
     title: "Figma Professional",
     description: "Advanced design and prototyping tools with unlimited projects and collaboration features.",
-    image: "https://images.unsplash.com/photo-1653647054667-c99dc7f914ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaWdtYSUyMGRlc2lnbnxlbnwxfHx8fDE3NTc0MzEyOTF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: getLogoUrl("Figma Professional"),
     value: "₹12,000/year",
     badge: "Design",
     link: "https://www.figma.com/education/",
@@ -210,12 +210,15 @@ export function BenefitsSection() {
                     </motion.div>
                   )}
                   
-                  <div className="aspect-[4/3] overflow-hidden">
-                    <motion.div layoutId={`benefit-image-${benefit.id}`}>
-                      <ImageWithFallback
+                  <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center p-8">
+                    <motion.div layoutId={`benefit-image-${benefit.id}`} className="flex items-center justify-center">
+                      <img
                         src={benefit.image}
                         alt={benefit.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="max-w-[180px] max-h-[120px] object-contain group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     </motion.div>
                   </div>

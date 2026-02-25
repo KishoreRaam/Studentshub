@@ -29,7 +29,19 @@ interface EventCardProps {
   onToggleSave: (eventId: string) => void;
 }
 
+import { databases, DATABASE_ID, COLLECTIONS } from '@/lib/appwrite';
+
 export default function EventCard({ event, onViewDetails, onToggleSave }: EventCardProps) {
+  const handleRegisterClick = () => {
+    databases.getDocument(DATABASE_ID, COLLECTIONS.EVENTS, event.id)
+      .then(doc => {
+        return databases.updateDocument(DATABASE_ID, COLLECTIONS.EVENTS, event.id, {
+          participantCount: (doc.participantCount || 0) + 1
+        });
+      })
+      .catch(console.error);
+  };
+
   const daysUntil = getDaysUntilEvent(event.date);
   const eventDate = new Date(event.date);
   const today = new Date();
@@ -66,11 +78,10 @@ export default function EventCard({ event, onViewDetails, onToggleSave }: EventC
         aria-label="Toggle bookmark"
       >
         <Bookmark
-          className={`w-5 h-5 ${
-            event.isSaved
-              ? 'fill-blue-600 text-blue-600 dark:fill-blue-400 dark:text-blue-400'
-              : 'text-blue-600 dark:text-blue-400'
-          }`}
+          className={`w-5 h-5 ${event.isSaved
+            ? 'fill-blue-600 text-blue-600 dark:fill-blue-400 dark:text-blue-400'
+            : 'text-blue-600 dark:text-blue-400'
+            }`}
         />
       </button>
 
@@ -189,7 +200,7 @@ export default function EventCard({ event, onViewDetails, onToggleSave }: EventC
             size="sm"
             className="border-blue-500 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
           >
-            <a href={event.registrationLink} target="_blank" rel="noopener noreferrer">
+            <a href={event.registrationLink} target="_blank" rel="noopener noreferrer" onClick={handleRegisterClick}>
               <ExternalLink className="w-4 h-4" />
             </a>
           </Button>

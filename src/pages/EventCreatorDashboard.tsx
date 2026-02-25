@@ -216,10 +216,10 @@ export default function EventCreatorDashboard() {
   }, [user]);
 
   const stats = useMemo(() => {
-    const totalViews = events.reduce((sum, e) => sum + (e.participantCount || 0), 0);
-    const totalSaves = 0;
+    const totalViews = events.reduce((sum, e) => sum + ((e as any).views || 0), 0);
+    const totalSaves = events.reduce((sum, e) => sum + ((e as any).saves || 0), 0);
     const totalRegistrations = events.reduce((sum, e) => sum + (e.participantCount || 0), 0);
-    const engagementRate = events.length > 0 ? Math.round((totalRegistrations / Math.max(totalViews, 1)) * 100) : 0;
+    const engagementRate = events.length > 0 && Math.max(totalViews, 1) > 0 ? Math.round((totalRegistrations / Math.max(totalViews, 1)) * 100) : 0;
     return { totalViews, totalSaves, totalRegistrations, engagementRate };
   }, [events]);
 
@@ -229,10 +229,10 @@ export default function EventCreatorDashboard() {
   }, [events, statusFilter]);
 
   const statCards = [
-    { label: 'Total Views', value: stats.totalViews, icon: <Eye size={20} color="#3b82f6" />, iconBg: 'rgba(59,130,246,0.15)', change: '+12%', positive: true },
-    { label: 'Total Saves', value: stats.totalSaves, icon: <Heart size={20} color="#a855f7" />, iconBg: 'rgba(168,85,247,0.15)', change: '+8%', positive: true },
-    { label: 'Total Registrations', value: stats.totalRegistrations, icon: <Users size={20} color="#10b981" />, iconBg: 'rgba(16,185,129,0.15)', change: '+24%', positive: true },
-    { label: 'Engagement Rate', value: `${stats.engagementRate}%`, icon: <TrendingUp size={20} color="#f59e0b" />, iconBg: 'rgba(245,158,11,0.15)', change: '-2%', positive: false },
+    { label: 'Total Views', value: stats.totalViews, icon: <Eye size={20} color="#3b82f6" />, iconBg: 'rgba(59,130,246,0.15)', change: 'Live', positive: true },
+    { label: 'Total Saves', value: stats.totalSaves, icon: <Heart size={20} color="#a855f7" />, iconBg: 'rgba(168,85,247,0.15)', change: 'Live', positive: true },
+    { label: 'Total Registrations', value: stats.totalRegistrations, icon: <Users size={20} color="#10b981" />, iconBg: 'rgba(16,185,129,0.15)', change: 'Live', positive: true },
+    { label: 'Engagement Rate', value: `${stats.engagementRate}%`, icon: <TrendingUp size={20} color="#f59e0b" />, iconBg: 'rgba(245,158,11,0.15)', change: 'Live', positive: true },
   ];
 
   const navItems = [
@@ -429,8 +429,8 @@ export default function EventCreatorDashboard() {
                         </td>
                         <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{formatDate(event.eventDate)}</td>
                         <td style={{ padding: '12px 16px' }}><StatusBadge status={getEventStatus(event)} /></td>
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{event.participantCount || 0}</td>
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>0</td>
+                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{(event as any).views || 0}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{(event as any).saves || 0}</td>
                         <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{event.participantCount || 0}</td>
                         <td style={{ padding: '12px 16px' }}>
                           <button style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #2a2a32', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--ecd-text-light)' }}>

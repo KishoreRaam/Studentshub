@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, SyntheticEvent } from 'react';
 import Papa from 'papaparse';
 import { DetailedPerkCard } from '@/components/DetailedPerkCard';
+import { getLogoUrl } from '@/utils/logoUtils';
 import './Perks.css';
 
 type CsvPerkRow = {
@@ -37,23 +38,7 @@ export type Perk = {
   requirements?: string[];
 };
 
-const LOGO_BASE_PATH = '/assets/Logos';
-
-const LOGO_FILES: Record<string, string> = {
-  'StudentGithub Pack': `${LOGO_BASE_PATH}/studentgithub-pack.png`,
-  'GitHub Student Pack': `${LOGO_BASE_PATH}/student-github-pack.png`,
-  'Amazon Prime Student': `${LOGO_BASE_PATH}/amazon-prime-student.jpg`,
-  Figma: `${LOGO_BASE_PATH}/figma.png`,
-  Todoist: `${LOGO_BASE_PATH}/todoist.jpg`,
-  Evernote: `${LOGO_BASE_PATH}/evernote.jpg`,
-  'Dell Student Store': `${LOGO_BASE_PATH}/dell.png`,
-  'HP Student Store': `${LOGO_BASE_PATH}/hp-student-store.jpg`,
-  'Disney+ Hotstar': `${LOGO_BASE_PATH}/disney-hotstar.webp`,
-  "Domino’s Pizza": `${LOGO_BASE_PATH}/dominos.png`,
-  "McDonald’s": `${LOGO_BASE_PATH}/mcdonalds.png`,
-};
-
-const FALLBACK_IMAGE = 'https://source.unsplash.com/400x300/?abstract';
+const FALLBACK_IMAGE = "data:image/svg+xml,%3Csvg xmlns=’http://www.w3.org/2000/svg’ width=’72’ height=’72’%3E%3Crect width=’72’ height=’72’ rx=’16’ fill=’%2394a3b8’ fill-opacity=’0.25’/%3E%3C/svg%3E";
 
 const CSV_PATH = '/assets/Name-Category-Description-DiscountOfferINR-VerificationMethod-Validity-ClaimLink.csv';
 
@@ -694,20 +679,9 @@ const normalizeClaimLink = (link?: string) => {
   return /^https?:\/\//i.test(trimmedLink) ? trimmedLink : `https://${trimmedLink}`;
 };
 
-const getImagePath = (name?: string) => {
+const getImagePath = (name?: string, claimLink?: string) => {
   if (!name) return '';
-  const trimmedName = name.trim();
-  const mappedLogo = LOGO_FILES[trimmedName];
-  if (mappedLogo) {
-    return mappedLogo;
-  }
-
-  const slug = trimmedName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-  return `${LOGO_BASE_PATH}/${slug}.png`;
+  return getLogoUrl(name.trim(), claimLink);
 };
 
 const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
@@ -812,7 +786,7 @@ export default function Perks() {
               title,
               description: descriptionText,
               category,
-              image: getImagePath(title),
+              image: getImagePath(title, normalizeClaimLink(claimLinkRaw)),
               isPopular: Math.random() < 0.3,
               discount: row.DiscountOfferINR?.trim() || row.DiscountOffer?.trim() || 'See Offer',
               claimLink: normalizeClaimLink(claimLinkRaw),

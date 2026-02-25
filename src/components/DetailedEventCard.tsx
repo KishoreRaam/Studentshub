@@ -19,9 +19,11 @@ import {
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from './ui/dialog';
+import { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Event, formatEventDate, getDaysUntilEvent } from '@/types/event';
 import { useSavedItems } from '@/hooks/useSavedItems';
+import { databases, DATABASE_ID, COLLECTIONS } from '@/lib/appwrite';
 
 interface DetailedEventCardProps {
   event: Event | null;
@@ -218,8 +220,8 @@ const renderStatsRow = (event: Event) => {
     daysUntil > 0
       ? `In ${daysUntil} day${daysUntil === 1 ? '' : 's'}`
       : daysUntil === 0
-      ? 'Today!'
-      : 'Event passed';
+        ? 'Today!'
+        : 'Event passed';
 
   return (
     <div className="px-6 py-6">
@@ -261,6 +263,32 @@ const renderStatsRow = (event: Event) => {
 
 export function DetailedEventCard({ event, isOpen, onClose, onSaveChange }: DetailedEventCardProps) {
   const { isSaved, toggleSave, isSaving } = useSavedItems('event');
+  const viewedEventId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen && event && viewedEventId.current !== event.id) {
+      viewedEventId.current = event.id;
+      // Fetch latest document to increment view
+      databases.getDocument(DATABASE_ID, COLLECTIONS.EVENTS, event.id)
+        .then(doc => {
+          return databases.updateDocument(DATABASE_ID, COLLECTIONS.EVENTS, event.id, {
+            views: ((doc as any).views || 0) + 1
+          });
+        })
+        .catch(console.error);
+    }
+  }, [isOpen, event]);
+
+  const handleRegisterClick = () => {
+    if (!event) return;
+    databases.getDocument(DATABASE_ID, COLLECTIONS.EVENTS, event.id)
+      .then(doc => {
+        return databases.updateDocument(DATABASE_ID, COLLECTIONS.EVENTS, event.id, {
+          participantCount: (doc.participantCount || 0) + 1
+        });
+      })
+      .catch(console.error);
+  };
 
   if (!event) {
     return null;
@@ -346,13 +374,12 @@ export function DetailedEventCard({ event, isOpen, onClose, onSaveChange }: Deta
                     {event.category}
                   </Badge>
                   <Badge
-                    className={`${
-                      event.status === 'Live Now'
-                        ? 'bg-red-500 text-white animate-pulse'
-                        : event.status === 'Registration Open'
+                    className={`${event.status === 'Live Now'
+                      ? 'bg-red-500 text-white animate-pulse'
+                      : event.status === 'Registration Open'
                         ? 'bg-green-500 text-white'
                         : 'bg-yellow-500 text-white'
-                    }`}
+                      }`}
                   >
                     {event.status}
                   </Badge>
@@ -455,6 +482,7 @@ export function DetailedEventCard({ event, isOpen, onClose, onSaveChange }: Deta
                   href={event.registrationLink}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={handleRegisterClick}
                   className={`flex-1 ${getCategoryButtonColor()} text-white font-semibold h-16 text-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg flex items-center justify-center gap-2 no-underline`}
                 >
                   <ExternalLink className="w-6 h-6" />
@@ -475,11 +503,10 @@ export function DetailedEventCard({ event, isOpen, onClose, onSaveChange }: Deta
                 size="lg"
                 onClick={handleSaveClick}
                 disabled={isSaving(event.id)}
-                className={`flex-1 h-16 font-semibold border-2 transition-all duration-200 ${
-                  isSaved(event.id)
-                    ? 'bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400 border-green-500 dark:border-green-600'
-                    : 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-                }`}
+                className={`flex-1 h-16 font-semibold border-2 transition-all duration-200 ${isSaved(event.id)
+                  ? 'bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400 border-green-500 dark:border-green-600'
+                  : 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                 type="button"
               >
                 {isSaving(event.id) ? (

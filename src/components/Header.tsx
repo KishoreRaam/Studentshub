@@ -19,10 +19,12 @@ export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Define sections for scroll tracking
+  // Define sections for scroll tracking (order matters - bottom to top check)
   const sections = [
     { id: 'home', path: '/', elementId: 'home' },
+    { id: 'events', path: '#events', elementId: 'events' },
     { id: 'benefits', path: '#benefits', elementId: 'benefits' },
+    { id: 'ai-tools', path: '#ai-tools', elementId: 'ai-tools' },
     { id: 'dashboard', path: '#dashboard', elementId: 'dashboard' },
   ];
 
@@ -44,23 +46,23 @@ export function Header() {
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home, scrollTo: 'home' },
+    { name: 'Events', path: '#events', icon: Calendar, scrollTo: 'events' },
     { name: 'Benefits', path: '#benefits', icon: Gift, scrollTo: 'benefits' },
+    { name: 'AI Tools', path: '#ai-tools', icon: Star, scrollTo: 'ai-tools' },
     { name: 'Dashboard', path: '#dashboard', icon: BarChart3, scrollTo: 'dashboard' },
-    { name: 'Events', path: '/events', icon: Calendar, isPage: true },
-    { name: 'AI Tools', path: '/tools', icon: Star, isPage: true },
   ];
   const mobileNavLinks = [
     { name: 'Home', path: '/', icon: Home, scrollTo: 'home' },
+    { name: 'Events', path: '#events', icon: Calendar, scrollTo: 'events' },
     { name: 'Benefits', path: '#benefits', icon: Gift, scrollTo: 'benefits' },
+    { name: 'AI Tools', path: '#ai-tools', icon: Star, scrollTo: 'ai-tools' },
     { name: 'Dashboard', path: '#dashboard', icon: BarChart3, scrollTo: 'dashboard' },
     { name: 'Register', path: '/college-portal', icon: BookOpen, isPage: true },
-    { name: 'Events', path: '/events', icon: Calendar, isPage: true },
-    { name: 'AI Tools', path: '/tools', icon: Star, isPage: true },
     { name: 'Maps', path: '/map', icon: MapPin, isPage: true },
   ];
 
   // Handle navigation with smooth scrolling
-  const handleNavClick = (link: typeof navLinks[0]) => {
+  const handleNavClick = (link: { path: string; scrollTo?: string; isPage?: boolean }) => {
     if (link.isPage) {
       navigate(link.path);
     } else if (link.scrollTo) {
@@ -96,7 +98,7 @@ export function Header() {
             <nav className="hidden md:flex space-x-1">
               {navLinks.map((link) => {
                 const Icon = link.icon;
-                const isActive = location.pathname === link.path || activeSection === link.path;
+                const isActive = activeSection === link.path;
                 return (
                   <button
                     key={link.path}
@@ -112,7 +114,7 @@ export function Header() {
                         {/* Layer 1: Bottom Line Indicator */}
                         <motion.div
                           layoutId="activeNavLine"
-                          className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-gradient-to-r from-blue-400 via-green-400 to-blue-400 rounded-full"
+                          className="absolute -bottom-2 left-3 right-3 h-0.5 bg-gradient-to-r from-blue-400 via-green-400 to-blue-400 rounded-full"
                           transition={{ type: "spring", stiffness: 380, damping: 30 }}
                         />
 
@@ -242,7 +244,7 @@ export function Header() {
 
                   {mobileNavLinks.map((link, index) => {
                     const Icon = link.icon;
-                    const isActive = location.pathname === link.path || activeSection === link.path;
+                    const isActive = activeSection === link.path;
                     return (
                       <motion.div
                         key={link.path}

@@ -236,9 +236,8 @@ export default function Dashboard() {
   };
 
   const handleAccessResource = (resource: SavedResource) => {
-    console.log("Access resource:", resource);
-    if (resource.link) {
-      window.open(resource.link, "_blank", "noopener,noreferrer");
+    if (resource.claimLink) {
+      window.open(resource.claimLink, "_blank", "noopener,noreferrer");
     }
   };
 

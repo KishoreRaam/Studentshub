@@ -4,23 +4,15 @@ import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Button } from './ui/button';
-import { 
-  Star, 
-  ChevronRight, 
-  Github, 
-  Package, 
+import {
+  Star,
+  ChevronRight,
+  Github,
+  Package,
   ExternalLink,
-  Code,
-  Server,
-  Globe,
-  Database,
-  Palette,
-  Shield,
-  Briefcase,
-  Mail,
-  Cloud,
   X
 } from 'lucide-react';
+import { getLogoUrl } from '../utils/logoUtils';
 
 // GitHub Student Pack benefits data
 const githubPackBenefits = [
@@ -29,7 +21,7 @@ const githubPackBenefits = [
     name: 'JetBrains',
     offer: 'All IDEs Free',
     description: 'Professional development environments for all programming languages',
-    icon: Code,
+    logoUrl: getLogoUrl('JetBrains'),
     bgColor: 'bg-orange-500',
     value: '$649/year',
     category: 'Development'
@@ -39,7 +31,7 @@ const githubPackBenefits = [
     name: 'DigitalOcean',
     offer: '$200 Credits',
     description: 'Cloud hosting and infrastructure services for your projects',
-    icon: Server,
+    logoUrl: getLogoUrl('DigitalOcean'),
     bgColor: 'bg-blue-500',
     value: '$200',
     category: 'Cloud'
@@ -49,7 +41,7 @@ const githubPackBenefits = [
     name: 'Namecheap',
     offer: 'Free .me Domain',
     description: 'One year free domain registration with SSL certificate',
-    icon: Globe,
+    logoUrl: getLogoUrl('Namecheap'),
     bgColor: 'bg-green-500',
     value: '$8.88/year',
     category: 'Domain'
@@ -59,7 +51,7 @@ const githubPackBenefits = [
     name: 'MongoDB Atlas',
     offer: '$200 Credits',
     description: 'NoSQL database cloud service with global clusters',
-    icon: Database,
+    logoUrl: getLogoUrl('MongoDB Atlas'),
     bgColor: 'bg-green-600',
     value: '$200',
     category: 'Database'
@@ -69,7 +61,7 @@ const githubPackBenefits = [
     name: 'Canva Pro',
     offer: 'Free Education Plan',
     description: 'Premium design tools with unlimited downloads and templates',
-    icon: Palette,
+    logoUrl: getLogoUrl('Canva Pro'),
     bgColor: 'bg-purple-500',
     value: '$120/year',
     category: 'Design'
@@ -79,7 +71,7 @@ const githubPackBenefits = [
     name: 'Auth0',
     offer: 'Free Authentication',
     description: 'Identity management platform for secure authentication',
-    icon: Shield,
+    logoUrl: getLogoUrl('Auth0'),
     bgColor: 'bg-orange-600',
     value: '$23/month',
     category: 'Security'
@@ -89,7 +81,7 @@ const githubPackBenefits = [
     name: 'Stripe',
     offer: 'Waived Processing Fees',
     description: 'Payment processing platform for your applications',
-    icon: Briefcase,
+    logoUrl: getLogoUrl('Stripe'),
     bgColor: 'bg-indigo-500',
     value: '$1000+',
     category: 'Payments'
@@ -99,7 +91,7 @@ const githubPackBenefits = [
     name: 'Mailgun',
     offer: '$20/month Credits',
     description: 'Email API service for transactional emails',
-    icon: Mail,
+    logoUrl: getLogoUrl('Mailgun'),
     bgColor: 'bg-red-500',
     value: '$240/year',
     category: 'Email'
@@ -109,7 +101,7 @@ const githubPackBenefits = [
     name: 'Heroku',
     offer: 'Free Dynos',
     description: 'Cloud platform for deploying and hosting applications',
-    icon: Cloud,
+    logoUrl: getLogoUrl('Heroku'),
     bgColor: 'bg-purple-600',
     value: '$25/month',
     category: 'Hosting'
@@ -209,15 +201,21 @@ export function GitHubStudentPack({ onClick, className }: GitHubStudentPackProps
 
             {/* Preview Benefits - Responsive Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-6">
-              {githubPackBenefits.slice(0, 6).map((benefit) => {
-                const IconComponent = benefit.icon;
-                return (
+              {githubPackBenefits.slice(0, 6).map((benefit) => (
                   <div key={benefit.id} className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center hover:bg-white/15 transition-colors">
-                    <IconComponent className="w-5 h-5 mx-auto mb-2 text-blue-300" />
+                    <div className="w-8 h-8 mx-auto mb-2 rounded-md overflow-hidden bg-white/10 flex items-center justify-center">
+                      <img
+                        src={benefit.logoUrl}
+                        alt={benefit.name}
+                        className="w-full h-full object-contain p-1"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
                     <div className="text-xs text-gray-300 truncate">{benefit.name}</div>
                   </div>
-                );
-              })}
+                ))}
             </div>
 
             {/* Description */}
@@ -298,8 +296,6 @@ export function GitHubStudentPack({ onClick, className }: GitHubStudentPackProps
                     {/* Benefits Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
                       {githubPackBenefits.map((benefit, index) => {
-                        const IconComponent = benefit.icon;
-                        
                         return (
                           <motion.div
                             key={benefit.id}
@@ -311,9 +307,16 @@ export function GitHubStudentPack({ onClick, className }: GitHubStudentPackProps
                           >
                             <Card className="h-full bg-gray-800/50 border border-gray-700/50 hover:border-gray-600 transition-all duration-200 overflow-hidden">
                               <CardContent className="p-4 h-full flex flex-col">
-                                {/* Icon */}
-                                <div className={`w-12 h-12 rounded-lg ${benefit.bgColor} p-3 mb-3 flex items-center justify-center flex-shrink-0`}>
-                                  <IconComponent className="w-6 h-6 text-white" />
+                                {/* Logo */}
+                                <div className="w-12 h-12 rounded-lg bg-white/10 mb-3 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                  <img
+                                    src={benefit.logoUrl}
+                                    alt={benefit.name}
+                                    className="w-full h-full object-contain p-1.5"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
                                 </div>
                                 
                                 {/* Content */}

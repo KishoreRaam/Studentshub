@@ -17,15 +17,19 @@ export default function Home() {
       <section id="home">
         <HeroSection />
       </section>
-      <EventsPreviewSection />
-      <FreeResourcesSection />
-      <AIToolsSection />
+      <section id="events">
+        <EventsPreviewSection />
+      </section>
       <section id="benefits">
         <BenefitsSection />
+      </section>
+      <section id="ai-tools">
+        <AIToolsSection />
       </section>
       <section id="dashboard">
         <DashboardPreview />
       </section>
+      <FreeResourcesSection />
       <StudentMapSection />
       <NewsletterSignup />
       <FeatureHighlights />

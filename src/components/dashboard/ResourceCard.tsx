@@ -2,6 +2,7 @@ import { Bookmark, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { SavedResource } from "@/types/dashboard";
+import { getLogoUrl } from "@/utils/logoUtils";
 
 type ResourceCardProps = {
   resource: SavedResource;
@@ -10,6 +11,11 @@ type ResourceCardProps = {
 };
 
 export default function ResourceCard({ resource, onAccessResource, onToggleSave }: ResourceCardProps) {
+  const logoUrl = getLogoUrl(
+    resource.provider || resource.title,
+    resource.claimLink
+  );
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 p-6 relative group">
       {/* Bookmark Icon */}
@@ -28,9 +34,20 @@ export default function ResourceCard({ resource, onAccessResource, onToggleSave 
         />
       </button>
 
-      {/* Icon */}
-      <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-600 dark:to-blue-700 rounded-xl shadow-md flex items-center justify-center mb-4">
-        <span className="text-3xl">{resource.icon}</span>
+      {/* Logo */}
+      <div className="w-16 h-16 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-900/30 dark:to-blue-900/30 rounded-xl shadow-md flex items-center justify-center mb-4 overflow-hidden">
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt={`${resource.title} logo`}
+            className="w-full h-full object-contain p-2"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
+          />
+        ) : null}
+        <span className={`text-3xl ${logoUrl ? 'hidden' : ''}`}>📚</span>
       </div>
 
       {/* Content */}
@@ -45,16 +62,18 @@ export default function ResourceCard({ resource, onAccessResource, onToggleSave 
           <Badge className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-0">
             {resource.category}
           </Badge>
-          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-0">
-            Saved
-          </Badge>
-          {resource.isPremium && (
-            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
-              Premium
+          {resource.badge && (
+            <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-0">
+              {resource.badge}
             </Badge>
           )}
         </div>
 
+        {resource.provider && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            by {resource.provider}
+          </p>
+        )}
         <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
           {resource.description}
         </p>

@@ -2,6 +2,7 @@ import { Bookmark } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { SavedPerk } from "@/types/dashboard";
+import { getLogoUrl } from "@/utils/logoUtils";
 
 type PerkCardProps = {
   perk: SavedPerk;
@@ -10,6 +11,8 @@ type PerkCardProps = {
 };
 
 export default function PerkCard({ perk, onViewDetails, onToggleSave }: PerkCardProps) {
+  const logoUrl = getLogoUrl(perk.title, perk.website || perk.claimLink);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 p-6 relative group">
       {/* Bookmark Icon */}
@@ -28,9 +31,20 @@ export default function PerkCard({ perk, onViewDetails, onToggleSave }: PerkCard
         />
       </button>
 
-      {/* Icon */}
-      <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-600 dark:to-blue-700 rounded-xl shadow-md flex items-center justify-center mb-4">
-        <span className="text-3xl">{perk.icon}</span>
+      {/* Logo */}
+      <div className="w-16 h-16 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-900/30 dark:to-blue-900/30 rounded-xl shadow-md flex items-center justify-center mb-4 overflow-hidden">
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt={`${perk.title} logo`}
+            className="w-full h-full object-contain p-2"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
+          />
+        ) : null}
+        <span className={`text-3xl ${logoUrl ? 'hidden' : ''}`}>{perk.icon}</span>
       </div>
 
       {/* Content */}
@@ -45,14 +59,18 @@ export default function PerkCard({ perk, onViewDetails, onToggleSave }: PerkCard
           <Badge className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-0">
             {perk.category}
           </Badge>
-          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-0">
-            Saved
-          </Badge>
+          {perk.discount && (
+            <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-0">
+              {perk.discount}
+            </Badge>
+          )}
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-          {perk.validity}
-        </p>
+        {perk.validity && (
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            {perk.validity}
+          </p>
+        )}
         <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
           {perk.description}
         </p>

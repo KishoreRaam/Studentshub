@@ -39,6 +39,8 @@ export interface Event {
   certificateOffered?: boolean;
   isPaid?: boolean;
   price?: string;
+  views?: number;
+  saves?: number;
 }
 
 export interface EventSpeaker {
