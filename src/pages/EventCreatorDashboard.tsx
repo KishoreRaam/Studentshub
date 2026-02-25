@@ -7,6 +7,7 @@ import {
   Eye, Heart, Users, TrendingUp, Plus, MoreHorizontal,
   Bell, Settings, Calendar, LayoutDashboard, ChevronDown, Menu, X,
 } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface EventDocument {
@@ -55,7 +56,34 @@ function getEventStatus(evt: EventDocument): 'Pending' | 'Approved' | 'Rejected'
 }
 
 // ── Responsive CSS ───────────────────────────────────────────────────────────
-const responsiveCSS = `
+const responsiveCSS = `\n:root {
+  --ecd-bg: #f8f9fb;
+  --ecd-surface: #ffffff;
+  --ecd-border: rgba(0,0,0,0.08);
+  --ecd-border-light: rgba(0,0,0,0.04);
+  --ecd-text: #374151;
+  --ecd-text-main: #030213;
+  --ecd-text-muted: #6b7280;
+  --ecd-text-light: #9ca3af;
+  --ecd-card-bg: #ffffff;
+  --ecd-nav-drawer: #ffffff;
+  --ecd-primary: #1a56db;
+  --ecd-nav-btn: #ffffff;
+}
+.dark {
+  --ecd-bg: #0b0b0f;
+  --ecd-surface: #16161b;
+  --ecd-border: #2a2a32;
+  --ecd-border-light: rgba(42,42,50,0.5);
+  --ecd-text: #e5e5e5;
+  --ecd-text-main: #fff;
+  --ecd-text-muted: #8b8b95;
+  --ecd-text-light: #55555f;
+  --ecd-card-bg: #1c1c22;
+  --ecd-nav-drawer: #16161b;
+  --ecd-primary: #1a56db;
+  --ecd-nav-btn: #16161b;
+}
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
 
   .ecd-header { padding: 12px 32px; }
@@ -124,29 +152,29 @@ function MobileEventCard({ event }: { event: EventDocument }) {
   const poster = getPosterUrl(event);
   return (
     <div style={{
-      background: '#1c1c22', border: '1px solid #2a2a32', borderRadius: 14, padding: 16,
+      background: 'var(--ecd-card-bg)', border: '1px solid #2a2a32', borderRadius: 14, padding: 16,
     }}>
       <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
         <div style={{
           width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-          background: poster ? 'transparent' : '#2a2a32',
+          background: poster ? 'transparent' : 'var(--ecd-border)',
           overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           {poster ? <img src={poster} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Calendar size={18} color="#55555f" />}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--ecd-text-main)', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {event.title}
           </p>
-          <p style={{ fontSize: 12, color: '#55555f', margin: '2px 0 0' }}>{event.organizer}</p>
+          <p style={{ fontSize: 12, color: 'var(--ecd-text-light)', margin: '2px 0 0' }}>{event.organizer}</p>
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <StatusBadge status={getEventStatus(event)} />
-          <span style={{ fontSize: 12, color: '#8b8b95' }}>{formatDate(event.eventDate)}</span>
+          <span style={{ fontSize: 12, color: 'var(--ecd-text-muted)' }}>{formatDate(event.eventDate)}</span>
         </div>
-        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#55555f' }}>
+        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--ecd-text-light)' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Eye size={12} /> {event.participantCount || 0}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Heart size={12} /> 0</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Users size={12} /> {event.participantCount || 0}</span>
@@ -216,10 +244,10 @@ export default function EventCreatorDashboard() {
 
   if (authLoading || loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0b0b0f', fontFamily: "'DM Sans', sans-serif" }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ecd-bg)', fontFamily: "'DM Sans', sans-serif" }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 48, height: 48, border: '3px solid #2a2a32', borderTopColor: '#1a56db', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto' }} />
-          <p style={{ marginTop: 16, color: '#55555f', fontSize: 14 }}>Loading your dashboard...</p>
+          <p style={{ marginTop: 16, color: 'var(--ecd-text-light)', fontSize: 14 }}>Loading your dashboard...</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -227,15 +255,15 @@ export default function EventCreatorDashboard() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0b0b0f', fontFamily: "'DM Sans', sans-serif", color: '#e5e5e5' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--ecd-bg)', fontFamily: "'DM Sans', sans-serif", color: 'var(--ecd-text)' }}>
       <style>{responsiveCSS}</style>
 
       {/* Header */}
-      <header className="ecd-header" style={{ background: '#0b0b0f', borderBottom: '1px solid #2a2a32', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header className="ecd-header" style={{ background: 'var(--ecd-bg)', borderBottom: '1px solid #2a2a32', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Left: Logo + Nav */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #1a56db, #9333ea)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 700 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #1a56db, #9333ea)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ecd-text-main)', fontSize: 14, fontWeight: 700 }}>
               SP
             </div>
           </Link>
@@ -247,7 +275,7 @@ export default function EventCreatorDashboard() {
                 display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', borderRadius: 10,
                 fontSize: 14, fontWeight: 500, textDecoration: 'none',
                 background: item.active ? 'rgba(26,86,219,0.1)' : 'transparent',
-                color: item.active ? '#1a56db' : '#8b8b95', transition: 'all 0.15s',
+                color: item.active ? '#1a56db' : 'var(--ecd-text-muted)', transition: 'all 0.15s',
               }}>
                 {item.icon}{item.label}
               </Link>
@@ -257,17 +285,18 @@ export default function EventCreatorDashboard() {
 
         {/* Right: Bell + Avatar + Mobile burger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid #2a2a32', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#8b8b95' }}>
+          <ThemeToggle />
+          <button style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid #2a2a32', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--ecd-text-muted)' }}>
             <Bell size={18} />
           </button>
-          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #1a56db, #9333ea)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 600 }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #1a56db, #9333ea)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ecd-text-main)', fontSize: 14, fontWeight: 600 }}>
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
           {/* Mobile hamburger */}
           <button
             className="ecd-nav-mobile-btn"
             onClick={() => setMobileMenuOpen(v => !v)}
-            style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid #2a2a32', background: 'transparent', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#8b8b95' }}
+            style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid #2a2a32', background: 'transparent', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--ecd-text-muted)' }}
           >
             {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -278,14 +307,14 @@ export default function EventCreatorDashboard() {
       {mobileMenuOpen && (
         <div className="ecd-nav-drawer" style={{
           display: 'flex', flexDirection: 'column', gap: 2,
-          background: '#16161b', borderBottom: '1px solid #2a2a32', padding: '8px 16px 14px',
+          background: 'var(--ecd-surface)', borderBottom: '1px solid #2a2a32', padding: '8px 16px 14px',
         }}>
           {navItems.map(item => (
             <Link key={item.label} to={item.href} onClick={() => setMobileMenuOpen(false)} style={{
               display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10,
               fontSize: 15, fontWeight: 500, textDecoration: 'none',
               background: item.active ? 'rgba(26,86,219,0.1)' : 'transparent',
-              color: item.active ? '#1a56db' : '#8b8b95',
+              color: item.active ? '#1a56db' : 'var(--ecd-text-muted)',
             }}>
               {item.icon}{item.label}
             </Link>
@@ -298,14 +327,14 @@ export default function EventCreatorDashboard() {
         {/* Title Row */}
         <div className="ecd-title-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
           <div>
-            <h1 className="ecd-title" style={{ fontWeight: 700, fontFamily: "'Playfair Display', serif", color: '#fff', margin: '0 0 4px' }}>
+            <h1 className="ecd-title" style={{ fontWeight: 700, fontFamily: "'Playfair Display', serif", color: 'var(--ecd-text-main)', margin: '0 0 4px' }}>
               Your Events Dashboard
             </h1>
-            <p style={{ fontSize: 14, color: '#8b8b95', margin: 0 }}>Manage and track your submitted events</p>
+            <p style={{ fontSize: 14, color: 'var(--ecd-text-muted)', margin: 0 }}>Manage and track your submitted events</p>
           </div>
           <Link to="/events/register" className="ecd-cta-btn" style={{
             display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 14,
-            background: '#1a56db', color: '#fff', fontSize: 14, fontWeight: 600, textDecoration: 'none',
+            background: '#1a56db', color: 'var(--ecd-text-main)', fontSize: 14, fontWeight: 600, textDecoration: 'none',
             boxShadow: '0 4px 12px rgba(26,86,219,0.3)', whiteSpace: 'nowrap', flexShrink: 0,
           }}>
             <Plus size={18} />Create New Event
@@ -315,7 +344,7 @@ export default function EventCreatorDashboard() {
         {/* Stat Cards */}
         <div className="ecd-stats" style={{ display: 'grid', gap: 16, marginBottom: 32 }}>
           {statCards.map(card => (
-            <div key={card.label} style={{ background: '#16161b', border: '1px solid #2a2a32', borderRadius: 16, padding: '16px 20px' }}>
+            <div key={card.label} style={{ background: 'var(--ecd-surface)', border: '1px solid #2a2a32', borderRadius: 16, padding: '16px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: card.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {card.icon}
@@ -324,24 +353,24 @@ export default function EventCreatorDashboard() {
                   {card.change}
                 </span>
               </div>
-              <p className="ecd-stat-value" style={{ fontWeight: 700, color: '#fff', margin: '0 0 2px' }}>{card.value}</p>
-              <p style={{ fontSize: 13, color: '#55555f', margin: 0 }}>{card.label}</p>
+              <p className="ecd-stat-value" style={{ fontWeight: 700, color: 'var(--ecd-text-main)', margin: '0 0 2px' }}>{card.value}</p>
+              <p style={{ fontSize: 13, color: 'var(--ecd-text-light)', margin: 0 }}>{card.label}</p>
             </div>
           ))}
         </div>
 
         {/* Events Table */}
-        <div style={{ background: '#16161b', border: '1px solid #2a2a32', borderRadius: 16, overflow: 'hidden' }}>
+        <div style={{ background: 'var(--ecd-surface)', border: '1px solid #2a2a32', borderRadius: 16, overflow: 'hidden' }}>
           {/* Table Header */}
           <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(42,42,50,0.5)', flexWrap: 'wrap', gap: 10 }}>
             <div>
-              <h2 style={{ fontSize: 16, fontWeight: 600, color: '#fff', margin: '0 0 2px' }}>Your Events</h2>
-              <p style={{ fontSize: 13, color: '#55555f', margin: 0 }}>{events.length} events</p>
+              <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ecd-text-main)', margin: '0 0 2px' }}>Your Events</h2>
+              <p style={{ fontSize: 13, color: 'var(--ecd-text-light)', margin: 0 }}>{events.length} events</p>
             </div>
             <div style={{ position: 'relative' }}>
               <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)} style={{
                 appearance: 'none', padding: '8px 32px 8px 14px', borderRadius: 10,
-                border: '1px solid #2a2a32', background: '#0b0b0f', color: '#e5e5e5',
+                border: '1px solid #2a2a32', background: 'var(--ecd-bg)', color: 'var(--ecd-text)',
                 fontSize: 13, fontWeight: 500, cursor: 'pointer', outline: 'none',
               }}>
                 <option value="All">All Status</option>
@@ -349,7 +378,7 @@ export default function EventCreatorDashboard() {
                 <option value="Approved">Approved</option>
                 <option value="Rejected">Rejected</option>
               </select>
-              <ChevronDown size={14} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#55555f', pointerEvents: 'none' }} />
+              <ChevronDown size={14} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--ecd-text-light)', pointerEvents: 'none' }} />
             </div>
           </div>
 
@@ -359,7 +388,7 @@ export default function EventCreatorDashboard() {
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(42,42,50,0.5)' }}>
                   {['EVENT NAME', 'DATE', 'STATUS', 'VIEWS', 'SAVES', 'REGISTRATIONS', 'ACTIONS'].map(col => (
-                    <th key={col} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#55555f', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <th key={col} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--ecd-text-light)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       {col}
                     </th>
                   ))}
@@ -368,7 +397,7 @@ export default function EventCreatorDashboard() {
               <tbody>
                 {filteredEvents.length === 0 ? (
                   <tr>
-                    <td colSpan={7} style={{ padding: 48, textAlign: 'center', color: '#55555f', fontSize: 14 }}>
+                    <td colSpan={7} style={{ padding: 48, textAlign: 'center', color: 'var(--ecd-text-light)', fontSize: 14 }}>
                       {events.length === 0 ? (
                         <div>
                           <p style={{ marginBottom: 12 }}>You haven't submitted any events yet</p>
@@ -389,22 +418,22 @@ export default function EventCreatorDashboard() {
                       >
                         <td style={{ padding: '12px 16px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                            <div style={{ width: 40, height: 40, borderRadius: 8, background: poster ? 'transparent' : '#2a2a32', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 8, background: poster ? 'transparent' : 'var(--ecd-border)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               {poster ? <img src={poster} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Calendar size={16} color="#55555f" />}
                             </div>
                             <div>
-                              <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.3 }}>{event.title}</p>
-                              <p style={{ fontSize: 12, color: '#55555f', margin: 0 }}>{event.organizer}</p>
+                              <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--ecd-text-main)', margin: 0, lineHeight: 1.3 }}>{event.title}</p>
+                              <p style={{ fontSize: 12, color: 'var(--ecd-text-light)', margin: 0 }}>{event.organizer}</p>
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: '#8b8b95' }}>{formatDate(event.eventDate)}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{formatDate(event.eventDate)}</td>
                         <td style={{ padding: '12px 16px' }}><StatusBadge status={getEventStatus(event)} /></td>
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: '#8b8b95' }}>{event.participantCount || 0}</td>
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: '#8b8b95' }}>0</td>
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: '#8b8b95' }}>{event.participantCount || 0}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{event.participantCount || 0}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>0</td>
+                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{event.participantCount || 0}</td>
                         <td style={{ padding: '12px 16px' }}>
-                          <button style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #2a2a32', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#55555f' }}>
+                          <button style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #2a2a32', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--ecd-text-light)' }}>
                             <MoreHorizontal size={16} />
                           </button>
                         </td>
@@ -419,7 +448,7 @@ export default function EventCreatorDashboard() {
           {/* Mobile Card List */}
           <div className="ecd-card-list" style={{ padding: 12 }}>
             {filteredEvents.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 32, color: '#55555f', fontSize: 14 }}>
+              <div style={{ textAlign: 'center', padding: 32, color: 'var(--ecd-text-light)', fontSize: 14 }}>
                 {events.length === 0 ? (
                   <div>
                     <p style={{ marginBottom: 12 }}>You haven't submitted any events yet</p>

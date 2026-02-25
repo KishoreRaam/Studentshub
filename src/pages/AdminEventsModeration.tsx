@@ -8,6 +8,7 @@ import {
   Check, X, Eye, Search, ArrowUpDown, ChevronDown,
   FileText, BarChart3,
 } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface EventDocument {
@@ -66,7 +67,36 @@ function getCategory(evt: EventDocument): string {
 }
 
 // ── Responsive CSS ───────────────────────────────────────────────────────────
-const responsiveCSS = `
+const responsiveCSS = `\n:root {
+  --adm-bg: #f8f9fb;
+  --adm-surface: #ffffff;
+  --adm-border: rgba(0,0,0,0.06);
+  --adm-border-strong: rgba(0,0,0,0.08);
+  --adm-border-light: rgba(0,0,0,0.04);
+  --adm-text: #030213;
+  --adm-text-sub: #374151;
+  --adm-text-muted: #6b7280;
+  --adm-text-light: #9ca3af;
+  --adm-icon-bg: #eef2ff;
+  --adm-hover: #f3f4f6;
+  --adm-overlay: rgba(0,0,0,0.4);
+  --adm-pending-bg: rgba(255,251,235,0.4);
+}
+.dark {
+  --adm-bg: #0b0b0f;
+  --adm-surface: #16161b;
+  --adm-border: #2a2a32;
+  --adm-border-strong: rgba(255,255,255,0.1);
+  --adm-border-light: rgba(255,255,255,0.05);
+  --adm-text: #ffffff;
+  --adm-text-sub: #d1d5db;
+  --adm-text-muted: #9ca3af;
+  --adm-text-light: #6b7280;
+  --adm-icon-bg: #1c1c22;
+  --adm-hover: rgba(255,255,255,0.05);
+  --adm-overlay: rgba(0,0,0,0.7);
+  --adm-pending-bg: rgba(251,191,36,0.1);
+}
   .adm-header { padding: 16px 32px; }
   .adm-header-sub { display: block; }
   .adm-content { padding: 24px 24px 48px; }
@@ -131,32 +161,32 @@ function EventDetailModal({ event, onClose }: { event: EventDocument; onClose: (
   const poster = getPosterUrl(event);
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', padding: 16 }}
+      style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--adm-overlay)', backdropFilter: 'blur(4px)', padding: 16 }}
       onClick={onClose}
     >
       <div
-        style={{ background: '#fff', borderRadius: 16, maxWidth: 600, width: '100%', maxHeight: '85vh', overflow: 'auto', padding: '24px', boxShadow: '0 24px 48px rgba(0,0,0,0.12)' }}
+        style={{ background: 'var(--adm-surface)', borderRadius: 16, maxWidth: 600, width: '100%', maxHeight: '85vh', overflow: 'auto', padding: '24px', boxShadow: '0 24px 48px rgba(0,0,0,0.12)' }}
         onClick={e => e.stopPropagation()}
       >
         {poster && (
           <img src={poster} alt={event.title} style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 12, marginBottom: 16 }} />
         )}
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#030213', marginBottom: 4 }}>{event.title}</h2>
-        <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--adm-text)', marginBottom: 4 }}>{event.title}</h2>
+        <p style={{ fontSize: 13, color: 'var(--adm-text-muted)', marginBottom: 16 }}>
           by {event.organizer} &middot; {formatDate(event.eventDate)}
         </p>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
           <StatusBadge status={getEventStatus(event)} />
-          <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: '#f3f4f6', color: '#374151' }}>{getCategory(event)}</span>
-          {event.location && <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: '#f3f4f6', color: '#374151' }}>{event.location}</span>}
+          <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: 'var(--adm-hover)', color: 'var(--adm-text-sub)' }}>{getCategory(event)}</span>
+          {event.location && <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: 'var(--adm-hover)', color: 'var(--adm-text-sub)' }}>{event.location}</span>}
         </div>
-        <p style={{ fontSize: 14, lineHeight: 1.6, color: '#374151', whiteSpace: 'pre-wrap' }}>{event.description}</p>
+        <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--adm-text-sub)', whiteSpace: 'pre-wrap' }}>{event.description}</p>
         {event.registrationLink && event.registrationLink !== 'N/A' && (
-          <a href={event.registrationLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 16, padding: '8px 16px', borderRadius: 8, background: '#1a56db', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+          <a href={event.registrationLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 16, padding: '8px 16px', borderRadius: 8, background: '#1a56db', color: 'var(--adm-surface)', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
             Registration Link
           </a>
         )}
-        <button onClick={onClose} style={{ display: 'block', margin: '20px auto 0', padding: '8px 24px', borderRadius: 8, background: '#f3f4f6', border: 'none', fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
+        <button onClick={onClose} style={{ display: 'block', margin: '20px auto 0', padding: '8px 24px', borderRadius: 8, background: 'var(--adm-hover)', border: 'none', fontSize: 13, fontWeight: 600, color: 'var(--adm-text-sub)', cursor: 'pointer' }}>
           Close
         </button>
       </div>
@@ -184,7 +214,7 @@ function EventCard({
 
   return (
     <div style={{
-      background: isPending ? 'rgba(255,251,235,0.4)' : '#fff',
+      background: isPending ? 'var(--adm-pending-bg)' : 'var(--adm-surface)',
       border: '1px solid rgba(0,0,0,0.06)',
       borderRadius: 14,
       padding: 16,
@@ -193,22 +223,22 @@ function EventCard({
       <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
         <div style={{
           width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-          background: poster ? 'transparent' : '#f3f4f6',
+          background: poster ? 'transparent' : 'var(--adm-hover)',
           overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           {poster ? <img src={poster} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Calendar size={18} color="#9ca3af" />}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#030213', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--adm-text)', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {event.title}
           </p>
-          <p style={{ fontSize: 12, color: '#9ca3af', margin: '2px 0 0' }}>{getCategory(event)}</p>
+          <p style={{ fontSize: 12, color: 'var(--adm-text-light)', margin: '2px 0 0' }}>{getCategory(event)}</p>
         </div>
         <StatusBadge status={eventStatus} />
       </div>
 
       {/* Meta row */}
-      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6b7280', marginBottom: 12, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--adm-text-muted)', marginBottom: 12, flexWrap: 'wrap' }}>
         <span>{formatDate(event.eventDate)}</span>
         <span>{event.organizer}</span>
         {event.location && <span>{event.location}</span>}
@@ -249,7 +279,7 @@ function EventCard({
           style={{
             width: isPending ? 40 : '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             padding: '8px 0', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)',
-            background: '#fff', color: '#6b7280', fontSize: 13, fontWeight: 500, cursor: 'pointer',
+            background: 'var(--adm-surface)', color: 'var(--adm-text-muted)', fontSize: 13, fontWeight: 500, cursor: 'pointer',
           }}
         >
           <Eye size={14} />{!isPending && ' View Details'}
@@ -356,10 +386,10 @@ export default function AdminEventsModeration() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fb', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--adm-bg)', fontFamily: 'Inter, sans-serif' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 48, height: 48, border: '3px solid #e5e7eb', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto' }} />
-          <p style={{ marginTop: 16, color: '#6b7280', fontSize: 14 }}>Loading events...</p>
+          <p style={{ marginTop: 16, color: 'var(--adm-text-muted)', fontSize: 14 }}>Loading events...</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -368,38 +398,39 @@ export default function AdminEventsModeration() {
 
   if (!user || !ADMIN_IDS.includes(user.$id)) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fb', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--adm-bg)', fontFamily: 'Inter, sans-serif' }}>
         <div style={{ textAlign: 'center' }}>
           <Shield size={48} color="#ef4444" style={{ margin: '0 auto', marginBottom: 16 }} />
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: '#030213', margin: '0 0 8px 0' }}>Access Denied</h2>
-          <p style={{ color: '#6b7280', margin: 0 }}>You do not have permission to view this page.</p>
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--adm-text)', margin: '0 0 8px 0' }}>Access Denied</h2>
+          <p style={{ color: 'var(--adm-text-muted)', margin: 0 }}>You do not have permission to view this page.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fb', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--adm-bg)', fontFamily: 'Inter, sans-serif' }}>
       <style>{responsiveCSS}</style>
 
       {/* Header */}
-      <header className="adm-header" style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header className="adm-header" style={{ background: 'var(--adm-surface)', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--adm-icon-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Shield size={20} color="#4f46e5" />
           </div>
           <div>
-            <h1 style={{ fontSize: 18, fontWeight: 700, color: '#030213', margin: 0 }}>Event Moderation</h1>
-            <p className="adm-header-sub" style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>Review and manage submitted events</p>
+            <h1 style={{ fontSize: 18, fontWeight: 700, color: 'var(--adm-text)', margin: 0 }}>Event Moderation</h1>
+            <p className="adm-header-sub" style={{ fontSize: 13, color: 'var(--adm-text-muted)', margin: 0 }}>Review and manage submitted events</p>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <ThemeToggle />
           {stats.pending > 0 && (
             <span style={{ padding: '4px 12px', borderRadius: 20, background: '#fef3c6', color: '#bb4d00', fontSize: 13, fontWeight: 600 }}>
               {stats.pending} pending
             </span>
           )}
-          <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 600 }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--adm-surface)', fontSize: 14, fontWeight: 600 }}>
             {user?.name?.charAt(0)?.toUpperCase() || 'A'}
           </div>
         </div>
@@ -409,13 +440,13 @@ export default function AdminEventsModeration() {
         {/* Stat Cards */}
         <div className="adm-stats" style={{ display: 'grid', gap: 16, marginBottom: 24 }}>
           {statCards.map(card => (
-            <div key={card.label} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.06)', borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div key={card.label} style={{ background: 'var(--adm-surface)', border: '1px solid rgba(0,0,0,0.06)', borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: card.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {card.icon}
               </div>
               <div>
-                <p className="adm-stat-label" style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>{card.label}</p>
-                <p className="adm-stat-value" style={{ fontSize: 24, fontWeight: 700, color: '#030213', margin: 0 }}>{card.value}</p>
+                <p className="adm-stat-label" style={{ fontSize: 13, color: 'var(--adm-text-muted)', margin: 0 }}>{card.label}</p>
+                <p className="adm-stat-value" style={{ fontSize: 24, fontWeight: 700, color: 'var(--adm-text)', margin: 0 }}>{card.value}</p>
               </div>
             </div>
           ))}
@@ -427,14 +458,14 @@ export default function AdminEventsModeration() {
             <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
               display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, border: 'none',
               fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-              background: activeTab === tab.key ? '#030213' : '#fff',
-              color: activeTab === tab.key ? '#fff' : '#374151',
+              background: activeTab === tab.key ? 'var(--adm-text)' : 'var(--adm-surface)',
+              color: activeTab === tab.key ? 'var(--adm-surface)' : 'var(--adm-text-sub)',
               boxShadow: activeTab !== tab.key ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
               transition: 'all 0.15s',
             }}>
               {tab.label}
               {tab.count !== undefined && tab.count > 0 && (
-                <span style={{ padding: '1px 8px', borderRadius: 10, fontSize: 11, fontWeight: 700, background: activeTab === tab.key ? 'rgba(255,255,255,0.2)' : '#fef3c6', color: activeTab === tab.key ? '#fff' : '#bb4d00' }}>
+                <span style={{ padding: '1px 8px', borderRadius: 10, fontSize: 11, fontWeight: 700, background: activeTab === tab.key ? 'rgba(255,255,255,0.2)' : '#fef3c6', color: activeTab === tab.key ? 'var(--adm-surface)' : '#bb4d00' }}>
                   {tab.count}
                 </span>
               )}
@@ -446,28 +477,28 @@ export default function AdminEventsModeration() {
         <div className="adm-filter-row" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
           <button onClick={() => setSortNewest(!sortNewest)} style={{
             display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10,
-            border: '1px solid rgba(0,0,0,0.08)', background: '#fff', fontSize: 13, color: '#374151', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap',
+            border: '1px solid rgba(0,0,0,0.08)', background: 'var(--adm-surface)', fontSize: 13, color: 'var(--adm-text-sub)', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap',
           }}>
             <ArrowUpDown size={14} />
             {sortNewest ? 'Newest first' : 'Oldest first'}
           </button>
           <div style={{ flex: 1 }} />
           <div className="adm-search" style={{ position: 'relative' }}>
-            <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+            <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--adm-text-light)' }} />
             <input
               type="text" placeholder="Search events, creators..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              style={{ padding: '8px 14px 8px 36px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)', background: '#fff', fontSize: 13, width: '100%', outline: 'none', color: '#030213', boxSizing: 'border-box' }}
+              style={{ padding: '8px 14px 8px 36px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)', background: 'var(--adm-surface)', fontSize: 13, width: '100%', outline: 'none', color: 'var(--adm-text)', boxSizing: 'border-box' }}
             />
           </div>
         </div>
 
         {/* Desktop Table */}
-        <div style={{ background: '#fff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--adm-surface)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden' }}>
           <table className="adm-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
                 {['Event Name', 'Submitted By', 'College', 'Date', 'Status', 'Actions'].map(col => (
-                  <th key={col} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <th key={col} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--adm-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     {col}
                   </th>
                 ))}
@@ -475,7 +506,7 @@ export default function AdminEventsModeration() {
             </thead>
             <tbody>
               {filteredEvents.length === 0 ? (
-                <tr><td colSpan={6} style={{ padding: 48, textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>No events found</td></tr>
+                <tr><td colSpan={6} style={{ padding: 48, textAlign: 'center', color: 'var(--adm-text-light)', fontSize: 14 }}>No events found</td></tr>
               ) : (
                 filteredEvents.map(event => {
                   const eventStatus = getEventStatus(event);
@@ -483,21 +514,21 @@ export default function AdminEventsModeration() {
                   const isPending = eventStatus === 'Pending';
                   const isProcessing = actionLoading === event.$id;
                   return (
-                    <tr key={event.$id} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', background: isPending ? 'rgba(255,251,235,0.4)' : '#fff' }}>
+                    <tr key={event.$id} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', background: isPending ? 'var(--adm-pending-bg)' : 'var(--adm-surface)' }}>
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: 8, background: poster ? 'transparent' : '#f3f4f6', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: 36, height: 36, borderRadius: 8, background: poster ? 'transparent' : 'var(--adm-hover)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {poster ? <img src={poster} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Calendar size={16} color="#9ca3af" />}
                           </div>
                           <div>
-                            <p style={{ fontSize: 14, fontWeight: 600, color: '#030213', margin: 0, lineHeight: 1.3 }}>{event.title}</p>
-                            <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>{getCategory(event)}</p>
+                            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--adm-text)', margin: 0, lineHeight: 1.3 }}>{event.title}</p>
+                            <p style={{ fontSize: 12, color: 'var(--adm-text-light)', margin: 0 }}>{getCategory(event)}</p>
                           </div>
                         </div>
                       </td>
-                      <td style={{ padding: '12px 16px', fontSize: 13, color: '#374151' }}>{event.submittedBy || event.createdByUserId || 'Unknown'}</td>
-                      <td style={{ padding: '12px 16px', fontSize: 13, color: '#374151' }}>{event.location || '—'}</td>
-                      <td style={{ padding: '12px 16px', fontSize: 13, color: '#374151' }}>{formatDate(event.eventDate)}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--adm-text-sub)' }}>{event.submittedBy || event.createdByUserId || 'Unknown'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--adm-text-sub)' }}>{event.location || '—'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--adm-text-sub)' }}>{formatDate(event.eventDate)}</td>
                       <td style={{ padding: '12px 16px' }}><StatusBadge status={eventStatus} /></td>
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -511,7 +542,7 @@ export default function AdminEventsModeration() {
                               </button>
                             </>
                           )}
-                          <button onClick={() => setViewEvent(event)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', background: '#fff', cursor: 'pointer', color: '#6b7280' }}>
+                          <button onClick={() => setViewEvent(event)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', background: 'var(--adm-surface)', cursor: 'pointer', color: 'var(--adm-text-muted)' }}>
                             <Eye size={14} />
                           </button>
                         </div>
@@ -526,7 +557,7 @@ export default function AdminEventsModeration() {
           {/* Mobile Card List */}
           <div className="adm-card-list" style={{ padding: 12 }}>
             {filteredEvents.length === 0 ? (
-              <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: 14, padding: 32 }}>No events found</p>
+              <p style={{ textAlign: 'center', color: 'var(--adm-text-light)', fontSize: 14, padding: 32 }}>No events found</p>
             ) : (
               filteredEvents.map(event => (
                 <EventCard
@@ -542,7 +573,7 @@ export default function AdminEventsModeration() {
           </div>
 
           {/* Footer */}
-          <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.06)', fontSize: 13, color: '#9ca3af' }}>
+          <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.06)', fontSize: 13, color: 'var(--adm-text-light)' }}>
             Showing {filteredEvents.length} of {events.length} events
           </div>
         </div>
