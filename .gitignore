@@ -44,3 +44,7 @@ coverage/
 # Temporary files
 *.tmp
 *.temp
+
+# Automation reports and staging (generated daily)
+scripts/automation/reports/*.json
+scripts/automation/staging/*.csv
