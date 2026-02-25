@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ChevronDown } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // ─── FLOATING CARD DATA ───────────────────────────────────────────────
 // Each card is positioned absolutely within the middle parallax layer.
@@ -284,7 +285,8 @@ export function Hero() {
                     className="mt-10 flex flex-wrap justify-center gap-4"
                 >
                     {/* Primary CTA: solid blue */}
-                    <button
+                    <Link
+                        to="/events"
                         className="w-[200px] h-[56px] rounded-[12px] cursor-pointer transition-all duration-200 hover:scale-[1.02]"
                         style={{
                             background: "var(--el-blue)",
@@ -294,12 +296,17 @@ export function Hero() {
                             fontSize: "16px",
                             boxShadow: "0 12px 28px var(--el-shadow-1)",
                             border: "none",
+                            textDecoration: "none",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                         }}
                     >
                         Explore Events →
-                    </button>
+                    </Link>
                     {/* Secondary CTA: outlined blue */}
-                    <button
+                    <Link
+                        to="/events/register"
                         className="w-[180px] h-[56px] rounded-[12px] cursor-pointer transition-all duration-200 hover:bg-[color:var(--el-blueLight)]"
                         style={{
                             background: "transparent",
@@ -308,10 +315,14 @@ export function Hero() {
                             fontFamily: "'DM Sans', sans-serif",
                             fontWeight: 600,
                             fontSize: "16px",
+                            textDecoration: "none",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                         }}
                     >
                         Submit Event
-                    </button>
+                    </Link>
                 </motion.div>
 
                 {/* ── STATS ROW ────────────────────────────────────────────── */}
