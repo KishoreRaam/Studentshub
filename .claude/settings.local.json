@@ -23,7 +23,16 @@
       "Bash(npx tsc:*)",
       "Bash(ls:*)",
       "Bash(tail:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git:*)",
+      "Bash(gh workflow:*)",
+      "Bash(where gh:*)",
+      "Bash(cmd:*)"
     ],
     "deny": [],
     "ask": []

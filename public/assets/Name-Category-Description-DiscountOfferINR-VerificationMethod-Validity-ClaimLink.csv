@@ -36,3 +36,7 @@ McDonald’s,Food/Dining,Meals/snacks,See details,Studentemail,While enrolled,ht
 Croma,Hardware,Electronics/Accessories,See details,Studentemail,While enrolled,https://www.croma.com/,False
 Nykaa,Wellbeign,Beauty & personal care,See details,Studentemail,While enrolled,https://www.nykaa.com/,True
 BookMyShow,Entertainment,Movie/event tickets,See details,Studentemail,While enrolled,https://in.bookmyshow.com/,False
+
+JetBrains Academy,Learning,"Interactive project-based learning for developers",Free for students,Studentemail,1 year (renewable),https://academy.jetbrains.com/,True
+FigJam,Productivity,"Online whiteboard for teams to ideate and brainstorm",Free for students,Studentemail,2 years (renewable),https://www.figma.com/figjam/,True
+GitHub Classroom,Productivity,"Tools for managing programming assignments",Free,Studentemail,While enrolled,https://classroom.github.com,True
