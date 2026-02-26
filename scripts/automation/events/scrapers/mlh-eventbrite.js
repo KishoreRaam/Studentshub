@@ -1,11 +1,16 @@
 'use strict';
 
+/**
+ * MLH scraper  — parses microdata (schema.org/Event) from mlh.io/seasons/2026/events
+ * Eventbrite   — parses JSON-LD structured data from Eventbrite search pages
+ */
+
 const fetch = require('node-fetch');
 const { USER_AGENT, REQUEST_DELAY_MS } = require('../config');
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// ── MLH ──────────────────────────────────────────────────────────────────────
+// ── MLH ───────────────────────────────────────────────────────────────────────
 
 async function scrapeMLH() {
   const events = [];
@@ -13,7 +18,7 @@ async function scrapeMLH() {
     console.log('  [MLH] Fetching https://mlh.io/seasons/2026/events ...');
     const res = await fetch('https://mlh.io/seasons/2026/events', {
       headers: { 'User-Agent': USER_AGENT, 'Accept': 'text/html' },
-      timeout: 15000,
+      timeout: 20000,
     });
     if (!res.ok) {
       console.warn(`  [MLH] HTTP ${res.status} — skipping`);
@@ -21,78 +26,65 @@ async function scrapeMLH() {
     }
     const html = await res.text();
 
-    // Extract event blocks using regex patterns
-    // MLH uses <div class="event"> blocks
-    const eventBlockRegex = /<div[^>]+class="[^"]*event[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/gi;
-    const blocks = [];
-    let match;
-    while ((match = eventBlockRegex.exec(html)) !== null) {
-      blocks.push(match[1]);
-    }
+    // All microdata fields are arrays ordered by event index
+    // Event names: <span itemprop="name">...</span> INSIDE an <h3> tag
+    // Location names also use itemprop="name" inside the location div — filtered by:
+    //   - location spans contain React HTML comment markers like "<!-- -->"
+    //   - event name spans do NOT contain HTML comment characters
 
-    // Fallback: look for anchor tags pointing to event pages
-    const linkRegex = /<a[^>]+href="([^"]*mlh\.io[^"]*)"[^>]*>([^<]+)<\/a>/gi;
-    const titleDateRegex = /<h3[^>]*class="[^"]*event-name[^"]*"[^>]*>([^<]+)<\/h3>/gi;
-    const dateRegex = /<p[^>]*class="[^"]*event-date[^"]*"[^>]*>([^<]+)<\/p>/gi;
-    const locationRegex = /<p[^>]*class="[^"]*event-location[^"]*"[^>]*>([^<]+)<\/p>/gi;
-    const linkHrefRegex = /<a[^>]+href="([^"]+)"[^>]*class="[^"]*event-link[^"]*"/gi;
+    // Strategy: match all itemprop="name" spans that have clean text (no < or !)
+    const nameMatches = [
+      ...html.matchAll(/<span[^>]+itemprop="name"[^>]*>([^<!]+)<\/span>/gi),
+    ].map(m => m[1].trim()).filter(n => n.length > 2);
 
-    const titles    = [...html.matchAll(/<h3[^>]*class="[^"]*event-name[^"]*"[^>]*>\s*([^<]+)\s*<\/h3>/gi)].map(m => m[1].trim());
-    const dates     = [...html.matchAll(/<p[^>]*class="[^"]*event-date[^"]*"[^>]*>\s*([^<]+)\s*<\/p>/gi)].map(m => m[1].trim());
-    const locations = [...html.matchAll(/<p[^>]*class="[^"]*event-location[^"]*"[^>]*>\s*([^<]+)\s*<\/p>/gi)].map(m => m[1].trim());
-    const links     = [...html.matchAll(/<a[^>]+href="(https:\/\/[^"]*)"[^>]*class="[^"]*event-[^"]*"/gi)].map(m => m[1]);
+    const startDates = [...html.matchAll(/itemprop="startDate"[^>]+content="([^"]+)"/gi)].map(m => m[1]);
+    const endDates   = [...html.matchAll(/itemprop="endDate"[^>]+content="([^"]+)"/gi)].map(m => m[1]);
+    const eventUrls  = [...html.matchAll(/itemprop="url"[^>]+content="([^"]+)"/gi)].map(m => m[1]);
+    const imgUrls    = [...html.matchAll(/itemprop="image"[^>]+content="([^"]+)"/gi)].map(m => m[1]);
+    const localities = [...html.matchAll(/itemprop="addressLocality"[^>]+content="([^"]+)"/gi)].map(m => m[1]);
 
-    // Build events from extracted arrays
-    const count = Math.max(titles.length, 0);
+    console.log(`  [MLH] Parsed: ${nameMatches.length} names, ${startDates.length} dates, ${eventUrls.length} urls`);
+
+    const now = new Date();
+    const count = Math.min(nameMatches.length, startDates.length, eventUrls.length);
+
     for (let i = 0; i < count; i++) {
-      const title = titles[i];
+      const title = nameMatches[i];
       if (!title) continue;
-      const dateStr = dates[i] || '';
-      const locationText = locations[i] || 'Online';
-      const link = links[i] || 'https://mlh.io/seasons/2025/events';
 
-      // Parse date range: "January 10 - 12, 2025" or "Jan 10, 2025"
-      let startDate = dateStr;
-      let endDate   = '';
-      const rangeMatch = dateStr.match(/(\w+ \d{1,2})\s*[-–]\s*(\d{1,2}),?\s*(\d{4})/);
-      if (rangeMatch) {
-        const [, start, endDay, year] = rangeMatch;
-        startDate = `${start}, ${year}`;
-        endDate   = `${start.split(' ')[0]} ${endDay}, ${year}`;
+      const startDate = startDates[i] || '';
+      const endDate   = endDates[i]   || '';
+      const url       = eventUrls[i]  || 'https://mlh.io/seasons/2026/events';
+      const imageUrl  = imgUrls[i]    || '';
+      const city      = localities[i] || '';
+
+      // Skip past events
+      if (startDate) {
+        const d = new Date(startDate);
+        if (!isNaN(d.getTime()) && d < now) continue;
       }
 
-      const now = new Date();
-      const parsedDate = new Date(startDate);
-      if (!isNaN(parsedDate.getTime()) && parsedDate < now) continue;
+      const location = city ? city : 'Online';
 
       events.push({
         title,
-        description: `MLH Hackathon: ${title}. ${locationText.includes('Digital') ? 'Online event.' : `In-person at ${locationText}.`}`,
+        description: `MLH Hackathon: ${title}. ${city ? `In-person at ${city}.` : 'Online/Digital event.'}`,
         startDate,
         endDate,
-        location: locationText.toLowerCase().includes('digital') ? 'Online' : locationText,
-        registrationLink: link,
+        location,
+        registrationLink: url,
         organizerName: 'MLH',
-        imageUrl: '',
+        imageUrl,
         tags: ['Hackathon', 'MLH', 'Student'],
         maxParticipants: 0,
-        source: 'mlh',
+        source:   'mlh',
         category: ['Hackathon'],
       });
     }
 
-    // If regex parsing got nothing, try a simpler approach
-    if (events.length === 0) {
-      console.warn('  [MLH] Regex parsing found 0 events — MLH may have changed their HTML structure');
-    }
-
-    console.log(`  [MLH] Found ${events.length} events`);
+    console.log(`  [MLH] Found ${events.length} upcoming events`);
     return events;
   } catch (err) {
-    if (err.name === 'AbortError' || err.code === 'ECONNRESET' || err.message.includes('403') || err.message.includes('429')) {
-      console.warn(`  [MLH] Rate limited or blocked: ${err.message}`);
-      return [];
-    }
     console.error('  [MLH] Error:', err.message);
     return [];
   }
@@ -105,8 +97,8 @@ async function scrapeEventbritePage(url, defaultCategory) {
     console.log(`  [Eventbrite] Fetching ${url} ...`);
     const res = await fetch(url, {
       headers: {
-        'User-Agent': USER_AGENT,
-        'Accept': 'text/html,application/xhtml+xml',
+        'User-Agent':      USER_AGENT,
+        'Accept':          'text/html,application/xhtml+xml',
         'Accept-Language': 'en-US,en;q=0.9',
       },
       timeout: 15000,
@@ -117,90 +109,62 @@ async function scrapeEventbritePage(url, defaultCategory) {
     }
     const html = await res.text();
     const events = [];
+    const now = new Date();
 
-    // Extract JSON-LD structured data which Eventbrite embeds
+    // Eventbrite embeds JSON-LD structured data
     const jsonLdMatches = [...html.matchAll(/<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)];
     for (const m of jsonLdMatches) {
       try {
-        const data = JSON.parse(m[1]);
-        const items = Array.isArray(data) ? data : data['@graph'] ? data['@graph'] : [data];
+        const raw  = JSON.parse(m[1]);
+        const items = Array.isArray(raw) ? raw : raw['@graph'] ? raw['@graph'] : [raw];
         for (const item of items) {
           if (!item || (item['@type'] !== 'Event' && item['@type'] !== 'SocialEvent')) continue;
-          const title = item.name || '';
+          const title = (item.name || '').trim();
           if (!title) continue;
 
           const startDate = item.startDate || '';
           const endDate   = item.endDate   || '';
-          const now = new Date();
+
           if (startDate) {
             const d = new Date(startDate);
             if (!isNaN(d.getTime()) && d < now) continue;
           }
 
-          const locationData = item.location || {};
-          let location = 'Online';
-          if (locationData['@type'] === 'VirtualLocation') location = 'Online';
-          else if (locationData.name) location = locationData.name;
-          else if (locationData.address) {
-            const addr = locationData.address;
-            location = [addr.addressLocality, addr.addressRegion, addr.addressCountry].filter(Boolean).join(', ') || 'In-Person';
+          const locData = item.location || {};
+          let location  = 'Online';
+          if (locData['@type'] === 'VirtualLocation') location = 'Online';
+          else if (locData.name) location = locData.name;
+          else if (locData.address) {
+            const a = locData.address;
+            location = [a.addressLocality, a.addressRegion, a.addressCountry].filter(Boolean).join(', ') || 'In-Person';
           }
 
           const registrationLink = item.url || item['@id'] || '';
           const organizer = item.organizer ? (item.organizer.name || '') : '';
-
-          // Try to get image from og:image
-          const ogImageMatch = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i);
-          const imageUrl = ogImageMatch ? ogImageMatch[1] : '';
+          const ogImg = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i);
 
           events.push({
             title,
-            description: item.description || `${defaultCategory} event: ${title}`,
+            description: (item.description || `${defaultCategory} event: ${title}`).slice(0, 1000),
             startDate,
             endDate,
             location,
             registrationLink,
             organizerName: organizer,
-            imageUrl,
+            imageUrl: ogImg ? ogImg[1] : '',
             tags: [defaultCategory, 'India', 'Student'],
             maxParticipants: 0,
-            source: 'eventbrite',
+            source:   'eventbrite',
             category: [defaultCategory],
           });
         }
       } catch (_) {}
     }
 
-    // Fallback: parse HTML cards if JSON-LD gave nothing
-    if (events.length === 0) {
-      const titleMatches = [...html.matchAll(/<a[^>]+class="[^"]*event-title[^"]*"[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/gi)];
-      for (const [, href, title] of titleMatches) {
-        if (!title.trim()) continue;
-        events.push({
-          title: title.trim(),
-          description: `${defaultCategory} event: ${title.trim()}`,
-          startDate: '',
-          endDate: '',
-          location: 'India',
-          registrationLink: href,
-          organizerName: '',
-          imageUrl: '',
-          tags: [defaultCategory, 'India', 'Student'],
-          maxParticipants: 0,
-          source: 'eventbrite',
-          category: [defaultCategory],
-        });
-      }
-    }
-
     console.log(`  [Eventbrite] Found ${events.length} events on ${url}`);
     return events;
   } catch (err) {
-    if (err.status === 403 || err.status === 429 || err.message.includes('403') || err.message.includes('429')) {
-      console.warn(`  [Eventbrite] Rate limited: ${err.message}`);
-      return [];
-    }
-    console.error(`  [Eventbrite] Error for ${url}:`, err.message);
+    console.warn(`  [Eventbrite] Error for ${url}: ${err.message}`);
     return [];
   }
 }
@@ -228,10 +192,11 @@ async function scrapeMLHAndEventbrite() {
 }
 
 if (require.main === module) {
-  require('dotenv').config();
+  const { loadEnv } = require('../utils');
+  loadEnv();
   scrapeMLHAndEventbrite().then(events => {
     console.log(JSON.stringify(events, null, 2));
-    console.log(`Total: ${events.length}`);
+    console.log(`\nTotal: ${events.length}`);
   });
 }
 
