@@ -1,0 +1,114 @@
+name: Daily Events Scraper
+
+on:
+  schedule:
+    - cron: '30 1 * * *'    # 7:00 AM IST daily
+  workflow_dispatch:
+
+jobs:
+  scrape-events:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-chromium-
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Run events scraper
+        env:
+          APPWRITE_ENDPOINT:           ${{ secrets.VITE_APPWRITE_ENDPOINT }}
+          APPWRITE_PROJECT_ID:         ${{ secrets.VITE_APPWRITE_PROJECT }}
+          APPWRITE_API_KEY:            ${{ secrets.APPWRITE_API_KEY }}
+          DATABASE_ID:                 ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
+          EVENTS_COLLECTION_ID:        ${{ secrets.VITE_APPWRITE_COLLECTION_EVENTS }}
+          APPWRITE_BUCKET_EVENT_MEDIA: ${{ secrets.VITE_APPWRITE_BUCKET_EVENT_MEDIA }}
+        run: node scripts/automation/events/run-scrapers.js
+
+      - name: Commit report
+        run: |
+          git config user.name "StudentsHub Bot"
+          git config user.email "bot@studentshub.dev"
+          git add scripts/automation/reports/events-update-*.json || true
+          git diff --staged --quiet || git commit -m "chore(events): scraper report $(date +%Y-%m-%d) [skip ci]"
+          git push || true
+
+      - name: Create issue for new events
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // Find the latest report file
+            const reportsDir = 'scripts/automation/reports';
+            let reportFiles = [];
+            try {
+              reportFiles = fs.readdirSync(reportsDir)
+                .filter(f => f.startsWith('events-update-') && f.endsWith('.json'))
+                .sort();
+            } catch (e) {
+              console.log('No reports directory found');
+              return;
+            }
+
+            if (!reportFiles.length) {
+              console.log('No report files found');
+              return;
+            }
+
+            const latestReport = path.join(reportsDir, reportFiles[reportFiles.length - 1]);
+            let report;
+            try {
+              report = JSON.parse(fs.readFileSync(latestReport, 'utf8'));
+            } catch (e) {
+              console.log('Could not parse report:', e.message);
+              return;
+            }
+
+            if (!report.eventsAdded || report.eventsAdded === 0) {
+              console.log('No new events added — skipping issue creation');
+              return;
+            }
+
+            const sourceList = Object.entries(report.sourceCounts || {})
+              .map(([k, v]) => `- ${k}: ${v} found`)
+              .join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `📅 ${report.eventsAdded} new events pending approval — ${report.runDate}`,
+              body: [
+                `The daily scraper added **${report.eventsAdded} new events** to the database pending your review.`,
+                '',
+                '**Review them at:** /admin/events',
+                '',
+                '**Sources:**',
+                sourceList,
+                '',
+                `**Duplicates skipped:** ${report.duplicatesSkipped}`,
+                `**Errors:** ${report.errors ? report.errors.length : 0}`,
+              ].join('\n'),
+              labels: ['automation', 'events'],
+            });

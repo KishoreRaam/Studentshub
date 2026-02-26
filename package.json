@@ -72,6 +72,7 @@
             "autoprefixer": "^10.4.24",
             "dotenv": "^17.2.3",
             "node-appwrite": "^21.0.0",
+            "playwright": "^1.58.2",
             "postcss": "^8.5.6",
             "tailwindcss": "^3.4.19",
             "tsx": "^4.21.0",
@@ -84,6 +85,10 @@
             "dev:full": "npm run api & npm run dev",
             "perks:check": "node scripts/automation/check-perk-links.js",
             "perks:discover": "node scripts/automation/discover-new-perks.js",
-            "perks:update": "npm run perks:check && npm run perks:discover"
+            "perks:update": "npm run perks:check && npm run perks:discover",
+            "events:scrape": "node scripts/automation/events/run-scrapers.js",
+            "events:devfolio": "node scripts/automation/events/scrapers/devfolio.js",
+            "events:unstop": "node scripts/automation/events/scrapers/unstop.js",
+            "events:mlh": "node scripts/automation/events/scrapers/mlh-eventbrite.js"
       }
 }
