@@ -44,14 +44,21 @@ jobs:
           APPWRITE_BUCKET_EVENT_MEDIA: ${{ secrets.VITE_APPWRITE_BUCKET_EVENT_MEDIA }}
         run: node scripts/automation/events/run-scrapers.js
 
+      - name: Print scraper report
+        if: always()
+        run: |
+          echo "=== Scraper Report ==="
+          cat scripts/automation/reports/events-update-*.json 2>/dev/null || echo "(no report file generated)"
+
       - name: Commit report
+        continue-on-error: true
         run: |
           git config user.name "StudentsHub Bot"
           git config user.email "bot@studentshub.dev"
           git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
           git add scripts/automation/reports/events-update-*.json || true
           git diff --staged --quiet || git commit -m "chore(events): scraper report $(date +%Y-%m-%d) [skip ci]"
-          git push || true
+          git push
 
       - name: Create issue for new events
         if: always()

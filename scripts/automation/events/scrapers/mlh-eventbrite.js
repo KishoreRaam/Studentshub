@@ -10,8 +10,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function scrapeMLH() {
   const events = [];
   try {
-    console.log('  [MLH] Fetching https://mlh.io/seasons/2025/events ...');
-    const res = await fetch('https://mlh.io/seasons/2025/events', {
+    console.log('  [MLH] Fetching https://mlh.io/seasons/2026/events ...');
+    const res = await fetch('https://mlh.io/seasons/2026/events', {
       headers: { 'User-Agent': USER_AGENT, 'Accept': 'text/html' },
       timeout: 15000,
     });

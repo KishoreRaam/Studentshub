@@ -1,154 +1,112 @@
 'use strict';
 
-const { chromium } = require('playwright');
-const { USER_AGENT, SCRAPER_TIMEOUT_MS, REQUEST_DELAY_MS } = require('../config');
+/**
+ * Devfolio scraper — uses the public Devfolio REST API.
+ * No browser needed; the same API that powers devfolio.co/hackathons.
+ */
+
+const fetch = require('node-fetch');
+const { USER_AGENT, REQUEST_DELAY_MS } = require('../config');
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+const API_PAGES  = 3;   // fetch first 3 pages (24 events each)
+const PAGE_SIZE  = 24;
+
+async function fetchPage(page) {
+  // Public Devfolio API — no auth required
+  const url = `https://api.devfolio.co/api/hackathons?count=${PAGE_SIZE}&page=${page}`;
+  const res = await fetch(url, {
+    headers: {
+      'Accept':     'application/json',
+      'User-Agent': USER_AGENT,
+    },
+    timeout: 15000,
+  });
+  if (!res.ok) throw new Error(`Devfolio API HTTP ${res.status}`);
+  return res.json();
+}
+
 async function scrapeDevfolio() {
   const events = [];
-  let browser;
+  const now = new Date();
+
   try {
-    browser = await chromium.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
-    });
-    const context = await browser.newContext({ userAgent: USER_AGENT });
-    const page = await context.newPage();
-    page.setDefaultTimeout(SCRAPER_TIMEOUT_MS);
+    console.log('  [Devfolio] Fetching via public API...');
 
-    console.log('  [Devfolio] Navigating to https://devfolio.co/hackathons ...');
-    let loaded = false;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let page = 0; page < API_PAGES; page++) {
+      let data;
       try {
-        await page.goto('https://devfolio.co/hackathons', { waitUntil: 'networkidle', timeout: SCRAPER_TIMEOUT_MS });
-        loaded = true;
-        break;
+        data = await fetchPage(page);
       } catch (err) {
-        console.warn(`  [Devfolio] Load attempt ${attempt + 1} failed: ${err.message}`);
-        if (attempt === 0) await sleep(3000);
-      }
-    }
-    if (!loaded) {
-      console.error('  [Devfolio] Could not load page after 2 attempts');
-      return [];
-    }
-
-    // Scroll to load more cards
-    for (let i = 0; i < 3; i++) {
-      await page.evaluate(() => window.scrollBy(0, 2000));
-      await sleep(REQUEST_DELAY_MS);
-    }
-
-    // Wait for hackathon cards
-    try {
-      await page.waitForSelector('a[href*="/hackathon/"]', { timeout: 10000 });
-    } catch {
-      console.warn('  [Devfolio] Card selector timeout — trying alternate selector');
-      try {
-        await page.waitForSelector('[class*="hackathon"]', { timeout: 5000 });
-      } catch {
-        console.warn('  [Devfolio] No cards found');
-        return [];
-      }
-    }
-
-    // Extract card data
-    const rawCards = await page.evaluate(() => {
-      const results = [];
-      // Try multiple selectors Devfolio has used over time
-      const cardSelectors = [
-        'a[href*="/hackathon/"]',
-        '[class*="HackathonCard"]',
-        '[data-testid*="hackathon"]',
-        '.sc-hackathon-card',
-      ];
-      let cards = [];
-      for (const sel of cardSelectors) {
-        cards = document.querySelectorAll(sel);
-        if (cards.length > 0) break;
+        console.warn(`  [Devfolio] Page ${page} failed: ${err.message}`);
+        break;
       }
 
-      cards.forEach(card => {
+      const hackathons = data.hackathons || data.results || data.data || [];
+      if (!hackathons.length) break;   // no more pages
+
+      for (const h of hackathons) {
         try {
-          const titleEl = card.querySelector('h2, h3, [class*="title"], [class*="name"]');
-          const title = titleEl ? titleEl.innerText.trim() : '';
-          if (!title) return;
+          const title = (h.name || h.title || '').trim();
+          if (!title) continue;
 
-          const descEl = card.querySelector('p, [class*="tagline"], [class*="description"], [class*="subtitle"]');
-          const description = descEl ? descEl.innerText.trim() : '';
+          // Date fields (ISO strings from the API)
+          const startDate = h.starts_at || h.start_date || h.startDate || '';
+          const endDate   = h.ends_at   || h.end_date   || h.endDate   || '';
 
-          // Date elements
-          const dateEls = card.querySelectorAll('[class*="date"], time, [class*="Date"]');
-          let startDate = '', endDate = '';
-          if (dateEls.length >= 2) {
-            startDate = dateEls[0].innerText.trim();
-            endDate   = dateEls[1].innerText.trim();
-          } else if (dateEls.length === 1) {
-            startDate = dateEls[0].innerText.trim();
+          // Skip past events
+          if (startDate) {
+            const d = new Date(startDate);
+            if (!isNaN(d.getTime()) && d < now) continue;
           }
 
           // Location
-          const locEl = card.querySelector('[class*="location"], [class*="Location"], [class*="venue"]');
-          const location = locEl ? locEl.innerText.trim() : 'Online';
+          const locType = (h.location_type || h.mode || '').toLowerCase();
+          let location = 'Online';
+          if (locType === 'in_person' || locType === 'offline') location = 'In-Person';
+          else if (locType === 'hybrid') location = 'Hybrid';
+          if (h.city || h.venue) location = `${h.city || h.venue}${h.country ? ', ' + h.country : ''}`.trim() || location;
 
           // Registration link
-          let registrationLink = card.href || card.getAttribute('href') || '';
-          if (registrationLink && !registrationLink.startsWith('http')) {
-            registrationLink = 'https://devfolio.co' + registrationLink;
-          }
+          const slug = h.slug || h.id || '';
+          const registrationLink = h.url || h.apply_url
+            || (slug ? `https://devfolio.co/hackathons/${slug}/apply` : '')
+            || 'N/A';
 
           // Organizer
-          const orgEl = card.querySelector('[class*="organizer"], [class*="host"], [class*="by"]');
-          const organizerName = orgEl ? orgEl.innerText.trim() : '';
+          const organizerName = (h.organization_name || h.organizer || h.org_name || '').trim();
 
           // Image
-          const imgEl = card.querySelector('img');
-          let imageUrl = '';
-          if (imgEl) {
-            imageUrl = imgEl.src || imgEl.getAttribute('data-src') || '';
-          }
-          if (!imageUrl) {
-            // Check background-image style
-            const styledEl = card.querySelector('[style*="background-image"]');
-            if (styledEl) {
-              const match = styledEl.getAttribute('style').match(/url\(["']?([^"')]+)["']?\)/);
-              if (match) imageUrl = match[1];
-            }
-          }
+          const imageUrl = h.banner || h.cover || h.logo || h.thumbnail || '';
 
-          // Tags
-          const tagEls = card.querySelectorAll('[class*="tag"], [class*="skill"], [class*="label"]');
-          const tags = [...tagEls].map(t => t.innerText.trim()).filter(Boolean);
+          // Tags / skills
+          const tags = Array.isArray(h.skills)
+            ? h.skills.map(s => (typeof s === 'string' ? s : s.title || s.name || '')).filter(Boolean)
+            : [];
 
-          // Team/participant size
-          const teamEl = card.querySelector('[class*="team"], [class*="participant"], [class*="size"]');
-          const maxParticipants = teamEl ? parseInt(teamEl.innerText.replace(/\D/g, '')) || 0 : 0;
+          const maxParticipants = parseInt(h.max_registrations || h.participant_limit || 0) || 0;
 
-          results.push({
-            title, description, startDate, endDate, location,
-            registrationLink, organizerName, imageUrl, tags, maxParticipants,
+          events.push({
+            title,
+            description: (h.tagline || h.description || '').trim(),
+            startDate,
+            endDate,
+            location,
+            registrationLink,
+            organizerName,
+            imageUrl,
+            tags,
+            maxParticipants,
+            source:   'devfolio',
+            category: ['Hackathon'],
           });
         } catch (_) {
-          // skip bad card
+          // skip bad entry
         }
-      });
-      return results;
-    });
-
-    const now = new Date();
-    for (const card of rawCards) {
-      if (!card.title) continue;
-      // Only future events
-      if (card.startDate) {
-        const d = new Date(card.startDate);
-        if (!isNaN(d.getTime()) && d < now) continue;
       }
-      events.push({
-        ...card,
-        source: 'devfolio',
-        category: ['Hackathon'],
-      });
+
+      if (page < API_PAGES - 1) await sleep(REQUEST_DELAY_MS);
     }
 
     console.log(`  [Devfolio] Found ${events.length} upcoming events`);
@@ -156,17 +114,17 @@ async function scrapeDevfolio() {
   } catch (err) {
     console.error('  [Devfolio] Scraper error:', err.message);
     return [];
-  } finally {
-    if (browser) await browser.close().catch(() => {});
   }
 }
 
-// Allow running standalone for testing
+// Standalone test
 if (require.main === module) {
   require('dotenv').config();
+  const { loadEnv } = require('../utils');
+  loadEnv();
   scrapeDevfolio().then(events => {
     console.log(JSON.stringify(events, null, 2));
-    console.log(`Total: ${events.length}`);
+    console.log(`\nTotal: ${events.length}`);
   });
 }
 
