@@ -44,6 +44,18 @@ jobs:
           APPWRITE_BUCKET_EVENT_MEDIA: ${{ secrets.VITE_APPWRITE_BUCKET_EVENT_MEDIA }}
         run: node scripts/automation/events/run-scrapers.js
 
+      - name: Fix event images (Unsplash backfill)
+        env:
+          APPWRITE_ENDPOINT:           ${{ secrets.VITE_APPWRITE_ENDPOINT }}
+          APPWRITE_PROJECT_ID:         ${{ secrets.VITE_APPWRITE_PROJECT }}
+          APPWRITE_API_KEY:            ${{ secrets.APPWRITE_API_KEY }}
+          DATABASE_ID:                 ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
+          EVENTS_COLLECTION_ID:        ${{ secrets.VITE_APPWRITE_COLLECTION_EVENTS }}
+          APPWRITE_BUCKET_EVENT_MEDIA: ${{ secrets.VITE_APPWRITE_BUCKET_EVENT_MEDIA }}
+          UNSPLASH_ACCESS_KEY:         ${{ secrets.UNSPLASH_ACCESS_KEY }}
+        run: node scripts/automation/events/fix-event-images.js --limit 45
+        continue-on-error: true
+
       - name: Print scraper report
         if: always()
         run: |

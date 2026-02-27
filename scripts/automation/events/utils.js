@@ -175,6 +175,28 @@ function getFallbackImage(category) {
   return FALLBACK_IMAGES[category] || FALLBACK_IMAGES.default;
 }
 
+// Search Unsplash for a relevant image; returns URL string or null
+async function searchUnsplashImage(query) {
+  const key = process.env.UNSPLASH_ACCESS_KEY;
+  if (!key) return null;
+  const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&orientation=landscape&per_page=3`;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { Authorization: `Client-ID ${key}` },
+    });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error(`Unsplash HTTP ${res.status}`);
+    const data = await res.json();
+    return data.results?.[0]?.urls?.regular || null;
+  } catch (err) {
+    console.warn('Unsplash search failed:', err.message);
+    return null;
+  }
+}
+
 // Fuzzy duplicate check: same title (80% similarity) + date within 7 days
 function isDuplicate(title, eventDate, existingEvents) {
   if (!title) return false;
@@ -221,5 +243,6 @@ module.exports = {
   downloadImageBuffer,
   uploadImageToAppwrite,
   getFallbackImage,
+  searchUnsplashImage,
   isDuplicate,
 };

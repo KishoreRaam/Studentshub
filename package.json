@@ -87,6 +87,7 @@
             "perks:discover": "node scripts/automation/discover-new-perks.js",
             "perks:update": "npm run perks:check && npm run perks:discover",
             "events:scrape": "node scripts/automation/events/run-scrapers.js",
+            "events:fix-images": "node scripts/automation/events/fix-event-images.js",
             "events:devfolio": "node scripts/automation/events/scrapers/devfolio.js",
             "events:unstop": "node scripts/automation/events/scrapers/unstop.js",
             "events:mlh": "node scripts/automation/events/scrapers/mlh-eventbrite.js"

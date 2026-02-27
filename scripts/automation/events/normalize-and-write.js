@@ -6,7 +6,7 @@ const fs   = require('fs');
 const {
   loadEnv, stripHtml, truncateDescription, parseToISO,
   guessCategory, buildTags, downloadImageBuffer,
-  uploadImageToAppwrite, getFallbackImage, isDuplicate,
+  uploadImageToAppwrite, getFallbackImage, searchUnsplashImage, isDuplicate,
 } = require('./utils');
 
 // Load env FIRST before requiring appwrite-client (which reads env vars at require-time)
@@ -175,6 +175,22 @@ async function normaliseAndWrite(allRawEvents, sourceCounts) {
             payload.thumbnailUrl = uploadResult.thumbnailUrl;
             imageUploaded = true;
             stats.imageUploaded++;
+          }
+        }
+      }
+      if (!imageUploaded) {
+        // Try Unsplash search before falling back to static category image
+        const unsplashUrl = await searchUnsplashImage(`${payload.title} ${eventType}`);
+        if (unsplashUrl) {
+          const buffer = await downloadImageBuffer(unsplashUrl);
+          if (buffer) {
+            const result = await uploadImageToAppwrite(buffer, 'poster.jpg');
+            if (result) {
+              payload.posterFileId = result.posterFileId;
+              payload.thumbnailUrl = result.thumbnailUrl;
+              imageUploaded = true;
+              stats.imageUploaded++;
+            }
           }
         }
       }
