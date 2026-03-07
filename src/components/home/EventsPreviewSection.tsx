@@ -13,6 +13,7 @@ import {
 
 import { databases, DATABASE_ID, COLLECTIONS, eventMediaBucket } from "../../lib/appwrite";
 import { FlowButton } from "../ui/flow-button";
+import { ButtonColorful } from "../ui/button-colorful";
 import { Query } from "appwrite";
 
 /* ═══════════════════════ Types ═══════════════════════ */
@@ -482,7 +483,7 @@ export function EventsPreviewSection() {
         {/* ═══════════ BLOCK 3: CTA Button ═══════════ */}
         <div className="flex justify-center w-full">
           <Link to="/events">
-            <FlowButton text="Explore All Events" />
+            <ButtonColorful label="Explore All Events" />
           </Link>
         </div>
       </div>

@@ -1,6 +1,5 @@
+import { useRef } from "react";
 import { Bookmark, ExternalLink } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { SavedResource } from "@/types/dashboard";
 import { getLogoUrl } from "@/utils/logoUtils";
 
@@ -11,35 +10,42 @@ type ResourceCardProps = {
 };
 
 export default function ResourceCard({ resource, onAccessResource, onToggleSave }: ResourceCardProps) {
-  const logoUrl = getLogoUrl(
-    resource.provider || resource.title,
-    resource.claimLink
-  );
+  const logoUrl = getLogoUrl(resource.provider || resource.title, resource.claimLink);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  const handleAccess = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const btn = btnRef.current;
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple-wave';
+      ripple.style.cssText = `width:60px;height:60px;left:${e.clientX - rect.left - 30}px;top:${e.clientY - rect.top - 30}px;background:radial-gradient(circle,rgba(0,166,62,0.4) 0%,transparent 70%);`;
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 700);
+    }
+    onAccessResource(resource);
+  };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 p-6 relative group">
-      {/* Bookmark Icon */}
+    <div className="nm-flat-hover rounded-2xl p-6 relative">
+      {/* Bookmark */}
       <button
         type="button"
         onClick={() => onToggleSave(resource.id)}
-        className="absolute top-4 right-4 p-2 rounded-full bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+        className="nm-btn absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center"
         aria-label="Toggle bookmark"
       >
         <Bookmark
-          className={`w-5 h-5 ${
-            resource.isSaved
-              ? "fill-blue-600 text-blue-600 dark:fill-blue-400 dark:text-blue-400"
-              : "text-blue-600 dark:text-blue-400"
-          }`}
+          className={`w-4 h-4 ${resource.isSaved ? 'fill-[#1A56DB] text-[#1A56DB]' : 'text-gray-500 dark:text-gray-400'}`}
         />
       </button>
 
       {/* Logo */}
-      <div className="w-16 h-16 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-900/30 dark:to-blue-900/30 rounded-xl shadow-md flex items-center justify-center mb-4 overflow-hidden">
+      <div className="nm-inset w-16 h-16 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
         {logoUrl ? (
           <img
             src={logoUrl}
-            alt={`${resource.title} logo`}
+            alt={resource.title}
             className="w-full h-full object-contain p-2"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
@@ -51,42 +57,33 @@ export default function ResourceCard({ resource, onAccessResource, onToggleSave 
       </div>
 
       {/* Content */}
-      <div className="mb-4">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white pr-8">
-            {resource.title}
-          </h3>
-        </div>
-
+      <div className="mb-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white pr-8 mb-2">{resource.title}</h3>
         <div className="flex flex-wrap gap-2 mb-3">
-          <Badge className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-0">
+          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-blue-100/70 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
             {resource.category}
-          </Badge>
+          </span>
           {resource.badge && (
-            <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-0">
+            <span className="px-2 py-1 rounded-lg text-xs font-medium bg-green-100/70 dark:bg-green-900/30 text-green-700 dark:text-green-400">
               {resource.badge}
-            </Badge>
+            </span>
           )}
         </div>
-
         {resource.provider && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-            by {resource.provider}
-          </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">by {resource.provider}</p>
         )}
-        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-          {resource.description}
-        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{resource.description}</p>
       </div>
 
-      {/* Action Button */}
-      <Button
-        onClick={() => onAccessResource(resource)}
-        className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-700 dark:hover:from-cyan-700 dark:hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all font-semibold"
+      {/* Action */}
+      <button
+        ref={btnRef}
+        onClick={handleAccess}
+        className="nm-btn relative overflow-hidden w-full py-3 rounded-xl text-sm font-semibold text-[#00A63E] dark:text-green-400 flex items-center justify-center gap-2 cursor-pointer"
       >
-        <ExternalLink className="w-4 h-4 mr-2" />
+        <ExternalLink className="w-4 h-4" />
         Access Resource
-      </Button>
+      </button>
     </div>
   );
 }

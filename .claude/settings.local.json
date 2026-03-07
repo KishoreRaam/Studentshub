@@ -34,7 +34,8 @@
       "Bash(where gh:*)",
       "Bash(cmd:*)",
       "Bash(node:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(sed -n '330,345p' /c/Users/Raam/Downloads/Studentshub/src/components/DashboardPreview.tsx\nsed -n '168,178p' /c/Users/Raam/Downloads/Studentshub/src/components/AIToolsSection.tsx\nsed -n '285,315p' /c/Users/Raam/Downloads/Studentshub/src/components/BenefitsSection.tsx)"
     ],
     "deny": [],
     "ask": []

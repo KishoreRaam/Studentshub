@@ -1,6 +1,7 @@
 import { BookOpen, FileText, GraduationCap, ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { FlowButton } from "./ui/flow-button";
+import { ButtonColorful } from "./ui/button-colorful";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Papa from "papaparse";
@@ -256,9 +257,9 @@ export function FreeResourcesSection() {
         </div>
 
         <div className="text-center flex justify-center mt-3">
-          <FlowButton
+          <ButtonColorful
             onClick={() => navigate('/courses')}
-            text="Explore More Resources"
+            label="Explore More Resources"
           />
         </div>
       </div>

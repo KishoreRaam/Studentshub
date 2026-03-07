@@ -1,0 +1,207 @@
+/* ═══════════════════════════════════════════════════
+   Neumorphic Dashboard — Design System
+   Light source: top-left | No flat borders, shadow-only edges
+   Light bg: #e0e5ec  |  Dark bg: #1e2030
+   ═══════════════════════════════════════════════════ */
+
+/* ── Base background ── */
+.nm-bg { background: #e0e5ec; }
+.dark .nm-bg { background: #1e2030; }
+
+/* ── Flat elevated surface ── */
+.nm-flat {
+  background: #e0e5ec;
+  box-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff;
+  border: none !important;
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dark .nm-flat {
+  background: #1e2030;
+  box-shadow: 6px 6px 12px #14152a, -6px -6px 12px #2a2d42;
+}
+
+/* ── Flat + hover lift ── */
+.nm-flat-hover {
+  background: #e0e5ec;
+  box-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff;
+  border: none !important;
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dark .nm-flat-hover {
+  background: #1e2030;
+  box-shadow: 6px 6px 12px #14152a, -6px -6px 12px #2a2d42;
+}
+.nm-flat-hover:hover {
+  box-shadow: 10px 10px 20px #a3b1c6, -10px -10px 20px #ffffff;
+  transform: translateY(-4px) scale(1.01);
+}
+.dark .nm-flat-hover:hover {
+  box-shadow: 10px 10px 20px #14152a, -10px -10px 20px #2a2d42;
+}
+
+/* ── Inset (pressed / search bar / icon cavity) ── */
+.nm-inset {
+  background: #e0e5ec;
+  box-shadow: inset 4px 4px 8px #a3b1c6, inset -4px -4px 8px #ffffff;
+  border: none !important;
+}
+.dark .nm-inset {
+  background: #1e2030;
+  box-shadow: inset 4px 4px 8px #14152a, inset -4px -4px 8px #2a2d42;
+}
+
+/* ── Convex button ── */
+.nm-btn {
+  background: #e0e5ec;
+  box-shadow: 4px 4px 8px #a3b1c6, -4px -4px 8px #ffffff;
+  border: none !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dark .nm-btn {
+  background: #1e2030;
+  box-shadow: 4px 4px 8px #14152a, -4px -4px 8px #2a2d42;
+}
+.nm-btn:hover {
+  box-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff;
+  transform: scale(1.03) translateY(-2px);
+}
+.dark .nm-btn:hover {
+  box-shadow: 6px 6px 12px #14152a, -6px -6px 12px #2a2d42;
+}
+.nm-btn:active {
+  box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff;
+  transform: scale(0.97);
+}
+.dark .nm-btn:active {
+  box-shadow: inset 3px 3px 6px #14152a, inset -3px -3px 6px #2a2d42;
+}
+
+/* ── Sidebar nav link ── */
+.nm-nav-link {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nm-nav-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(26,86,219,0.06) 0%, rgba(26,86,219,0.12) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+.nm-nav-link:hover::before { transform: translateX(0); }
+
+/* ── Active nav (inset) ── */
+.nm-nav-active {
+  background: #e0e5ec !important;
+  box-shadow: inset 4px 4px 8px #a3b1c6, inset -4px -4px 8px #ffffff !important;
+}
+.dark .nm-nav-active {
+  background: #1e2030 !important;
+  box-shadow: inset 4px 4px 8px #14152a, inset -4px -4px 8px #2a2d42 !important;
+}
+
+/* ── Progress track (inset) ── */
+.nm-progress-track {
+  background: #e0e5ec;
+  box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff;
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.dark .nm-progress-track {
+  background: #1e2030;
+  box-shadow: inset 3px 3px 6px #14152a, inset -3px -3px 6px #2a2d42;
+}
+
+/* ── Progress fill with shimmer ── */
+.nm-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nm-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 200%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+  animation: waveShimmer 2s linear infinite;
+}
+
+/* ── Gradient divider ── */
+.nm-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(163,177,198,0.6), transparent);
+}
+.dark .nm-divider {
+  background: linear-gradient(90deg, transparent, rgba(42,45,66,0.9), transparent);
+}
+
+/* ═══════════════ ANIMATIONS ═══════════════ */
+
+/* Icon float bob — 5px vertical, 3s cycle */
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+.float-bob { animation: floatBob 3s ease-in-out infinite; }
+
+/* Staggered slide-bounce entrance for list items */
+@keyframes slideBounce {
+  0%   { opacity: 0; transform: translateX(-12px); }
+  65%  { transform: translateX(3px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.slide-bounce {
+  animation: slideBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Fade up for cards / sections */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+}
+
+/* Shimmer sweep for progress bars */
+@keyframes waveShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Glow pulse for progress fills */
+@keyframes glowPulse {
+  0%, 100% { filter: brightness(1); }
+  50%       { filter: brightness(1.25) drop-shadow(0 0 5px currentColor); }
+}
+.glow-pulse { animation: glowPulse 2.5s ease-in-out infinite; }
+
+/* Click ripple */
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 0.5; }
+  100% { transform: scale(4); opacity: 0; }
+}
+.ripple-wave {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ripple 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Online status dot pulse */
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.5); opacity: 0.5; }
+}
+.pulse-dot { animation: pulseDot 1.8s ease-in-out infinite; }

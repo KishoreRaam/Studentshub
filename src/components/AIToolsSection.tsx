@@ -6,7 +6,7 @@ import { Badge } from './ui/badge';
 import { ExternalLink, Sparkles, Star } from 'lucide-react';
 import { parseAIToolsCSV } from '@/utils/csvParser';
 import type { AITool } from '@/types/ai-tools';
-import { FlowButton } from './ui/flow-button';
+import { ButtonColorful } from './ui/button-colorful';
 
 export function AIToolsSection() {
   const [tools, setTools] = useState<AITool[]>([]);
@@ -169,7 +169,7 @@ export function AIToolsSection() {
           className="text-center mt-12"
         >
           <Link to="/tools">
-            <FlowButton text="Discover More AI Tools" />
+            <ButtonColorful label="Discover More AI Tools" />
           </Link>
         </motion.div>
       </div>

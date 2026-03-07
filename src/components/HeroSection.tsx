@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { FlowButton } from './ui/flow-button';
 import { FloatingCharacter } from './ui/floating-character';
+import { ButtonColorful } from './ui/button-colorful';
 import { AnimatedTitle } from './AnimatedTitle';
 
 // Counter animation hook
@@ -117,7 +118,7 @@ export function HeroSection() {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <Link to="/perks">
-              <FlowButton text="Explore Benefits" />
+              <ButtonColorful label="Explore Benefits" />
             </Link>
             <Link to="/dashboard">
               <FlowButton text="View Dashboard" />

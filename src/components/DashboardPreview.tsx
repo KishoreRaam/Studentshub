@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { getSavedPerks, getSavedResources, getSavedAITools } from '../services/saved-items.service';
 import { FlowButton } from './ui/flow-button';
+import { ButtonColorful } from './ui/button-colorful';
 
 interface DashboardStats {
   totalSaved: number;
@@ -332,9 +333,9 @@ export function DashboardPreview() {
           className="text-center mt-12"
         >
           <div className="flex justify-center">
-            <FlowButton
+            <ButtonColorful
               onClick={() => navigate('/dashboard')}
-              text="Access Your Dashboard"
+              label="Access Your Dashboard"
             />
           </div>
         </motion.div>

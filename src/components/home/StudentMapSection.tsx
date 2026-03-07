@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Filter, Clock, TrendingUp, Lightbulb, Map } from "lucide-react";
 import { MapPreview } from "../map/MapPreview";
-import { FlowButton } from "../ui/flow-button";
+import { ButtonColorful } from "../ui/button-colorful";
 
 type TimeOption = "Morning" | "Afternoon" | "Evening";
 
@@ -401,9 +401,9 @@ export default function StudentMapSection() {
 
           {/* ── Explore Map CTA — prominent full-width button below map + sidebar ── */}
           <div className="w-full flex justify-center mt-4">
-            <FlowButton
+            <ButtonColorful
               onClick={() => navigate("/map")}
-              text="Explore Live Map →"
+              label="Explore Live Map"
             />
           </div>
         </div>

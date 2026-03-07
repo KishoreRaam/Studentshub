@@ -8,6 +8,7 @@ import { GitHubStudentPack } from './GitHubStudentPack';
 import { ExternalLink, Star } from 'lucide-react';
 import { getLogoUrl } from '../utils/logoUtils';
 import { FlowButton } from './ui/flow-button';
+import { ButtonColorful } from './ui/button-colorful';
 
 // Remove GitHub Student Pack from regular benefits array
 type Benefit = {
@@ -287,7 +288,7 @@ export function BenefitsSection() {
           className="text-center mt-12"
         >
           <Link to="/perks">
-            <FlowButton text="View More Benefits" />
+            <ButtonColorful label="View More Benefits" />
           </Link>
         </motion.div>
 
