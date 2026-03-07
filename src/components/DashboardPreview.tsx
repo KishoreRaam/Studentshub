@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { getSavedPerks, getSavedResources, getSavedAITools } from '../services/saved-items.service';
+import { FlowButton } from './ui/flow-button';
 
 interface DashboardStats {
   totalSaved: number;
@@ -107,7 +108,7 @@ export function DashboardPreview() {
             Track Your Benefits
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Get real-time insights into your student benefits with our comprehensive 
+            Get real-time insights into your student benefits with our comprehensive
             dashboard. Monitor expiration dates, discover new offers, and maximize your savings.
           </p>
         </motion.div>
@@ -145,7 +146,7 @@ export function DashboardPreview() {
                 )}
               </div>
             </div>
-            
+
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4 border border-blue-100 dark:border-blue-800">
@@ -157,7 +158,7 @@ export function DashboardPreview() {
                   <CheckCircle className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
-              
+
               <div className="bg-yellow-50 dark:bg-yellow-900/30 rounded-xl p-4 border border-yellow-100 dark:border-yellow-800">
                 <div className="flex items-center justify-between">
                   <div>
@@ -167,7 +168,7 @@ export function DashboardPreview() {
                   <AlertCircle className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
                 </div>
               </div>
-              
+
               <div className="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-4 border border-purple-100 dark:border-purple-800">
                 <div className="flex items-center justify-between">
                   <div>
@@ -177,7 +178,7 @@ export function DashboardPreview() {
                   <Mail className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
-              
+
               <div className="bg-green-50 dark:bg-green-900/30 rounded-xl p-4 border border-green-100 dark:border-green-800">
                 <div className="flex items-center justify-between">
                   <div>
@@ -283,12 +284,12 @@ export function DashboardPreview() {
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="category" stroke="#666" />
                       <YAxis stroke="#666" />
-                      <Tooltip 
+                      <Tooltip
                         cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
                       />
-                      <Bar 
-                        dataKey="count" 
-                        fill="#10B981" 
+                      <Bar
+                        dataKey="count"
+                        fill="#10B981"
                         radius={[4, 4, 0, 0]}
                       />
                     </BarChart>
@@ -308,10 +309,9 @@ export function DashboardPreview() {
               <CardContent className="space-y-4">
                 {recentActivity.map((activity) => (
                   <div key={activity.id} className="flex items-start space-x-3">
-                    <div className={`w-2 h-2 rounded-full mt-2 ${
-                      activity.status === 'success' ? 'bg-green-500' :
-                      activity.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
-                    }`} />
+                    <div className={`w-2 h-2 rounded-full mt-2 ${activity.status === 'success' ? 'bg-green-500' :
+                        activity.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
+                      }`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-900 dark:text-gray-100">{activity.action}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
@@ -331,12 +331,12 @@ export function DashboardPreview() {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="bg-gradient-to-r from-blue-600 to-green-500 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 font-semibold"
-          >
-            Access Your Dashboard
-          </button>
+          <div className="flex justify-center">
+            <FlowButton
+              onClick={() => navigate('/dashboard')}
+              text="Access Your Dashboard"
+            />
+          </div>
         </motion.div>
       </div>
     </section>

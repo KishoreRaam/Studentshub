@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
 import { Button } from './ui/button';
+import { FlowButton } from './ui/flow-button';
+import { FloatingCharacter } from './ui/floating-character';
 import { AnimatedTitle } from './AnimatedTitle';
 
 // Counter animation hook
@@ -65,21 +67,8 @@ export function HeroSection() {
   const avgSavings = useCountUp(4, 2000, startCounting); // 4 Lakh
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20 overflow-hidden transition-colors duration-300">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 0.1, scale: 1 }}
-          transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400 dark:bg-blue-600 rounded-full blur-3xl"
-        />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 0.1, scale: 1 }}
-          transition={{ duration: 2, delay: 1, repeat: Infinity, repeatType: "reverse" }}
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-green-400 dark:bg-green-600 rounded-full blur-3xl"
-        />
-      </div>
+      {/* Minimalist interactive floating character background */}
+      <FloatingCharacter />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
@@ -127,26 +116,12 @@ export function HeroSection() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Button
-              asChild
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group"
-            >
-              <Link to="/perks">
-                Explore Benefits
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="border-2 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-8 py-4 rounded-xl"
-            >
-              <Link to="/dashboard">
-                View Dashboard
-              </Link>
-            </Button>
+            <Link to="/perks">
+              <FlowButton text="Explore Benefits" />
+            </Link>
+            <Link to="/dashboard">
+              <FlowButton text="View Dashboard" />
+            </Link>
           </motion.div>
 
           {/* Stats */}

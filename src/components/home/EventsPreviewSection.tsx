@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { databases, DATABASE_ID, COLLECTIONS, eventMediaBucket } from "../../lib/appwrite";
+import { FlowButton } from "../ui/flow-button";
 import { Query } from "appwrite";
 
 /* ═══════════════════════ Types ═══════════════════════ */
@@ -181,8 +182,8 @@ function EventCard({
         >
           <Bookmark
             className={`w-[16px] h-[16px] ${event.bookmarked
-                ? "fill-[#1A56DB] text-[#1A56DB] dark:fill-blue-400 dark:text-blue-400"
-                : "text-[#6A7282] dark:text-gray-400"
+              ? "fill-[#1A56DB] text-[#1A56DB] dark:fill-blue-400 dark:text-blue-400"
+              : "text-[#6A7282] dark:text-gray-400"
               }`}
             strokeWidth={2}
           />
@@ -238,9 +239,7 @@ function EventCard({
             <Users className="w-[14px] h-[14px]" strokeWidth={2} />
             {event.spotsLeft} spots left
           </span>
-          <button className="flex items-center justify-center h-[30px] px-[16px] py-[6px] bg-[#1A56DB] hover:brightness-110 text-white font-body font-semibold text-[12px] leading-[18px] text-center rounded-[10px] cursor-pointer transition-all duration-200">
-            View Details
-          </button>
+          <FlowButton text="View Details" />
         </div>
       </div>
     </div>
@@ -482,12 +481,8 @@ export function EventsPreviewSection() {
 
         {/* ═══════════ BLOCK 3: CTA Button ═══════════ */}
         <div className="flex justify-center w-full">
-          <Link
-            to="/events"
-            className="group inline-flex items-center gap-[8px] h-[52px] px-[32px] bg-[#1A56DB] text-white font-body font-semibold text-[16px] leading-[24px] rounded-[16px] shadow-[0_4px_16px_rgba(26,86,219,0.25)] cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:brightness-110"
-          >
-            Explore All Events
-            <ArrowRight className="w-[20px] h-[20px] transition-transform duration-200 group-hover:translate-x-1" strokeWidth={2} />
+          <Link to="/events">
+            <FlowButton text="Explore All Events" />
           </Link>
         </div>
       </div>

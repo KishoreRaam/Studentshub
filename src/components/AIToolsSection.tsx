@@ -6,6 +6,7 @@ import { Badge } from './ui/badge';
 import { ExternalLink, Sparkles, Star } from 'lucide-react';
 import { parseAIToolsCSV } from '@/utils/csvParser';
 import type { AITool } from '@/types/ai-tools';
+import { FlowButton } from './ui/flow-button';
 
 export function AIToolsSection() {
   const [tools, setTools] = useState<AITool[]>([]);
@@ -168,13 +169,7 @@ export function AIToolsSection() {
           className="text-center mt-12"
         >
           <Link to="/tools">
-            <button className="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden bg-gradient-to-r from-blue-600 to-green-500 rounded-xl text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25">
-              <span className="relative z-10 flex items-center space-x-2">
-                <span className="font-medium">Discover More AI Tools</span>
-                <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
+            <FlowButton text="Discover More AI Tools" />
           </Link>
         </motion.div>
       </div>

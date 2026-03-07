@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card, CardContent } from './ui/card';
 import { ChevronDown, HelpCircle } from 'lucide-react';
+import { FlowButton } from './ui/flow-button';
 
 const faqs = [
   {
@@ -101,7 +102,7 @@ export function FAQ() {
                       <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     </motion.div>
                   </button>
-                  
+
                   <AnimatePresence>
                     {openFAQ === faq.id && (
                       <motion.div
@@ -136,9 +137,9 @@ export function FAQ() {
             <p className="text-blue-100 mb-6">
               Our support team is here to help you make the most of your student benefits.
             </p>
-            <button className="bg-white text-blue-600 px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200">
-              Contact Support
-            </button>
+            <div className="flex justify-center">
+              <FlowButton text="Contact Support" />
+            </div>
           </div>
         </motion.div>
       </div>

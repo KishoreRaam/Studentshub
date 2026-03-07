@@ -7,9 +7,27 @@ import { BenefitDetail } from './BenefitDetail';
 import { GitHubStudentPack } from './GitHubStudentPack';
 import { ExternalLink, Star } from 'lucide-react';
 import { getLogoUrl } from '../utils/logoUtils';
+import { FlowButton } from './ui/flow-button';
 
 // Remove GitHub Student Pack from regular benefits array
-const benefits = [
+type Benefit = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  value: string;
+  badge: string;
+  link: string;
+  fullDescription: string;
+  features: string[];
+  requirements: string[];
+  howToApply: string[];
+  validUntil: string;
+  usedBy: string;
+  popular?: boolean;
+};
+
+const benefits: Benefit[] = [
   {
     id: 3,
     title: "Microsoft 365",
@@ -153,7 +171,7 @@ const benefits = [
 ];
 
 export function BenefitsSection() {
-  const [selectedBenefit, setSelectedBenefit] = useState<(typeof benefits)[0] | null>(null);
+  const [selectedBenefit, setSelectedBenefit] = useState<Benefit | null>(null);
 
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-800/50 transition-colors duration-300">
@@ -182,7 +200,7 @@ export function BenefitsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* GitHub Student Pack - Special Bundle Card */}
           <GitHubStudentPack />
-          
+
           {/* Regular Benefits */}
           {benefits.map((benefit, index) => (
             <motion.div
@@ -199,7 +217,7 @@ export function BenefitsSection() {
               <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden bg-white dark:bg-gray-800">
                 <div className="relative">
                   {benefit.popular && (
-                    <motion.div 
+                    <motion.div
                       layoutId={`benefit-popular-${benefit.id}`}
                       className="absolute top-4 right-4 z-10"
                     >
@@ -209,7 +227,7 @@ export function BenefitsSection() {
                       </div>
                     </motion.div>
                   )}
-                  
+
                   <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center p-8">
                     <motion.div layoutId={`benefit-image-${benefit.id}`} className="flex items-center justify-center">
                       <img
@@ -223,7 +241,7 @@ export function BenefitsSection() {
                     </motion.div>
                   </div>
                 </div>
-                
+
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-3">
                     <motion.div layoutId={`benefit-badge-${benefit.id}`}>
@@ -231,25 +249,25 @@ export function BenefitsSection() {
                         {benefit.badge}
                       </Badge>
                     </motion.div>
-                    <motion.span 
+                    <motion.span
                       layoutId={`benefit-value-${benefit.id}`}
                       className="text-green-600 font-semibold text-sm"
                     >
                       {benefit.value}
                     </motion.span>
                   </div>
-                  
-                  <motion.h3 
+
+                  <motion.h3
                     layoutId={`benefit-title-${benefit.id}`}
                     className="text-xl text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200"
                   >
                     {benefit.title}
                   </motion.h3>
-                  
+
                   <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
                     {benefit.description}
                   </p>
-                  
+
                   <div className="flex items-center text-blue-600 group-hover:text-blue-700 transition-colors duration-200">
                     <span className="text-sm mr-2">Learn more</span>
                     <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
@@ -269,13 +287,7 @@ export function BenefitsSection() {
           className="text-center mt-12"
         >
           <Link to="/perks">
-            <button className="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden bg-gradient-to-r from-blue-600 to-green-500 rounded-xl text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 btn-float">
-              <span className="relative z-10 flex items-center space-x-2">
-                <span className="font-medium">View More Benefits</span>
-                <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
+            <FlowButton text="View More Benefits" />
           </Link>
         </motion.div>
 
@@ -295,9 +307,7 @@ export function BenefitsSection() {
               Verify your student email and start saving thousands on the tools you need for your education and career.
             </p>
             <Link to="/college-portal">
-              <button className="bg-white text-blue-600 px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200">
-                Get Started Now
-              </button>
+              <FlowButton text="Get Started Now" />
             </Link>
           </div>
         </motion.div>

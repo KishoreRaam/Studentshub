@@ -32,7 +32,9 @@
       "Bash(git:*)",
       "Bash(gh workflow:*)",
       "Bash(where gh:*)",
-      "Bash(cmd:*)"
+      "Bash(cmd:*)",
+      "Bash(node:*)",
+      "Bash(npx vite:*)"
     ],
     "deny": [],
     "ask": []

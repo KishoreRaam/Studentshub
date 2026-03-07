@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Filter, Clock, TrendingUp, Lightbulb, Map } from "lucide-react";
 import { MapPreview } from "../map/MapPreview";
+import { FlowButton } from "../ui/flow-button";
 
 type TimeOption = "Morning" | "Afternoon" | "Evening";
 
@@ -399,37 +400,12 @@ export default function StudentMapSection() {
           </div>
 
           {/* ── Explore Map CTA — prominent full-width button below map + sidebar ── */}
-          <button
-            onClick={() => navigate("/map")}
-            className="w-full cursor-pointer flex items-center justify-center"
-            style={{
-              height: 60,
-              borderRadius: 16,
-              background: "linear-gradient(135deg, #155DFC 0%, #00A63E 100%)",
-              border: "none",
-              boxShadow: "0 12px 32px rgba(21,93,252,0.30), 0 4px 12px rgba(0,0,0,0.12)",
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 700,
-              fontSize: 18,
-              letterSpacing: 0.2,
-              color: "#fff",
-              gap: 10,
-              transition: "opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "0.93";
-              e.currentTarget.style.transform = "translateY(-1px)";
-              e.currentTarget.style.boxShadow = "0 16px 40px rgba(21,93,252,0.38), 0 4px 12px rgba(0,0,0,0.14)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 12px 32px rgba(21,93,252,0.30), 0 4px 12px rgba(0,0,0,0.12)";
-            }}
-          >
-            <Map size={20} color="#fff" />
-            Explore Live Map →
-          </button>
+          <div className="w-full flex justify-center mt-4">
+            <FlowButton
+              onClick={() => navigate("/map")}
+              text="Explore Live Map →"
+            />
+          </div>
         </div>
 
         {/* BLOCK 3 — Smart Insight Banner */}

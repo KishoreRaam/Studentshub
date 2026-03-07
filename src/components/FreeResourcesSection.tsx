@@ -1,5 +1,6 @@
 import { BookOpen, FileText, GraduationCap, ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
+import { FlowButton } from "./ui/flow-button";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Papa from "papaparse";
@@ -128,7 +129,7 @@ export function FreeResourcesSection() {
             }
             setLoading(false);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('CSV parsing error:', error);
             setResources(fallbackResources);
             setLoading(false);
@@ -196,11 +197,10 @@ export function FreeResourcesSection() {
             return (
               <div
                 key={resource.id}
-                className={`bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 card-hover transition-all duration-500 ${
-                  isVisible
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-8"
-                }`}
+                className={`bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 card-hover transition-all duration-500 ${isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8"
+                  }`}
               >
                 {/* Logo */}
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center mb-4 overflow-hidden">
@@ -239,21 +239,15 @@ export function FreeResourcesSection() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Button
-                        variant="ghost"
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                      >
-                        Get Access
-                      </Button>
+                      <FlowButton
+                        text="Get Access"
+                      />
                     </a>
                   ) : (
-                    <Button
-                      variant="ghost"
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                    <FlowButton
+                      text="Get Access"
                       onClick={() => navigate('/resources')}
-                    >
-                      Get Access
-                    </Button>
+                    />
                   )}
                 </div>
               </div>
@@ -261,15 +255,11 @@ export function FreeResourcesSection() {
           })}
         </div>
 
-        {/* Explore More Button */}
-        <div className="text-center">
-          <Button
+        <div className="text-center flex justify-center mt-3">
+          <FlowButton
             onClick={() => navigate('/courses')}
-            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg font-semibold hover:scale-105"
-          >
-            Explore More Resources
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+            text="Explore More Resources"
+          />
         </div>
       </div>
     </section>

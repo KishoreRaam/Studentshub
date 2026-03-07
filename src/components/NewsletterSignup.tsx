@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Button } from './ui/button';
+import { FlowButton } from './ui/flow-button';
 import { Input } from './ui/input';
 import { Mail, CheckCircle } from 'lucide-react';
 import { functions } from '../lib/appwrite';
@@ -63,13 +64,11 @@ export function NewsletterSignup() {
                 className="flex-1 bg-white/90 backdrop-blur-sm border-0 text-gray-900 placeholder-gray-500"
                 required
               />
-              <Button
+              <FlowButton
                 type="submit"
                 disabled={isLoading}
-                className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                {isLoading ? 'Subscribing...' : 'Subscribe'}
-              </Button>
+                text={isLoading ? 'Subscribing...' : 'Subscribe'}
+              />
             </form>
           ) : (
             <motion.div
