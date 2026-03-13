@@ -4,10 +4,16 @@ import { Query } from 'appwrite';
 import { databases, DATABASE_ID, COLLECTIONS, storage, eventMediaBucket } from '../lib/appwrite';
 import { useAuth } from '../contexts/AuthContext';
 import {
-  Eye, Heart, Users, TrendingUp, Plus, MoreHorizontal,
+  Eye, Heart, Users, TrendingUp, Plus, Edit3,
   Bell, Settings, Calendar, LayoutDashboard, ChevronDown, Menu, X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { ThemeToggle } from '../components/ThemeToggle';
+
+const CATEGORIES = [
+  'Webinar', 'Hackathon', 'Workshop', 'Conference',
+  'Cultural', 'Sports', 'Technical', 'Seminar', 'Competition', 'Symposium',
+];
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface EventDocument {
@@ -147,8 +153,181 @@ function StatusBadge({ status }: { status: 'Pending' | 'Approved' | 'Rejected' }
   );
 }
 
+// ── Edit Event Modal ──────────────────────────────────────────────────────────
+interface EditForm {
+  title: string; organizer: string; description: string;
+  category: string[]; eventDate: string; time: string;
+  location: string; registrationLink: string;
+}
+
+function EditEventModal({
+  event, onClose, onSave, saving,
+}: {
+  event: EventDocument;
+  onClose: () => void;
+  onSave: (id: string, data: EditForm) => Promise<void>;
+  saving: boolean;
+}) {
+  const [form, setForm] = useState<EditForm>({
+    title: event.title,
+    organizer: event.organizer,
+    description: event.description,
+    category: Array.isArray(event.category)
+      ? event.category
+      : event.category ? [event.category] : [],
+    eventDate: event.eventDate ? event.eventDate.slice(0, 10) : '',
+    time: event.time || '',
+    location: event.location || '',
+    registrationLink: event.registrationLink !== 'N/A' ? (event.registrationLink || '') : '',
+  });
+
+  const set = (key: keyof EditForm, val: string) =>
+    setForm(prev => ({ ...prev, [key]: val }));
+
+  const toggleCategory = (cat: string) =>
+    setForm(prev => ({
+      ...prev,
+      category: prev.category.includes(cat)
+        ? prev.category.filter(c => c !== cat)
+        : [...prev.category, cat],
+    }));
+
+  const handleSubmit = () => {
+    if (!form.title.trim() || !form.organizer.trim() || !form.description.trim() || !form.eventDate) {
+      toast.error('Title, organizer, description and date are required');
+      return;
+    }
+    onSave(event.$id, form);
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '9px 12px', borderRadius: 10,
+    border: '1px solid var(--ecd-border)', background: 'var(--ecd-bg)',
+    color: 'var(--ecd-text)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+    fontFamily: 'inherit',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block', fontSize: 12, fontWeight: 600,
+    color: 'var(--ecd-text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em',
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)', padding: 16 }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: 'var(--ecd-surface)', borderRadius: 18, width: '100%', maxWidth: 560, maxHeight: '92vh', overflow: 'auto', padding: 28, boxShadow: '0 28px 64px rgba(0,0,0,0.35)' }}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--ecd-text-main)', margin: '0 0 2px' }}>Edit Event</h2>
+            <p style={{ fontSize: 12, color: 'var(--ecd-text-light)', margin: 0 }}>{event.title}</p>
+          </div>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--ecd-border)', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ecd-text-muted)' }}>
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Re-review notice */}
+        <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(254,243,199,0.15)', border: '1px solid rgba(254,230,133,0.35)', marginBottom: 22 }}>
+          <p style={{ fontSize: 12, color: '#fbbf24', margin: 0, lineHeight: 1.5 }}>
+            Saving will re-submit this event for admin review. Poster and promo video are preserved.
+          </p>
+        </div>
+
+        {/* Text fields */}
+        {([
+          { label: 'Event Title *', key: 'title', type: 'text', placeholder: 'Enter event title' },
+          { label: 'Organizer *', key: 'organizer', type: 'text', placeholder: 'Organizer or club name' },
+          { label: 'Event Date *', key: 'eventDate', type: 'date', placeholder: '' },
+          { label: 'Till Date / End Time', key: 'time', type: 'text', placeholder: 'e.g. 2025-06-30 or 6:00 PM IST' },
+          { label: 'Location', key: 'location', type: 'text', placeholder: 'Online or physical address' },
+          { label: 'Registration Link', key: 'registrationLink', type: 'text', placeholder: 'https://...' },
+        ] as { label: string; key: keyof EditForm; type: string; placeholder: string }[]).map(f => (
+          <div key={f.key} style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>{f.label}</label>
+            <input
+              type={f.type}
+              value={form[f.key] as string}
+              onChange={e => set(f.key, e.target.value)}
+              placeholder={f.placeholder}
+              style={inputStyle}
+            />
+          </div>
+        ))}
+
+        {/* Description */}
+        <div style={{ marginBottom: 18 }}>
+          <label style={labelStyle}>Description *</label>
+          <textarea
+            value={form.description}
+            onChange={e => set('description', e.target.value)}
+            rows={5}
+            maxLength={5000}
+            style={{ ...inputStyle, resize: 'vertical' }}
+          />
+          <p style={{ fontSize: 11, color: 'var(--ecd-text-light)', margin: '4px 0 0', textAlign: 'right' }}>
+            {form.description.length}/5000
+          </p>
+        </div>
+
+        {/* Categories */}
+        <div style={{ marginBottom: 26 }}>
+          <label style={labelStyle}>Category</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {CATEGORIES.map(cat => {
+              const selected = form.category.includes(cat);
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => toggleCategory(cat)}
+                  style={{
+                    padding: '5px 13px', borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: 'pointer',
+                    border: '1px solid', borderColor: selected ? '#1a56db' : 'var(--ecd-border)',
+                    background: selected ? 'rgba(26,86,219,0.12)' : 'transparent',
+                    color: selected ? '#1a56db' : 'var(--ecd-text-muted)', transition: 'all 0.15s',
+                  }}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer buttons */}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={onClose}
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1px solid var(--ecd-border)', background: 'transparent', color: 'var(--ecd-text-muted)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={saving}
+            style={{ flex: 2, padding: '11px 0', borderRadius: 12, border: 'none', background: saving ? '#555' : '#1a56db', color: '#fff', fontSize: 14, fontWeight: 600, cursor: saving ? 'wait' : 'pointer', transition: 'background 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          >
+            {saving ? (
+              <>
+                <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                Saving...
+              </>
+            ) : 'Save & Resubmit'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Mobile Event Card ────────────────────────────────────────────────────────
-function MobileEventCard({ event }: { event: EventDocument }) {
+function MobileEventCard({ event, onEdit }: { event: EventDocument; onEdit: (e: EventDocument) => void }) {
   const poster = getPosterUrl(event);
   return (
     <div style={{
@@ -174,10 +353,19 @@ function MobileEventCard({ event }: { event: EventDocument }) {
           <StatusBadge status={getEventStatus(event)} />
           <span style={{ fontSize: 12, color: 'var(--ecd-text-muted)' }}>{formatDate(event.eventDate)}</span>
         </div>
-        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--ecd-text-light)' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Eye size={12} /> {event.participantCount || 0}</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Heart size={12} /> 0</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Users size={12} /> {event.participantCount || 0}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--ecd-text-light)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Eye size={12} /> {event.participantCount || 0}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Heart size={12} /> 0</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Users size={12} /> {event.participantCount || 0}</span>
+          </div>
+          <button
+            onClick={() => onEdit(event)}
+            title="Edit event"
+            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 8, border: '1px solid #2a2a32', background: 'transparent', color: '#1a56db', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+          >
+            <Edit3 size={12} /> Edit
+          </button>
         </div>
       </div>
     </div>
@@ -192,6 +380,8 @@ export default function EventCreatorDashboard() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'All' | 'Pending' | 'Approved' | 'Rejected'>('All');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<EventDocument | null>(null);
+  const [saveLoading, setSaveLoading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/login');
@@ -222,6 +412,36 @@ export default function EventCreatorDashboard() {
     const engagementRate = events.length > 0 && Math.max(totalViews, 1) > 0 ? Math.round((totalRegistrations / Math.max(totalViews, 1)) * 100) : 0;
     return { totalViews, totalSaves, totalRegistrations, engagementRate };
   }, [events]);
+
+  const handleSave = async (id: string, form: EditForm) => {
+    setSaveLoading(true);
+    try {
+      const payload: Record<string, unknown> = {
+        title: form.title.trim(),
+        organizer: form.organizer.trim(),
+        description: form.description.trim(),
+        category: form.category,
+        eventType: form.category.length > 0 ? form.category[0] : 'Other',
+        eventDate: new Date(form.eventDate).toISOString(),
+        time: form.time.trim(),
+        location: form.location.trim() || 'Online',
+        registrationLink: form.registrationLink.trim() || 'N/A',
+        approved: false,
+        status: 'Upcoming',
+      };
+      await databases.updateDocument(DATABASE_ID, COLLECTIONS.EVENTS, id, payload);
+      setEvents(prev => prev.map(e =>
+        e.$id === id ? { ...e, ...(payload as Partial<EventDocument>) } : e,
+      ));
+      setEditingEvent(null);
+      toast.success('Event updated and resubmitted for review');
+    } catch (err) {
+      console.error('Failed to update event:', err);
+      toast.error('Failed to update event. Please try again.');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
 
   const filteredEvents = useMemo(() => {
     if (statusFilter === 'All') return events;
@@ -433,8 +653,12 @@ export default function EventCreatorDashboard() {
                         <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{(event as any).saves || 0}</td>
                         <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ecd-text-muted)' }}>{event.participantCount || 0}</td>
                         <td style={{ padding: '12px 16px' }}>
-                          <button style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #2a2a32', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--ecd-text-light)' }}>
-                            <MoreHorizontal size={16} />
+                          <button
+                            onClick={() => setEditingEvent(event)}
+                            title="Edit event"
+                            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, border: '1px solid #2a2a32', background: 'transparent', color: '#1a56db', fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          >
+                            <Edit3 size={13} /> Edit
                           </button>
                         </td>
                       </tr>
@@ -457,11 +681,20 @@ export default function EventCreatorDashboard() {
                 ) : 'No events match the selected filter'}
               </div>
             ) : (
-              filteredEvents.map(event => <MobileEventCard key={event.$id} event={event} />)
+              filteredEvents.map(event => <MobileEventCard key={event.$id} event={event} onEdit={setEditingEvent} />)
             )}
           </div>
         </div>
       </div>
+
+      {editingEvent && (
+        <EditEventModal
+          event={editingEvent}
+          onClose={() => setEditingEvent(null)}
+          onSave={handleSave}
+          saving={saveLoading}
+        />
+      )}
     </div>
   );
 }

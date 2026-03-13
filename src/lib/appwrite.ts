@@ -39,6 +39,7 @@ export const profilePicturesBucket = import.meta.env.VITE_APPWRITE_BUCKET_PROFIL
 // Legacy bucket exports (kept for backward compatibility)
 export const avatarsBucket = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || 'avatars';
 export const eventMediaBucket = import.meta.env.VITE_APPWRITE_BUCKET_EVENT_MEDIA || 'event_media';
+export const eventVideosBucket = import.meta.env.VITE_APPWRITE_BUCKET_EVENT_VIDEOS || 'event_videos';
 
 // Collections configuration (named exports for easy importing)
 export const COLLECTIONS = {
@@ -53,6 +54,8 @@ export const COLLECTIONS = {
   SAVED_EVENTS: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_EVENTS || 'saved_events',
   COLLEGE_REGISTRATIONS: import.meta.env.VITE_APPWRITE_COLLECTION_COLLEGE_REGISTRATIONS || 'college_registrations',
   USERS_META: import.meta.env.VITE_APPWRITE_COLLECTION_USERS_META || 'users_meta',
+  PERK_REDEMPTIONS: import.meta.env.VITE_APPWRITE_COLLECTION_PERK_REDEMPTIONS || 'perk_redemptions',
+  USER_SAVINGS_SUMMARY: import.meta.env.VITE_APPWRITE_COLLECTION_USER_SAVINGS_SUMMARY || 'user_savings_summary',
 };
 
 // OAuth Configuration

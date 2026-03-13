@@ -1,0 +1,79 @@
+updateBucket(paramsOrFirst, ...rest) {
+    let params;
+    if (paramsOrFirst && typeof paramsOrFirst === "object" && !Array.isArray(paramsOrFirst)) {
+      params = paramsOrFirst || {};
+    } else {
+      params = {
+        bucketId: paramsOrFirst,
+        name: rest[0],
+        permissions: rest[1],
+        fileSecurity: rest[2],
+        enabled: rest[3],
+        maximumFileSize: rest[4],
+        allowedFileExtensions: rest[5],
+        compression: rest[6],
+        encryption: rest[7],
+        antivirus: rest[8],
+        transformations: rest[9]
+      };
+    }
+    const bucketId = params.bucketId;
+    const name = params.name;
+    const permissions = params.permissions;
+    const fileSecurity = params.fileSecurity;
+    const enabled = params.enabled;
+    const maximumFileSize = params.maximumFileSize;
+    const allowedFileExtensions = params.allowedFileExtensions;
+    const compression = params.compression;
+    const encryption = params.encryption;
+    const antivirus = params.antivirus;
+    const transformations = params.transformations;
+    if (typeof bucketId === "undefined") {
+      throw new client.AppwriteException('Missing required parameter: "bucketId"');
+    }
+    if (typeof name === "undefined") {
+      throw new client.AppwriteException('Missing required parameter: "name"');
+    }
+    const apiPath = "/storage/buckets/{bucketId}".replace("{bucketId}", bucketId);
+    const payload = {};
+    if (typeof name !== "undefined") {
+      payload["name"] = name;
+    }
+    if (typeof permissions !== "undefined") {
+      payload["permissions"] = permissions;
+    }
+    if (typeof fileSecurity !== "undefined") {
+      payload["fileSecurity"] = fileSecurity;
+    }
+    if (typeof enabled !== "undefined") {
+      payload["enabled"] = enabled;
+    }
+    if (typeof maximumFileSize !== "undefined") {
+      payload["maximumFileSize"] = maximumFileSize;
+    }
+    if (typeof allowedFileExtensions !== "undefined") {
+      payload["allowedFileExtensions"] = allowedFileExtensions;
+    }
+    if (typeof compression !== "undefined") {
+      payload["compression"] = compression;
+    }
+    if (typeof encryption !== "undefined") {
+      payload["encryption"] = encryption;
+    }
+    if (typeof antivirus !== "undefined") {
+      payload["antivirus"] = antivirus;
+    }
+    if (typeof transformations !== "undefined") {
+      payload["transformations"] = transformations;
+    }
+    const uri = new URL(this.client.config.endpoint + apiPath);
+    const apiHeaders = {
+      "content-type": "application/json"
+    };
+    return this.client.call(
+      "put",
+      uri,
+      apiHeaders,
+      payload
+    );
+  }

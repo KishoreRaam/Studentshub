@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Query } from 'appwrite';
-import { databases, DATABASE_ID, COLLECTIONS, storage, eventMediaBucket } from '../lib/appwrite';
+import { databases, DATABASE_ID, COLLECTIONS, storage, eventMediaBucket, eventVideosBucket } from '../lib/appwrite';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import {
   Shield, Calendar, Clock, Users, XCircle,
   Check, X, Eye, Search, ArrowUpDown, ChevronDown,
-  FileText, BarChart3,
+  FileText, BarChart3, Trash2,
 } from 'lucide-react';
 import { ThemeToggle } from '../components/ThemeToggle';
 
@@ -33,6 +33,7 @@ interface EventDocument {
   approved?: boolean;
   submittedBy?: string;
   createdByUserId?: string;
+  promoVideoFileId?: string;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -200,17 +201,20 @@ function EventCard({
   onApprove,
   onReject,
   onView,
+  onDelete,
   isProcessing,
 }: {
   event: EventDocument;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
   onView: (e: EventDocument) => void;
+  onDelete: (e: EventDocument) => void;
   isProcessing: boolean;
 }) {
   const eventStatus = getEventStatus(event);
   const isPending = eventStatus === 'Pending';
   const poster = getPosterUrl(event);
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
 
   return (
     <div style={{
@@ -277,13 +281,27 @@ function EventCard({
         <button
           onClick={() => onView(event)}
           style={{
-            width: isPending ? 40 : '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             padding: '8px 0', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)',
             background: 'var(--adm-surface)', color: 'var(--adm-text-muted)', fontSize: 13, fontWeight: 500, cursor: 'pointer',
           }}
         >
-          <Eye size={14} />{!isPending && ' View Details'}
+          <Eye size={14} /> View
         </button>
+        {confirmDelete ? (
+          <>
+            <button onClick={() => { onDelete(event); setConfirmDelete(false); }} disabled={isProcessing} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', fontSize: 13, fontWeight: 600, cursor: isProcessing ? 'wait' : 'pointer' }}>
+              Confirm
+            </button>
+            <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', background: 'var(--adm-surface)', color: 'var(--adm-text-sub)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button onClick={() => setConfirmDelete(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, padding: '8px 0', borderRadius: 8, border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.06)', color: '#ef4444', cursor: 'pointer' }} title="Delete">
+            <Trash2 size={14} />
+          </button>
+        )}
       </div>
     </div>
   );
@@ -301,6 +319,7 @@ export default function AdminEventsModeration() {
   const [sortNewest, setSortNewest] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [viewEvent, setViewEvent] = useState<EventDocument | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAllEvents = async () => {
@@ -365,6 +384,27 @@ export default function AdminEventsModeration() {
     } catch (err) {
       console.error('Failed to reject event:', err);
       toast.error('Failed to reject event. Check collection permissions.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDelete = async (event: EventDocument) => {
+    setActionLoading(event.$id);
+    try {
+      if (event.posterFileId) {
+        try { await storage.deleteFile(eventMediaBucket, event.posterFileId); } catch (_) { /* ignore if already gone */ }
+      }
+      if (event.promoVideoFileId) {
+        try { await storage.deleteFile(eventVideosBucket, event.promoVideoFileId); } catch (_) { /* ignore if already gone */ }
+      }
+      await databases.deleteDocument(DATABASE_ID, COLLECTIONS.EVENTS, event.$id);
+      setEvents(prev => prev.filter(e => e.$id !== event.$id));
+      setDeleteConfirm(null);
+      toast.success('Event deleted');
+    } catch (err) {
+      console.error('Failed to delete event:', err);
+      toast.error('Failed to delete event');
     } finally {
       setActionLoading(null);
     }
@@ -545,6 +585,20 @@ export default function AdminEventsModeration() {
                           <button onClick={() => setViewEvent(event)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', background: 'var(--adm-surface)', cursor: 'pointer', color: 'var(--adm-text-muted)' }}>
                             <Eye size={14} />
                           </button>
+                          {deleteConfirm === event.$id ? (
+                            <>
+                              <button onClick={() => handleDelete(event)} disabled={isProcessing} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', fontSize: 12, fontWeight: 600, cursor: isProcessing ? 'wait' : 'pointer' }}>
+                                Yes
+                              </button>
+                              <button onClick={() => setDeleteConfirm(null)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', background: 'var(--adm-surface)', color: 'var(--adm-text-sub)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                                No
+                              </button>
+                            </>
+                          ) : (
+                            <button onClick={() => setDeleteConfirm(event.$id)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.06)', cursor: 'pointer', color: '#ef4444' }} title="Delete event">
+                              <Trash2 size={14} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -566,6 +620,7 @@ export default function AdminEventsModeration() {
                   onApprove={handleApprove}
                   onReject={handleReject}
                   onView={setViewEvent}
+                  onDelete={handleDelete}
                   isProcessing={actionLoading === event.$id}
                 />
               ))

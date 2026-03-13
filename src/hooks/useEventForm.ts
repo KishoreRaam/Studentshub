@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { databases, DATABASE_ID, COLLECTIONS, AppwriteID, storage, eventMediaBucket, account } from '../lib/appwrite';
+import { databases, DATABASE_ID, COLLECTIONS, AppwriteID, storage, eventMediaBucket, eventVideosBucket, account } from '../lib/appwrite';
 import { toast } from 'sonner';
 
 export interface EventFormData {
@@ -44,11 +44,16 @@ const REQUIRED_FIELDS: (keyof EventFormData)[] = [
 
 const URL_REGEX = /^https?:\/\/.+\..+/;
 
+const VIDEO_MAX_BYTES = 500 * 1024 * 1024; // 500MB
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+
 export function useEventForm() {
   const [formData, setFormData] = useState<EventFormData>(initialFormData);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [posterPreview, setPosterPreview] = useState<string | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +87,32 @@ export function useEventForm() {
     setPosterFile(null);
     setPosterPreview(null);
   }, [posterPreview]);
+
+  const handleSetVideoFile = useCallback((file: File | null) => {
+    if (!file) {
+      if (videoPreview) URL.revokeObjectURL(videoPreview);
+      setVideoFile(null);
+      setVideoPreview(null);
+      return;
+    }
+    if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+      toast.error('Only MP4, WebM, or MOV video files are accepted.');
+      return;
+    }
+    if (file.size > VIDEO_MAX_BYTES) {
+      toast.error('Video must be under 500MB.');
+      return;
+    }
+    if (videoPreview) URL.revokeObjectURL(videoPreview);
+    setVideoFile(file);
+    setVideoPreview(URL.createObjectURL(file));
+  }, [videoPreview]);
+
+  const removeVideo = useCallback(() => {
+    if (videoPreview) URL.revokeObjectURL(videoPreview);
+    setVideoFile(null);
+    setVideoPreview(null);
+  }, [videoPreview]);
 
   const progress = useMemo(() => {
     const filled = REQUIRED_FIELDS.filter(f => Array.isArray(formData[f]) ? (formData[f] as string[]).length > 0 : (formData[f] as string).trim() !== '').length;
@@ -152,6 +183,29 @@ export function useEventForm() {
         }
       }
 
+      let promoVideoFileId: string | undefined;
+      let promoVideoUrl: string | undefined;
+
+      if (videoFile) {
+        if (!user) {
+          toast.error('You must be logged in to upload a promo video. Submitting without video.');
+        } else {
+          try {
+            toast.info('Uploading promo video… this may take a moment.');
+            const uploaded = await storage.createFile(eventVideosBucket, AppwriteID.unique(), videoFile);
+            promoVideoFileId = uploaded.$id;
+            const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1';
+            const project = import.meta.env.VITE_APPWRITE_PROJECT || '';
+            promoVideoUrl = `${endpoint}/storage/buckets/${eventVideosBucket}/files/${uploaded.$id}/view?project=${project}`;
+            toast.success('Promo video uploaded!');
+          } catch (uploadErr: unknown) {
+            const msg = uploadErr instanceof Error ? uploadErr.message : 'Unknown error';
+            console.error('Video upload failed:', uploadErr);
+            toast.error(`Video upload failed: ${msg}. Submitting without video.`);
+          }
+        }
+      }
+
       const userId = user?.$id || 'anonymous';
 
       const payload: Record<string, unknown> = {
@@ -176,6 +230,8 @@ export function useEventForm() {
 
       if (posterFileId) payload.posterFileId = posterFileId;
       if (thumbnailUrl) payload.thumbnailUrl = thumbnailUrl;
+      if (promoVideoFileId) payload.promoVideoFileId = promoVideoFileId;
+      if (promoVideoUrl) payload.promoVideoUrl = promoVideoUrl;
 
       await databases.createDocument(
         DATABASE_ID,
@@ -188,6 +244,7 @@ export function useEventForm() {
       setIsSuccess(true);
       setFormData(initialFormData);
       removePoster();
+      removeVideo();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to submit event';
       console.error('Event submission error:', err);
@@ -196,7 +253,7 @@ export function useEventForm() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, posterFile, validate, removePoster]);
+  }, [formData, posterFile, videoFile, validate, removePoster, removeVideo]);
 
   return {
     formData,
@@ -205,6 +262,10 @@ export function useEventForm() {
     setPosterFile: handleSetPosterFile,
     removePoster,
     posterPreview,
+    videoFile,
+    setVideoFile: handleSetVideoFile,
+    removeVideo,
+    videoPreview,
     validate,
     fieldErrors,
     submitEvent,

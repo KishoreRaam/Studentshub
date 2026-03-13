@@ -8,6 +8,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { SearchProvider } from "./contexts/SearchContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ProfileButton } from "./components/ProfileButton";
+import { Analytics } from "@vercel/analytics/react";
 import { EmailInquiryWidget } from "./components/EmailInquiryWidget";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -47,6 +48,7 @@ export default function App() {
     <ThemeProvider defaultTheme="system" storageKey="edubuzz-theme">
       <SearchProvider>
         <ScrollToTop />
+        <Analytics />
 
         {isAdminPage ? (
           <Routes>

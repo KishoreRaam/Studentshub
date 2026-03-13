@@ -27,6 +27,7 @@ const DATABASE_ID = databaseId; // Alias for compatibility
 //const avatarsBucket = import.meta.env.VITE_APPWRITE_AVATAR_BUCKET || "avatars";
 const profilePicturesBucket = import.meta.env.VITE_APPWRITE_BUCKET_PROFILE_PICTURES || "69376d25000b39c8273e";
 const eventMediaBucket = import.meta.env.VITE_APPWRITE_BUCKET_EVENT_MEDIA || "event_media";
+const eventVideosBucket = import.meta.env.VITE_APPWRITE_BUCKET_EVENT_VIDEOS || "event_videos";
 
 // Collections configuration
 const COLLECTIONS = {
@@ -40,6 +41,9 @@ const COLLECTIONS = {
   EVENTS: import.meta.env.VITE_APPWRITE_COLLECTION_EVENTS || "events",
   SAVED_EVENTS: import.meta.env.VITE_APPWRITE_COLLECTION_SAVED_EVENTS || "saved_events",
   COLLEGE_REGISTRATIONS: import.meta.env.VITE_APPWRITE_COLLECTION_COLLEGE_REGISTRATIONS || "college_registrations",
+  USERS_META: import.meta.env.VITE_APPWRITE_COLLECTION_USERS_META || "users_meta",
+  PERK_REDEMPTIONS: import.meta.env.VITE_APPWRITE_COLLECTION_PERK_REDEMPTIONS || "perk_redemptions",
+  USER_SAVINGS_SUMMARY: import.meta.env.VITE_APPWRITE_COLLECTION_USER_SAVINGS_SUMMARY || "user_savings_summary",
 };
 
 // Lightweight oauth config object for frontend usage only
@@ -61,6 +65,7 @@ export {
   DATABASE_ID,
   profilePicturesBucket,
   eventMediaBucket,
+  eventVideosBucket,
   COLLECTIONS,
   OAUTH_CONFIG
 };

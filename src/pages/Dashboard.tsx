@@ -11,6 +11,9 @@ import AIToolCard from "@/components/dashboard/AIToolCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import RecentUpdates from "@/components/dashboard/RecentUpdates";
 import { DetailedPerkCard } from "@/components/DetailedPerkCard";
+import { SavingsDashboardWidget } from "@/components/SavingsDashboardWidget";
+import { PendingClaimsPrompt } from "@/components/PendingClaimsPrompt";
+import { usePerkTracker } from "@/hooks/usePerkTracker";
 import type { Stat, SavedPerk, SavedResource, SavedAITool, Subscription, Update, UserProfile } from "@/types/dashboard";
 import type { Perk } from "@/pages/benfits/Perks";
 import { useAuth } from "@/contexts/AuthContext";
@@ -97,6 +100,7 @@ export default function Dashboard() {
   const [selectedPerk, setSelectedPerk] = useState<Perk | null>(null);
   const [statsData, setStatsData] = useState<Stat[]>([]);
   const [subscriptionsData, setSubscriptionsData] = useState<Subscription[]>([]);
+  const [savedItemsRefresh, setSavedItemsRefresh] = useState(0);
   const [updatesData, setUpdatesData] = useState<Update[]>([]);
 
   // ── Load user profile ────────────────────────────────────────────────────
@@ -148,18 +152,8 @@ export default function Dashboard() {
           { title: "Resources & Tools",  value: resources.length + aiTools.length, subtitle: "Available for access",       icon: BookOpen },
         ]);
 
-        const subs: Subscription[] = perks
-          .filter((p: any) => p.claimed)
-          .slice(0, 5)
-          .map((p: any) => ({
-            id: p.id,
-            title: p.title,
-            category: p.category,
-            icon: p.icon || "💎",
-            expiryDate: p.validity || "N/A",
-            status: "active" as const,
-          }));
-        setSubscriptionsData(subs);
+        // Subscriptions are now built from claimedRedemptions (set via usePerkTracker)
+        // — see the useEffect below that watches claimedRedemptions.
 
         const updates: Update[] = [];
         if (perks.some((p: any) => !p.claimed)) {
@@ -177,7 +171,39 @@ export default function Dashboard() {
       }
     }
     if (authUser && !loading) loadSavedItems();
-  }, [authUser, loading]);
+  }, [authUser, loading, savedItemsRefresh]);
+
+  // ── Perk savings tracker ─────────────────────────────────────────────────
+  const {
+    savings,
+    pendingClaims,
+    claimedRedemptions,
+    claimPerk: _trackerClaimPerk,
+    skipPerk: trackerSkipPerk,
+    loading: trackerLoading,
+  } = usePerkTracker(authUser?.$id);
+
+  // Wrap claimPerk so the subscriptions list refreshes after a claim
+  const trackerClaimPerk = async (redemptionId: string) => {
+    await _trackerClaimPerk(redemptionId);
+    setSavedItemsRefresh(n => n + 1);
+  };
+
+  // Rebuild Active Subscriptions from perk_redemptions whenever claimed list changes
+  useEffect(() => {
+    if (claimedRedemptions.length === 0) return;
+    const subs: Subscription[] = claimedRedemptions.slice(0, 5).map(r => ({
+      id: r.$id,
+      title: r.perk_name,
+      category: r.partner_name || "Perk",
+      icon: "🎁",
+      expiryDate: r.claimed_at
+        ? new Date(r.claimed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : "N/A",
+      status: "active" as const,
+    }));
+    setSubscriptionsData(subs);
+  }, [claimedRedemptions]);
 
   // ── Perk conversion ──────────────────────────────────────────────────────
   const convertToPerk = (savedPerk: SavedPerk): Perk => ({
@@ -214,6 +240,8 @@ export default function Dashboard() {
       const perks = await getSavedPerks(authUser.$id);
       setSavedPerks(perks as any[]);
       if (selectedPerk && !perks.some(p => p.id === selectedPerk.id)) setSelectedPerk(null);
+      // Re-derive subscriptions from updated perks so Active Subscriptions reflects claims
+      setSavedItemsRefresh(n => n + 1);
     } catch (error) { console.error("Error refreshing saved perks:", error); }
   };
 
@@ -457,6 +485,20 @@ export default function Dashboard() {
                       </RippleButton>
                     ))}
                   </div>
+                </div>
+
+                {/* Pending claims prompt */}
+                {pendingClaims.length > 0 && (
+                  <PendingClaimsPrompt
+                    claims={pendingClaims}
+                    onClaim={trackerClaimPerk}
+                    onSkip={trackerSkipPerk}
+                  />
+                )}
+
+                {/* Savings widget */}
+                <div className="mb-8 fade-up" style={{ animationDelay: "200ms" }}>
+                  <SavingsDashboardWidget savings={savings} loading={trackerLoading} />
                 </div>
 
                 {/* Subscriptions + updates */}

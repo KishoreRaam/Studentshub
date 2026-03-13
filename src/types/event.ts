@@ -35,6 +35,8 @@ export interface Event {
   speakers?: EventSpeaker[];
   benefits?: string[];
   resources?: EventResource[];
+  promoVideoFileId?: string; // Appwrite file ID in event_videos bucket
+  promoVideoUrl?: string;   // Resolved view URL for the promo video
   recordingUrl?: string; // For past events
   certificateOffered?: boolean;
   isPaid?: boolean;

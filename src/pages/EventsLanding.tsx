@@ -17,7 +17,7 @@ import {
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Query } from 'appwrite';
-import { databases, DATABASE_ID, COLLECTIONS, storage, eventMediaBucket } from '../lib/appwrite';
+import { databases, DATABASE_ID, COLLECTIONS, storage, eventMediaBucket, eventVideosBucket } from '../lib/appwrite';
 import { EventCalendar } from '../components/events/EventCalendar';
 import { Footer } from '../components/Footer';
 
@@ -138,6 +138,8 @@ interface EventDocument {
   thumbnailUrl?: string;
   posterFileId?: string;
   recordingUrl?: string;
+  promoVideoFileId?: string;
+  promoVideoUrl?: string;
   streams?: string[];
   tags?: string[];
   location?: string;
@@ -162,6 +164,16 @@ function getPosterUrl(evt: EventDocument): string | null {
     return `${endpoint}/storage/buckets/${eventMediaBucket}/files/${evt.posterFileId}/preview?project=${project}&width=600&height=400`;
   }
   if (evt.thumbnailUrl) return evt.thumbnailUrl;
+  return null;
+}
+
+function getVideoUrl(evt: EventDocument): string | null {
+  if (evt.promoVideoFileId) {
+    const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1';
+    const project = import.meta.env.VITE_APPWRITE_PROJECT || '';
+    return `${endpoint}/storage/buckets/${eventVideosBucket}/files/${evt.promoVideoFileId}/view?project=${project}`;
+  }
+  if (evt.promoVideoUrl) return evt.promoVideoUrl;
   return null;
 }
 
@@ -204,6 +216,8 @@ export default function EventsLanding() {
   const [subscribed, setSubscribed] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [videoModalUrl, setVideoModalUrl] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // ── Appwrite events state ──────────────────────────────────────────────────
   const [events, setEvents] = useState<EventDocument[]>([]);
@@ -758,16 +772,33 @@ export default function EventsLanding() {
                     ))}
                   </div>
                 </div>
-                {/* Play button overlay */}
-                <div style={{
-                  position: 'absolute', bottom: 20, right: 20,
-                  width: 48, height: 48, borderRadius: '50%',
-                  background: 'var(--el-bg-card)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer',
-                }}>
-                  <Play size={20} color={C.white} fill={C.white} />
-                </div>
+                {/* Play button — only shown when the event has a promo video */}
+                {featuredEvent && getVideoUrl(featuredEvent) && (
+                  <button
+                    onClick={() => setVideoModalUrl(getVideoUrl(featuredEvent))}
+                    title="Play promo video"
+                    style={{
+                      position: 'absolute', bottom: 20, right: 20,
+                      width: 56, height: 56, borderRadius: '50%',
+                      background: 'rgba(26,86,219,0.92)',
+                      border: '2.5px solid rgba(255,255,255,0.35)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 20px rgba(26,86,219,0.5)',
+                      transition: 'transform 0.15s, box-shadow 0.15s',
+                    }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)';
+                      (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 28px rgba(26,86,219,0.7)';
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+                      (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 20px rgba(26,86,219,0.5)';
+                    }}
+                  >
+                    <Play size={22} color={C.white} fill={C.white} />
+                  </button>
+                )}
               </div>
 
               {/* Event details */}
@@ -1455,6 +1486,54 @@ export default function EventsLanding() {
         {/* Common Footer */}
         <Footer />
       </div>
+
+      {/* ── Promo Video Modal ─────────────────────────────────────────────── */}
+      {videoModalUrl && (
+        <div
+          onClick={() => {
+            videoRef.current?.pause();
+            setVideoModalUrl(null);
+          }}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'rgba(0,0,0,0.88)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ position: 'relative', maxWidth: '92vw' }}
+          >
+            <video
+              ref={videoRef}
+              src={videoModalUrl}
+              poster={featuredEvent ? (getPosterUrl(featuredEvent) ?? undefined) : undefined}
+              autoPlay
+              controls
+              style={{
+                maxWidth: '90vw', maxHeight: '82vh',
+                borderRadius: 16, display: 'block',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.7)',
+              }}
+            />
+            <button
+              onClick={() => {
+                videoRef.current?.pause();
+                setVideoModalUrl(null);
+              }}
+              style={{
+                position: 'absolute', top: -16, right: -16,
+                width: 40, height: 40, borderRadius: '50%',
+                background: C.white, border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
+              }}
+            >
+              <X size={18} color={C.dark} />
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

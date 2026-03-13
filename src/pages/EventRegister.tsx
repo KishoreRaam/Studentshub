@@ -85,10 +85,12 @@ export default function EventRegister() {
   const { user, loading: authLoading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const posterInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const {
     formData, updateField,
     posterFile, setPosterFile, removePoster, posterPreview,
+    videoFile, setVideoFile, removeVideo, videoPreview,
     fieldErrors, submitEvent,
     isSubmitting, isSuccess, progress,
   } = useEventForm();
@@ -119,6 +121,18 @@ export default function EventRegister() {
         setPosterFile(file);
       }
     }
+  };
+
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setVideoFile(file);
+    // validation (type + size) handled inside useEventForm
+  };
+
+  const handleVideoDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) setVideoFile(file);
   };
 
   const scrollTo = (id: string) =>
@@ -795,6 +809,65 @@ export default function EventRegister() {
                       </p>
                       <p style={{ ...Fb, fontWeight: 400, fontSize: 12, color: C.muted, margin: 0 }}>
                         JPG, PNG, GIF, WebP up to 10MB
+                      </p>
+                    </div>
+                  )}
+                </FieldWrapper>
+
+                {/* Promo Video Upload */}
+                <FieldWrapper label="Promo Video">
+                  <input
+                    ref={videoInputRef}
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime"
+                    onChange={handleVideoSelect}
+                    style={{ display: 'none' }}
+                  />
+                  {videoPreview ? (
+                    <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: `0.8px solid ${C.border}`, background: '#000' }}>
+                      <video
+                        src={videoPreview}
+                        poster={posterPreview ?? undefined}
+                        controls
+                        muted
+                        style={{ width: '100%', maxHeight: 240, display: 'block', objectFit: 'contain' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={removeVideo}
+                        style={{
+                          position: 'absolute', top: 10, right: 10,
+                          width: 32, height: 32, borderRadius: '50%',
+                          background: 'rgba(0,0,0,0.6)', color: '#fff',
+                          border: 'none', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                      ><X size={16} /></button>
+                      <p style={{ ...Fb, fontWeight: 400, fontSize: 12, color: '#fff', background: 'rgba(0,0,0,0.55)', margin: 0, padding: '4px 10px', position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                        {videoFile?.name} ({(videoFile!.size / (1024 * 1024)).toFixed(1)} MB)
+                      </p>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => videoInputRef.current?.click()}
+                      onDragOver={e => e.preventDefault()}
+                      onDrop={handleVideoDrop}
+                      style={{
+                        border: `2px dashed ${C.border}`,
+                        borderRadius: 12, padding: '32px 0',
+                        textAlign: 'center', cursor: 'pointer',
+                        background: C.grayBg, transition: 'border-color 0.15s',
+                      }}
+                    >
+                      <Upload size={28} color={C.purple} />
+                      <p style={{ ...Fb, fontWeight: 500, fontSize: 14, color: C.body, margin: '12px 0 4px' }}>
+                        Click to upload or drag and drop
+                      </p>
+                      <p style={{ ...Fb, fontWeight: 400, fontSize: 12, color: C.muted, margin: 0 }}>
+                        Optional · MP4, MOV or WebM · Max 500MB
+                      </p>
+                      <p style={{ ...Fb, fontWeight: 400, fontSize: 11, color: C.muted, margin: '6px 0 0' }}>
+                        This video will play in the Spotlight section on the Events page
                       </p>
                     </div>
                   )}

@@ -35,7 +35,12 @@
       "Bash(cmd:*)",
       "Bash(node:*)",
       "Bash(npx vite:*)",
-      "Bash(sed -n '330,345p' /c/Users/Raam/Downloads/Studentshub/src/components/DashboardPreview.tsx\nsed -n '168,178p' /c/Users/Raam/Downloads/Studentshub/src/components/AIToolsSection.tsx\nsed -n '285,315p' /c/Users/Raam/Downloads/Studentshub/src/components/BenefitsSection.tsx)"
+      "Bash(sed -n '330,345p' /c/Users/Raam/Downloads/Studentshub/src/components/DashboardPreview.tsx\nsed -n '168,178p' /c/Users/Raam/Downloads/Studentshub/src/components/AIToolsSection.tsx\nsed -n '285,315p' /c/Users/Raam/Downloads/Studentshub/src/components/BenefitsSection.tsx)",
+      "Bash(cd \"C:\\\\Users\\\\Raam\\\\Downloads\\\\Studentshub\" && ./node_modules/.bin/tsc --noEmit 2>&1 | head -60)",
+      "Bash(cd \"C:\\\\Users\\\\Raam\\\\Downloads\\\\Studentshub\" && node_modules/.bin/vite build 2>&1 | tail -20)",
+      "Bash(echo \"\" >> \"C:/Users/Raam/Downloads/Studentshub/.env\" && echo \"# Perk Savings Tracker\" >> \"C:/Users/Raam/Downloads/Studentshub/.env\" && echo \"VITE_APPWRITE_COLLECTION_PERK_REDEMPTIONS=perk_redemptions\" >> \"C:/Users/Raam/Downloads/Studentshub/.env\" && echo \"VITE_APPWRITE_COLLECTION_USER_SAVINGS_SUMMARY=user_savings_summary\" >> \"C:/Users/Raam/Downloads/Studentshub/.env\")",
+      "Bash(cd \"C:/Users/Raam/Downloads/Studentshub\" && node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | head -40)",
+      "Bash(cd \"C:/Users/Raam/Downloads/Studentshub\" && APPWRITE_API_KEY=\"standard_96f11899ef5e4ae0f02c9824aaf24568b97bf6623030ff8f484015a8254ffb2ee522be1c0d87ece8e322c93e6e0e1087313e17303a1970d0b550da02a024b3c8f06258ca5ea6b108d4ccab5c50402cb973998a42e1f44660e0d1c7058fa92010b0636b8313ce3d37eba29cf6dcc4c3b45fc6771d97e4295c3c3e3455cc3016e1\" node scripts/setup-appwrite.js 2>&1)"
     ],
     "deny": [],
     "ask": []

@@ -1,11 +1,15 @@
-import { Gift, Check, Calendar, Clock, ArrowLeft, Bookmark, Users, Shield, Star, ExternalLink, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { Gift, Check, Clock, ArrowLeft, Bookmark, Users, Shield, Star, ExternalLink, Loader2, CheckCircle, X, Sparkles } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { motion } from "motion/react";
+import { toast } from "sonner";
 import type { Perk } from "@/pages/benfits/Perks";
 import { useSavedItems } from "@/hooks/useSavedItems";
+import { useAuth } from "@/contexts/AuthContext";
+import { trackPerkClick, claimPerk as serviceClaimPerk } from "@/services/perkService";
 
 interface DetailedPerkCardProps {
   perk: Perk | null;
@@ -127,13 +131,208 @@ const renderStatsRow = (perk: Perk) => {
   );
 };
 
+// ─── Floating claim notification (rendered inside a Sonner toast.custom) ────
+
+interface PerkClaimNotificationProps {
+  toastId: string | number;
+  perkName: string;
+  partnerName: string;
+  savedAmount: number;
+  discount?: string;
+  onClaim: () => Promise<void>;
+  onDismiss: () => void;
+}
+
+function PerkClaimNotification({
+  perkName,
+  partnerName,
+  savedAmount,
+  discount,
+  onClaim,
+  onDismiss,
+}: PerkClaimNotificationProps) {
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleClaim = async () => {
+    setBusy(true);
+    await onClaim();
+    setDone(true);
+    setBusy(false);
+  };
+
+  return (
+    <div
+      className="w-[340px] rounded-2xl overflow-hidden shadow-2xl"
+      style={{
+        background: '#1e2030',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)',
+      }}
+    >
+      {/* Top gradient bar */}
+      <div className="h-1 w-full bg-gradient-to-r from-[#1A56DB] to-[#00A63E]" />
+
+      <div className="p-4">
+        {done ? (
+          /* ── Success state ── */
+          <div className="flex items-center gap-3 py-1">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1A56DB]/20 to-[#00A63E]/20 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-5 h-5 text-[#00A63E]" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white">Savings recorded! 🎉</p>
+              <p className="text-xs text-gray-400 mt-0.5">{perkName} marked as used</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* ── Header ── */}
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1A56DB]/20 to-[#00A63E]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4 text-[#1A56DB]" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white leading-snug">
+                    Opened {partnerName}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Did you end up using this perk?
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={onDismiss}
+                className="text-gray-600 hover:text-gray-300 transition-colors flex-shrink-0 mt-0.5"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* ── Savings badge ── */}
+            {(savedAmount > 0 || discount) && (
+              <div
+                className="rounded-xl px-3 py-2 mb-3 flex items-center gap-2"
+                style={{ background: 'rgba(26, 86, 219, 0.12)', border: '1px solid rgba(26, 86, 219, 0.2)' }}
+              >
+                <Gift className="w-3.5 h-3.5 text-[#1A56DB] flex-shrink-0" />
+                <span className="text-xs font-semibold text-[#1A56DB]">
+                  {savedAmount > 0
+                    ? `Save ₹${savedAmount.toLocaleString('en-IN')} with ${perkName}`
+                    : discount
+                    ? `${discount} with ${perkName}`
+                    : perkName}
+                </span>
+              </div>
+            )}
+
+            {/* ── Action buttons ── */}
+            <div className="flex gap-2">
+              <button
+                onClick={handleClaim}
+                disabled={busy}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold text-white transition-opacity disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg, #1A56DB, #00A63E)' }}
+              >
+                {busy ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <CheckCircle className="w-3.5 h-3.5" />
+                )}
+                Yes, I used it!
+              </button>
+              <button
+                onClick={onDismiss}
+                disabled={busy}
+                className="flex-1 rounded-xl py-2.5 text-xs font-semibold text-gray-400 hover:text-white transition-colors"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                Not this time
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Extract a numeric amount from strings like "50% off", "Free (₹5000 value)", "Save ₹500" */
+function parseDiscountAmount(discount?: string): number {
+  if (!discount) return 0;
+  const match = discount.match(/[₹$][\s]*(\d[\d,]*)/);
+  if (match) return parseFloat(match[1].replace(/,/g, ''));
+  const plain = discount.match(/\b(\d{3,})\b/);
+  if (plain) return parseFloat(plain[1]);
+  return 0;
+}
+
 export function DetailedPerkCard({ perk, isOpen, onClose, onSaveChange }: DetailedPerkCardProps) {
-  // Use saved items hook for save functionality
+  const { user } = useAuth();
   const { isSaved, toggleSave, isSaving } = useSavedItems('perk');
+
+  const redemptionIdRef = useRef<string | null>(null);
 
   if (!perk) {
     return null;
   }
+
+  /** Called when "Apply Now" is clicked — opens link + shows floating confirm popup */
+  const handleApplyNow = () => {
+    if (!perk.claimLink?.trim()) return;
+
+    // Open partner site immediately
+    window.open(perk.claimLink, '_blank', 'noopener,noreferrer');
+
+    if (!user) return;
+
+    // Fire-and-forget: record the click attempt
+    const trackPromise = trackPerkClick({
+      userId: user.$id,
+      perkId: perk.id,
+      perkName: perk.title,
+      savedAmount: parseDiscountAmount(perk.discount),
+      partnerName: perk.website || perk.title,
+    });
+    trackPromise
+      .then(id => { redemptionIdRef.current = id; })
+      .catch(err => console.error('[DetailedPerkCard] trackPerkClick failed:', err));
+
+    // Show floating claim notification
+    const toastId = `perk-claim-${perk.id}-${Date.now()}`;
+    toast.custom(
+      (id) => (
+        <PerkClaimNotification
+          toastId={id}
+          perkName={perk.title}
+          partnerName={perk.website || perk.title}
+          savedAmount={parseDiscountAmount(perk.discount)}
+          discount={perk.discount}
+          onClaim={async () => {
+            toast.dismiss(id);
+            try {
+              // Wait for redemptionId if not yet available
+              const redemptionId = redemptionIdRef.current
+                ?? await trackPromise.catch(() => null);
+              if (redemptionId && user) {
+                await serviceClaimPerk(redemptionId, user.$id);
+                toast.success('Savings recorded!', {
+                  description: `${perk.title} marked as used.`,
+                });
+              }
+            } catch (err) {
+              console.error('[DetailedPerkCard] claim failed:', err);
+              toast.error('Could not record claim. Try again later.');
+            }
+          }}
+          onDismiss={() => toast.dismiss(id)}
+        />
+      ),
+      { id: toastId, duration: 30000 }
+    );
+  };
 
   const categoryClass =
     categoryColors[perk.category as keyof typeof categoryColors] ??
@@ -186,6 +385,7 @@ export function DetailedPerkCard({ perk, isOpen, onClose, onSaveChange }: Detail
       open={isOpen}
       onOpenChange={(open: boolean) => {
         if (!open) {
+          redemptionIdRef.current = null;
           onClose();
         }
       }}
@@ -274,16 +474,15 @@ export function DetailedPerkCard({ perk, isOpen, onClose, onSaveChange }: Detail
             <div className="flex-shrink-0 p-6 border-t-2 border-border bg-card backdrop-blur-sm shadow-lg">
               <div className="flex flex-col sm:flex-row gap-3">
                 {perk.claimLink && perk.claimLink.trim() !== '' ? (
-                  <a
-                    href={perk.claimLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex-1 ${getCategoryButtonColor()} text-white font-semibold h-16 text-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg flex items-center justify-center gap-2 no-underline`}
+                  <button
+                    onClick={handleApplyNow}
+                    type="button"
+                    className={`flex-1 ${getCategoryButtonColor()} text-white font-semibold h-16 text-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg flex items-center justify-center gap-2`}
                   >
                     <Gift className="w-6 h-6" />
                     <span>Apply Now</span>
                     <ExternalLink className="w-5 h-5" />
-                  </a>
+                  </button>
                 ) : (
                   <button
                     disabled
@@ -307,24 +506,15 @@ export function DetailedPerkCard({ perk, isOpen, onClose, onSaveChange }: Detail
                   type="button"
                 >
                   {isSaving(perk.id) ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Saving...
-                    </>
+                    <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Saving...</>
                   ) : isSaved(perk.id) ? (
-                    <>
-                      <Bookmark className="w-5 h-5 mr-2 fill-current" />
-                      Saved ✓
-                    </>
+                    <><Bookmark className="w-5 h-5 mr-2 fill-current" />Saved ✓</>
                   ) : (
-                    <>
-                      <Bookmark className="w-5 h-5 mr-2" />
-                      Save for Later
-                    </>
+                    <><Bookmark className="w-5 h-5 mr-2" />Save for Later</>
                   )}
                 </Button>
               </div>
-              
+
               <button
                 type="button"
                 onClick={onClose}
