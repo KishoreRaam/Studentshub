@@ -1,6 +1,6 @@
 title,category,description,DiscountOffer,VerificationMethod,validity,claimlink,isActive
 StudentGithub Pack,Learning,"Github offers wide range of benfits , from coding to learning to deploying ",See details,Studentemail,4 years (renewable),https://education.github.com/pack,True
-Apple Music,Entertainment,"Ad-free music, downloads",See details,"Studentemail ",While enrolled,https://www.apple.com/in/apple-music/,False
+Apple Music,Entertainment,"Ad-free music, downloads",See details,"Studentemail ",While enrolled,https://www.apple.com/in/apple-music/,True
 Amazon Prime Student,Entertainment,"Prime Video, Music, Delivery",See details,Studentemail,4 years (renewable),https://www.amazon.in/prime/student,False
 Disney+ Hotstar,Entertainment,"Movies, TV, sports streaming",See details,"SheerID ",While enrolled,https://www.hotstar.com/in/,True
 Hulu,Entertainment,U.S. TV & movies,See details,SheerID,While enrolled,https://www.hulu.com/,True
