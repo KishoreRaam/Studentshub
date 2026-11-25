@@ -1,5 +1,5 @@
 title,category,description,DiscountOffer,VerificationMethod,validity,claimlink,isActive
-StudentGithub Pack,Learning,"Github offers wide range of benfits , from coding to learning to deploying ",See details,Studentemail,4 years (renewable),https://education.github.com/pack,True
+StudentGithub Pack,Learning,"Github offers wide range of benfits , from coding to learning to deploying ",See details,Studentemail,4 years (renewable),https://education.github.com/pack,False
 Apple Music,Entertainment,"Ad-free music, downloads",See details,"Studentemail ",While enrolled,https://www.apple.com/in/apple-music/,True
 Amazon Prime Student,Entertainment,"Prime Video, Music, Delivery",See details,Studentemail,4 years (renewable),https://www.amazon.in/prime/student,False
 Disney+ Hotstar,Entertainment,"Movies, TV, sports streaming",See details,"SheerID ",While enrolled,https://www.hotstar.com/in/,True
@@ -28,7 +28,7 @@ Udemy,Learning,Online courses,See details,Studentemail,While enrolled,https://ww
 LinkedIn Learning,Learning,Professional courses,See details,Studentemail,While enrolled,https://www.linkedin.com/learning/,True
 Air India,Travel,Domestic/Int’l flights,See details,Studentemail,Under 26 or enrolled,https://www.airindia.com,False
 IndiGo,Travel,Domestic flights,See details,Studentemail,While enrolled,https://www.goindigo.in/,False
-British Airways,Travel,Int’l flights,See details,"Studentemail ",While enrolled,https://www.britishairways.com/travel/student-fares/public/en_gb,True
+British Airways,Travel,Int’l flights,See details,"Studentemail ",While enrolled,https://www.britishairways.com/travel/student-fares/public/en_gb,False
 Emirates,Travel,Int’l flights,See details,"Studentemail ",While enrolled,https://www.emirates.com/in/english/plan-book/fare-types/student-fares/,False
 Pizza Hut,Food/Dining,"Pizza, combos",See details,Studentemail,While enrolled,https://www.pizzahut.co.in/,True
 Domino’s Pizza,Food/Dining,"Pizza, combos, meals",See details,Studentemail,While enrolled,https://www.dominos.co.in/,True
